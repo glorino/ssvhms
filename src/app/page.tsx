@@ -22,10 +22,10 @@ const quickActions = [
 ]
 
 const departments = [
-  { icon: Heart, name: "Cardiology", count: "2 Specialists", href: "/doctors" },
-  { icon: Stethoscope, name: "General Medicine", count: "4 Specialists", href: "/doctors" },
-  { icon: Activity, name: "Neurology", count: "1 Specialist", href: "/doctors" },
-  { icon: Pill, name: "Pharmacy", count: "3 Pharmacists", href: "/pharmacy" },
+  { icon: Heart, name: "Cardiology", count: "2 Specialists", href: "/login" },
+  { icon: Stethoscope, name: "General Medicine", count: "4 Specialists", href: "/login" },
+  { icon: Activity, name: "Neurology", count: "1 Specialist", href: "/login" },
+  { icon: Pill, name: "Pharmacy", count: "3 Pharmacists", href: "/login" },
 ]
 
 const stats = [
