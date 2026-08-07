@@ -20,7 +20,13 @@ import {
   Clock,
   ArrowRight,
   MapPin,
-  ChevronDown,
+  Star,
+  ChevronRight,
+  Activity,
+  Zap,
+  Calendar,
+  FileText,
+  CheckCircle,
 } from "lucide-react"
 
 const demoUsers = [
@@ -30,6 +36,20 @@ const demoUsers = [
   { email: "nurse@hospital.com", role: "Nurse", icon: Heart, color: "bg-pink-500" },
   { email: "pharmacist@hospital.com", role: "Pharmacist", icon: Pill, color: "bg-violet-500" },
   { email: "pathologist@hospital.com", role: "Pathologist", icon: FlaskConical, color: "bg-amber-500" },
+]
+
+const departments = [
+  { icon: Heart, name: "Cardiology", desc: "Expert heart care", color: "text-red-500" },
+  { icon: Stethoscope, name: "General Medicine", desc: "Primary healthcare", color: "text-blue-500" },
+  { icon: Activity, name: "Neurology", desc: "Brain & nerve care", color: "text-purple-500" },
+  { icon: Pill, name: "Pharmacy", desc: "24/7 medication", color: "text-green-500" },
+]
+
+const stats = [
+  { value: "10K+", label: "Happy Patients" },
+  { value: "200+", label: "Expert Doctors" },
+  { value: "50+", label: "Departments" },
+  { value: "24/7", label: "Emergency Care" },
 ]
 
 export default function LoginPage() {
@@ -44,7 +64,6 @@ export default function LoginPage() {
     e.preventDefault()
     setIsLoading(true)
     setError("")
-
     try {
       const result = await signIn("credentials", { email, password, redirect: false })
       if (result?.error) {
@@ -60,9 +79,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-white">
       {/* Top Bar */}
-      <div className="bg-[#0f766e] text-white text-sm">
+      <div className="bg-[#0f766e] text-white text-xs">
         <div className="max-w-7xl mx-auto px-6 py-2 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <span className="flex items-center gap-1.5">
@@ -84,8 +103,8 @@ export default function LoginPage() {
       </div>
 
       {/* Header */}
-      <header className="bg-white border-b border-gray-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <header className="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#0f766e] to-[#14b8a6] flex items-center justify-center shadow-md">
               <Heart className="h-5 w-5 text-white" fill="white" />
@@ -97,34 +116,34 @@ export default function LoginPage() {
           </div>
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
             <a href="#" className="hover:text-[#0f766e] transition-colors">Home</a>
-            <a href="#" className="hover:text-[#0f766e] transition-colors">Departments</a>
-            <a href="#" className="hover:text-[#0f766e] transition-colors">Doctors</a>
-            <a href="#" className="hover:text-[#0f766e] transition-colors">Contact</a>
+            <a href="#departments" className="hover:text-[#0f766e] transition-colors">Departments</a>
+            <a href="#about" className="hover:text-[#0f766e] transition-colors">About</a>
+            <a href="#contact" className="hover:text-[#0f766e] transition-colors">Contact</a>
           </nav>
-          <a
-            href="#"
+          <button
+            onClick={() => document.getElementById("login-section")?.scrollIntoView({ behavior: "smooth" })}
             className="flex items-center gap-2 bg-[#0f766e] hover:bg-[#0d6d65] text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors shadow-sm"
           >
-            Book Appointment
+            Sign In
             <ArrowRight className="h-4 w-4" />
-          </a>
+          </button>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 relative">
+      {/* Hero + Login Section */}
+      <section id="login-section" className="relative min-h-[600px]">
         {/* Background */}
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=1920&q=80&auto=format&fit=crop"
+            src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1920&q=80&auto=format&fit=crop"
             alt="Hospital"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/80 via-gray-900/50 to-gray-900/30" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0f766e]/90 via-[#0f766e]/70 to-[#0f766e]/40" />
         </div>
 
         {/* Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-16 lg:py-24 flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-20 flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
           {/* Left - Hero Text */}
           <div className="flex-1 text-white">
             <motion.div
@@ -132,16 +151,16 @@ export default function LoginPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <span className="inline-block bg-white/15 backdrop-blur-sm text-white/90 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
+              <span className="inline-block bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-4 py-1.5 rounded-full mb-6">
                 Trusted by 10,000+ Patients
               </span>
-              <h1 className="text-4xl lg:text-5xl font-bold leading-tight mb-4">
+              <h1 className="text-4xl lg:text-[56px] font-bold leading-[1.1] mb-5">
                 World-class care,
                 <br />
                 close to home
               </h1>
-              <p className="text-lg text-white/75 mb-8 max-w-lg leading-relaxed">
-                Experience exceptional healthcare with our team of expert doctors, 
+              <p className="text-lg text-white/80 mb-8 max-w-lg leading-relaxed">
+                Experience exceptional healthcare with our team of expert doctors,
                 cutting-edge technology, and compassionate care.
               </p>
             </motion.div>
@@ -150,18 +169,16 @@ export default function LoginPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="flex flex-wrap gap-6"
+              className="flex flex-wrap gap-5"
             >
               {[
                 { icon: Shield, label: "NABH Certified" },
                 { icon: Clock, label: "24/7 Emergency" },
                 { icon: Stethoscope, label: "Expert Doctors" },
               ].map((item) => (
-                <div key={item.label} className="flex items-center gap-2 text-white/80">
-                  <div className="h-8 w-8 rounded-lg bg-white/10 flex items-center justify-center">
-                    <item.icon className="h-4 w-4" />
-                  </div>
-                  <span className="text-sm font-medium">{item.label}</span>
+                <div key={item.label} className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2.5">
+                  <item.icon className="h-4 w-4 text-white" />
+                  <span className="text-sm font-medium text-white">{item.label}</span>
                 </div>
               ))}
             </motion.div>
@@ -172,13 +189,13 @@ export default function LoginPage() {
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="w-full max-w-md"
+            className="w-full max-w-[440px] flex-shrink-0"
           >
             <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
               {/* Card Header */}
-              <div className="bg-gradient-to-r from-[#0f766e] to-[#14b8a6] px-8 py-6">
+              <div className="bg-gradient-to-r from-[#0f766e] to-[#14b8a6] px-8 py-5">
                 <h2 className="text-xl font-bold text-white">Welcome back</h2>
-                <p className="text-white/80 text-sm mt-1">Sign in to your account</p>
+                <p className="text-white/80 text-sm mt-0.5">Sign in to your account to continue</p>
               </div>
 
               {/* Card Body */}
@@ -189,7 +206,7 @@ export default function LoginPage() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="mb-5 overflow-hidden"
+                      className="mb-4 overflow-hidden"
                     >
                       <div className="p-3 rounded-lg bg-red-50 border border-red-100 text-red-600 text-sm">
                         {error}
@@ -200,9 +217,7 @@ export default function LoginPage() {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Email address
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Email address</label>
                     <div className="relative">
                       <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] text-gray-400 pointer-events-none" />
                       <input
@@ -217,9 +232,7 @@ export default function LoginPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Password
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
                     <div className="relative">
                       <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] text-gray-400 pointer-events-none" />
                       <input
@@ -241,13 +254,11 @@ export default function LoginPage() {
                   </div>
 
                   <div className="flex items-center justify-between text-sm">
-                    <label className="flex items-center gap-2 text-gray-600">
+                    <label className="flex items-center gap-2 text-gray-600 cursor-pointer">
                       <input type="checkbox" className="rounded border-gray-300 text-[#0f766e] focus:ring-[#0f766e]" />
                       Remember me
                     </label>
-                    <a href="#" className="text-[#0f766e] hover:underline font-medium">
-                      Forgot password?
-                    </a>
+                    <a href="#" className="text-[#0f766e] hover:underline font-medium">Forgot password?</a>
                   </div>
 
                   <motion.button
@@ -258,26 +269,18 @@ export default function LoginPage() {
                     className="w-full py-2.5 px-4 bg-gradient-to-r from-[#0f766e] to-[#14b8a6] text-white rounded-lg font-semibold hover:from-[#0d6d65] hover:to-[#0f766e] focus:ring-4 focus:ring-teal-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md shadow-teal-500/20"
                   >
                     {isLoading ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Signing in...
-                      </>
+                      <><Loader2 className="h-4 w-4 animate-spin" />Signing in...</>
                     ) : (
-                      <>
-                        Sign in
-                        <ArrowRight className="h-4 w-4" />
-                      </>
+                      <><span>Sign in</span><ArrowRight className="h-4 w-4" /></>
                     )}
                   </motion.button>
                 </form>
 
                 {/* Quick Access */}
-                <div className="mt-6">
+                <div className="mt-5">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="h-px flex-1 bg-gray-100" />
-                    <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
-                      Quick Access
-                    </span>
+                    <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Quick Access</span>
                     <div className="h-px flex-1 bg-gray-100" />
                   </div>
 
@@ -313,21 +316,153 @@ export default function LoginPage() {
             </div>
           </motion.div>
         </div>
-      </main>
+      </section>
+
+      {/* Stats Bar */}
+      <section className="bg-gray-50 border-y border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 py-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat) => (
+              <div key={stat.label} className="text-center">
+                <p className="text-3xl font-bold text-[#0f766e]">{stat.value}</p>
+                <p className="text-sm text-gray-500 mt-1">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Departments */}
+      <section id="departments" className="py-16">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <span className="text-[#0f766e] font-semibold text-sm uppercase tracking-wider">Our Services</span>
+            <h2 className="text-3xl font-bold text-gray-900 mt-2">Departments</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {departments.map((dept) => (
+              <div key={dept.name} className="bg-white rounded-xl border border-gray-100 p-6 hover:shadow-lg hover:border-gray-200 transition-all cursor-pointer group">
+                <div className={`h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center mb-4 group-hover:bg-[#0f766e]/10 transition-colors`}>
+                  <dept.icon className={`h-6 w-6 ${dept.color}`} />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-1">{dept.name}</h3>
+                <p className="text-sm text-gray-500">{dept.desc}</p>
+                <div className="flex items-center gap-1 mt-3 text-[#0f766e] text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                  Learn more <ChevronRight className="h-3.5 w-3.5" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* About / Features */}
+      <section id="about" className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <span className="text-[#0f766e] font-semibold text-sm uppercase tracking-wider">Why Choose Us</span>
+              <h2 className="text-3xl font-bold text-gray-900 mt-2 mb-6">Trusted care, measurable results</h2>
+              <p className="text-gray-600 mb-8 leading-relaxed">
+                Our hospital combines cutting-edge medical technology with compassionate care to deliver the best outcomes for every patient.
+              </p>
+              <div className="space-y-4">
+                {[
+                  { icon: CheckCircle, text: "NABL accredited laboratory" },
+                  { icon: CheckCircle, text: "Cashless insurance on 38+ providers" },
+                  { icon: CheckCircle, text: "Same-day lab reports via WhatsApp" },
+                  { icon: CheckCircle, text: "Online appointment booking" },
+                ].map((item) => (
+                  <div key={item.text} className="flex items-center gap-3">
+                    <item.icon className="h-5 w-5 text-[#0f766e] flex-shrink-0" />
+                    <span className="text-gray-700">{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="relative">
+              <img
+                src="https://images.unsplash.com/photo-1551076805-e1869033e561?w=800&q=80&auto=format&fit=crop"
+                alt="Hospital"
+                className="rounded-2xl shadow-xl w-full"
+              />
+              <div className="absolute -bottom-6 -left-6 bg-white rounded-xl shadow-lg p-5 flex items-center gap-4">
+                <div className="h-12 w-12 rounded-xl bg-[#0f766e]/10 flex items-center justify-center">
+                  <Star className="h-6 w-6 text-[#0f766e]" fill="#0f766e" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-gray-900">4.9</p>
+                  <p className="text-xs text-gray-500">Patient Rating</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section id="contact" className="py-16">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="bg-gradient-to-r from-[#0f766e] to-[#14b8a6] rounded-2xl px-10 py-12 text-center text-white">
+            <h2 className="text-3xl font-bold mb-3">Ready to Book?</h2>
+            <p className="text-white/80 mb-6 max-w-md mx-auto">
+              Schedule your appointment today and experience world-class healthcare.
+            </p>
+            <button
+              onClick={() => document.getElementById("login-section")?.scrollIntoView({ behavior: "smooth" })}
+              className="inline-flex items-center gap-2 bg-white text-[#0f766e] font-semibold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors shadow-lg"
+            >
+              Get Started
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 text-sm">
-        <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-[#0f766e] to-[#14b8a6] flex items-center justify-center">
-              <Heart className="h-3.5 w-3.5 text-white" fill="white" />
+        <div className="max-w-7xl mx-auto px-6 py-10">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#0f766e] to-[#14b8a6] flex items-center justify-center">
+                  <Heart className="h-4 w-4 text-white" fill="white" />
+                </div>
+                <span className="font-bold text-white">SSVHMS</span>
+              </div>
+              <p className="text-sm leading-relaxed">Smart System for Hospital Management. Delivering exceptional healthcare since 2020.</p>
             </div>
-            <span className="font-semibold text-white">SSVHMS</span>
+            <div>
+              <h4 className="font-semibold text-white mb-3">Quick Links</h4>
+              <div className="space-y-2">
+                <a href="#" className="block hover:text-white transition-colors">Home</a>
+                <a href="#departments" className="block hover:text-white transition-colors">Departments</a>
+                <a href="#about" className="block hover:text-white transition-colors">About Us</a>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-semibold text-white mb-3">Services</h4>
+              <div className="space-y-2">
+                <a href="#" className="block hover:text-white transition-colors">Appointments</a>
+                <a href="#" className="block hover:text-white transition-colors">Lab Reports</a>
+                <a href="#" className="block hover:text-white transition-colors">Emergency</a>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-semibold text-white mb-3">Contact</h4>
+              <div className="space-y-2">
+                <p>25 Kings Street, CA</p>
+                <p>+1 (555) 123-4567</p>
+                <p>info@ssvhms.com</p>
+              </div>
+            </div>
           </div>
-          <p>© 2026 Smart System for Hospital Management. All rights reserved.</p>
-          <div className="flex items-center gap-4">
-            <a href="#" className="hover:text-white transition-colors">Privacy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms</a>
+          <div className="border-t border-gray-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>© 2026 SSVHMS. All rights reserved.</p>
+            <div className="flex items-center gap-4">
+              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+            </div>
           </div>
         </div>
       </footer>
