@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState } from "react"
 import { useSession, signOut } from "next-auth/react"
@@ -10,7 +10,7 @@ const notifications = [
   { id: 1, title: "New patient registered", message: "Rajesh Kumar has been added", time: "5 min ago", read: false },
   { id: 2, title: "Appointment confirmed", message: "Dr. Priya Sharma - 10:00 AM", time: "15 min ago", read: false },
   { id: 3, title: "Lab results ready", message: "CBC test completed for Anita Patel", time: "1 hour ago", read: true },
-  { id: 4, title: "Payment received", message: "₹15,000 from Suresh Reddy", time: "2 hours ago", read: true },
+  { id: 4, title: "Payment received", message: "₦15,000 from Suresh Reddy", time: "2 hours ago", read: true },
   { id: 5, title: "Bed status update", message: "ICU-03 now available", time: "3 hours ago", read: true },
 ]
 

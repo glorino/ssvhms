@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState } from "react"
 import Link from "next/link"
@@ -37,7 +37,7 @@ const statsData = [
   { title: "Total Medicines", value: "6", icon: Pill, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/30" },
   { title: "Total Stock Units", value: "1,285", icon: Package, gradient: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/30" },
   { title: "Low Stock Alert", value: "2", icon: AlertTriangle, gradient: "from-rose-500 to-pink-600", shadow: "shadow-rose-500/30" },
-  { title: "Today Sales", value: "₹1,580", icon: TrendingUp, gradient: "from-violet-500 to-purple-600", shadow: "shadow-violet-500/30" },
+  { title: "Today Sales", value: "₦1,580", icon: TrendingUp, gradient: "from-violet-500 to-purple-600", shadow: "shadow-violet-500/30" },
 ]
 
 export default function PharmacyPage() {
@@ -140,7 +140,7 @@ export default function PharmacyPage() {
                           <TableCell><Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200">{med.category}</Badge></TableCell>
                           <TableCell className="text-slate-600">{med.batchNo}</TableCell>
                           <td className="text-right"><span className={med.stock < med.minStock ? "text-rose-600 font-bold" : "text-slate-700 font-medium"}>{med.stock}</span></td>
-                          <td className="text-right font-medium text-slate-700">₹{med.sellingPrice}</td>
+                          <td className="text-right font-medium text-slate-700">₦{med.sellingPrice}</td>
                           <TableCell className="text-slate-600">{med.expiryDate}</TableCell>
                           <TableCell>
                             <Badge variant={med.status === "In Stock" ? "success" : "destructive"} className={med.status === "In Stock" ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-red-100 text-red-700 border-red-200"}>
@@ -199,8 +199,8 @@ export default function PharmacyPage() {
                           <TableCell className="text-slate-600">{pur.supplier}</TableCell>
                           <TableCell className="text-slate-600">{pur.invoiceNo}</TableCell>
                           <TableCell className="text-slate-600">{pur.date}</TableCell>
-                          <td className="text-right font-medium text-slate-700">₹{pur.totalAmount.toLocaleString()}</td>
-                          <td className="text-right font-medium text-slate-700">₹{pur.paidAmount.toLocaleString()}</td>
+                          <td className="text-right font-medium text-slate-700">₦{pur.totalAmount.toLocaleString()}</td>
+                          <td className="text-right font-medium text-slate-700">₦{pur.paidAmount.toLocaleString()}</td>
                           <TableCell>
                             <Badge variant={pur.status === "Paid" ? "success" : "warning"} className={pur.status === "Paid" ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-amber-100 text-amber-700 border-amber-200"}>
                               {pur.status}
@@ -245,8 +245,8 @@ export default function PharmacyPage() {
                           <TableCell className="text-slate-600">{sale.patient}</TableCell>
                           <TableCell className="text-slate-600">{sale.items}</TableCell>
                           <TableCell className="text-slate-600">{sale.date}</TableCell>
-                          <td className="text-right font-medium text-slate-700">₹{sale.totalAmount.toLocaleString()}</td>
-                          <td className="text-right font-medium text-slate-700">₹{sale.paidAmount.toLocaleString()}</td>
+                          <td className="text-right font-medium text-slate-700">₦{sale.totalAmount.toLocaleString()}</td>
+                          <td className="text-right font-medium text-slate-700">₦{sale.paidAmount.toLocaleString()}</td>
                           <TableCell>
                             <Badge variant={sale.status === "Paid" ? "success" : "warning"} className={sale.status === "Paid" ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-amber-100 text-amber-700 border-amber-200"}>
                               {sale.status}

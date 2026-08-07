@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React from "react"
 import Link from "next/link"
@@ -29,7 +29,7 @@ const patientStats = [
   { title: "Upcoming Appointments", value: "3", icon: Calendar, gradient: "from-blue-500 to-cyan-500" },
   { title: "Active Prescriptions", value: "5", icon: Pill, gradient: "from-violet-500 to-purple-500" },
   { title: "Pending Reports", value: "2", icon: FlaskConical, gradient: "from-amber-500 to-orange-500" },
-  { title: "Outstanding Bills", value: "₹4,500", icon: CreditCard, gradient: "from-rose-500 to-pink-500" },
+  { title: "Outstanding Bills", value: "₦4,500", icon: CreditCard, gradient: "from-rose-500 to-pink-500" },
 ]
 
 const appointments = [

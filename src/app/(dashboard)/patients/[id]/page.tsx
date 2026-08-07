@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React from "react"
 import Link from "next/link"
@@ -396,8 +396,8 @@ export default function PatientDetailPage() {
                       <TableCell className="font-medium">{bill.id}</TableCell>
                       <TableCell>{bill.date}</TableCell>
                       <TableCell>{bill.type}</TableCell>
-                      <TableCell>₹{bill.amount.toLocaleString()}</TableCell>
-                      <TableCell>₹{bill.paid.toLocaleString()}</TableCell>
+                      <TableCell>₦{bill.amount.toLocaleString()}</TableCell>
+                      <TableCell>₦{bill.paid.toLocaleString()}</TableCell>
                       <TableCell>
                         <Badge variant="success">{bill.status}</Badge>
                       </TableCell>

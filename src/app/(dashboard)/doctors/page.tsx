@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState } from "react"
 import Link from "next/link"
@@ -144,7 +144,7 @@ export default function DoctorsPage() {
                           </div>
                           <div className="flex items-center justify-between text-sm">
                             <span className="text-slate-500">Fee</span>
-                            <span className="font-semibold text-slate-800">₹{doctor.consultationFee}</span>
+                            <span className="font-semibold text-slate-800">₦{doctor.consultationFee}</span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
                             <span className="text-slate-500">Rating</span>

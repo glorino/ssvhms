@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState } from "react"
 import Link from "next/link"
@@ -25,9 +25,9 @@ const totalCollected = bills.reduce((acc, bill) => acc + Number(bill.paidAmount)
 const totalPending = bills.reduce((acc, bill) => acc + Number(bill.dueAmount), 0)
 
 const statsData = [
-  { title: "Total Revenue", value: `₹${totalRevenue.toLocaleString()}`, icon: IndianRupee, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/30" },
-  { title: "Collected", value: `₹${totalCollected.toLocaleString()}`, icon: CheckCircle, gradient: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/30" },
-  { title: "Pending", value: `₹${totalPending.toLocaleString()}`, icon: AlertCircle, gradient: "from-rose-500 to-pink-600", shadow: "shadow-rose-500/30" },
+  { title: "Total Revenue", value: `₦${totalRevenue.toLocaleString()}`, icon: IndianRupee, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/30" },
+  { title: "Collected", value: `₦${totalCollected.toLocaleString()}`, icon: CheckCircle, gradient: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/30" },
+  { title: "Pending", value: `₦${totalPending.toLocaleString()}`, icon: AlertCircle, gradient: "from-rose-500 to-pink-600", shadow: "shadow-rose-500/30" },
   { title: "Total Bills", value: "6", icon: FileText, gradient: "from-violet-500 to-purple-600", shadow: "shadow-violet-500/30" },
 ]
 
@@ -121,9 +121,9 @@ export default function BillingPage() {
                       </TableCell>
                       <TableCell><Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200">{bill.billType}</Badge></TableCell>
                       <TableCell className="text-slate-600">{bill.billDate}</TableCell>
-                      <td className="text-right font-medium text-slate-700">₹{Number(bill.totalAmount).toLocaleString()}</td>
-                      <td className="text-right font-medium text-emerald-600">₹{Number(bill.paidAmount).toLocaleString()}</td>
-                      <td className="text-right font-medium text-rose-600">₹{Number(bill.dueAmount).toLocaleString()}</td>
+                      <td className="text-right font-medium text-slate-700">₦{Number(bill.totalAmount).toLocaleString()}</td>
+                      <td className="text-right font-medium text-emerald-600">₦{Number(bill.paidAmount).toLocaleString()}</td>
+                      <td className="text-right font-medium text-rose-600">₦{Number(bill.dueAmount).toLocaleString()}</td>
                       <TableCell>
                         <Badge variant={bill.paymentStatus === "Paid" ? "success" : bill.paymentStatus === "Partial" ? "warning" : "destructive"} className={
                           bill.paymentStatus === "Paid" ? "bg-emerald-100 text-emerald-700 border-emerald-200" :

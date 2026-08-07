@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState } from "react"
 import Link from "next/link"
@@ -59,7 +59,7 @@ const stats = [
   },
   {
     title: "Monthly Payroll",
-    value: "₹3,63,000",
+    value: "₦3,63,000",
     icon: Banknote,
     gradient: "from-purple-500 to-violet-600",
     shadow: "shadow-purple-500/30",
@@ -264,7 +264,7 @@ export default function HRPage() {
                           </TableCell>
                           <TableCell className="text-slate-600">{s.joiningDate}</TableCell>
                           <TableCell className="text-slate-600">{s.contact}</TableCell>
-                          <TableCell className="text-slate-700 font-medium">₹{s.salary.toLocaleString()}</TableCell>
+                          <TableCell className="text-slate-700 font-medium">₦{s.salary.toLocaleString()}</TableCell>
                           <TableCell>
                             <Badge
                               variant={s.status === "Active" ? "success" : "warning"}
@@ -526,10 +526,10 @@ export default function HRPage() {
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell className="text-slate-700">₹{pay.basic.toLocaleString()}</TableCell>
-                          <TableCell className="text-slate-700">₹{pay.allowances.toLocaleString()}</TableCell>
-                          <TableCell className="text-red-600 font-medium">₹{pay.deductions.toLocaleString()}</TableCell>
-                          <TableCell className="text-right font-bold text-slate-900">₹{pay.netPay.toLocaleString()}</TableCell>
+                          <TableCell className="text-slate-700">₦{pay.basic.toLocaleString()}</TableCell>
+                          <TableCell className="text-slate-700">₦{pay.allowances.toLocaleString()}</TableCell>
+                          <TableCell className="text-red-600 font-medium">₦{pay.deductions.toLocaleString()}</TableCell>
+                          <TableCell className="text-right font-bold text-slate-900">₦{pay.netPay.toLocaleString()}</TableCell>
                           <TableCell>
                             <Badge
                               variant={pay.status === "Paid" ? "success" : "warning"}

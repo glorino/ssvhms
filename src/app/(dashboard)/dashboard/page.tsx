@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React from "react"
 import Link from "next/link"
@@ -14,9 +14,9 @@ const stats = [
   { title: "Total Patients", value: "12,847", change: "+12.5%", trend: "up" as const, icon: Users, gradient: "linear-gradient(135deg, #3b82f6, #06b6d4)" },
   { title: "Appointments", value: "48", change: "+8.2%", trend: "up" as const, icon: Calendar, gradient: "linear-gradient(135deg, #8b5cf6, #a855f7)" },
   { title: "Active Doctors", value: "32", change: "+2.1%", trend: "up" as const, icon: Stethoscope, gradient: "linear-gradient(135deg, #0f766e, #14b8a6)" },
-  { title: "Revenue Today", value: "₹2,84,500", change: "+15.3%", trend: "up" as const, icon: CreditCard, gradient: "linear-gradient(135deg, #f59e0b, #f97316)" },
+  { title: "Revenue Today", value: "₦2,84,500", change: "+15.3%", trend: "up" as const, icon: CreditCard, gradient: "linear-gradient(135deg, #f59e0b, #f97316)" },
   { title: "Beds Occupied", value: "156/200", change: "78%", trend: "neutral" as const, icon: BedDouble, gradient: "linear-gradient(135deg, #f43f5e, #ec4899)" },
-  { title: "Pending Bills", value: "₹4,25,000", change: "-5.2%", trend: "down" as const, icon: TrendingUp, gradient: "linear-gradient(135deg, #ef4444, #f97316)" },
+  { title: "Pending Bills", value: "₦4,25,000", change: "-5.2%", trend: "down" as const, icon: TrendingUp, gradient: "linear-gradient(135deg, #ef4444, #f97316)" },
 ]
 
 const recentAppointments = [
@@ -37,10 +37,10 @@ const bedStatus = [
 ]
 
 const departments = [
-  { name: "Cardiology", patients: 45, revenue: "₹4,50,000", icon: Heart, color: "linear-gradient(135deg, #ef4444, #ec4899)" },
-  { name: "Neurology", patients: 28, revenue: "₹5,10,000", icon: Brain, color: "linear-gradient(135deg, #8b5cf6, #a855f7)" },
-  { name: "Orthopedics", patients: 38, revenue: "₹3,20,000", icon: Bone, color: "linear-gradient(135deg, #3b82f6, #06b6d4)" },
-  { name: "Ophthalmology", patients: 22, revenue: "₹1,80,000", icon: Eye, color: "linear-gradient(135deg, #0f766e, #14b8a6)" },
+  { name: "Cardiology", patients: 45, revenue: "₦4,50,000", icon: Heart, color: "linear-gradient(135deg, #ef4444, #ec4899)" },
+  { name: "Neurology", patients: 28, revenue: "₦5,10,000", icon: Brain, color: "linear-gradient(135deg, #8b5cf6, #a855f7)" },
+  { name: "Orthopedics", patients: 38, revenue: "₦3,20,000", icon: Bone, color: "linear-gradient(135deg, #3b82f6, #06b6d4)" },
+  { name: "Ophthalmology", patients: 22, revenue: "₦1,80,000", icon: Eye, color: "linear-gradient(135deg, #0f766e, #14b8a6)" },
 ]
 
 const quickActions = [
