@@ -80,7 +80,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex bg-white" style={{ paddingLeft: '24px', paddingBottom: '24px' }}>
+    <div className="min-h-screen flex bg-white">
       {/* Left Side */}
       <div className="hidden lg:flex lg:w-[52%] relative overflow-hidden bg-gradient-to-br from-[#4f46e5] via-[#6366f1] to-[#8b5cf6]">
         {/* Background decoration */}
@@ -93,7 +93,7 @@ export default function LoginPage() {
           }} />
         </div>
 
-        <div className="relative z-10 flex flex-col w-full p-10 lg:p-14">
+        <div className="relative z-10 flex flex-col w-full p-16 lg:p-20">
           {/* Logo */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
