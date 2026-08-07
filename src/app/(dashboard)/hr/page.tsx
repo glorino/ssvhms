@@ -2,13 +2,69 @@
 
 import React, { useState } from "react"
 import Link from "next/link"
-import { Plus, Search, Filter, Download, Eye, Edit, Users, CheckCircle, Clock, AlertCircle, Banknote } from "lucide-react"
+import { motion } from "framer-motion"
+import {
+  Plus,
+  Search,
+  Filter,
+  Download,
+  Eye,
+  Edit,
+  Users,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  Banknote,
+} from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  AnimatedPage,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/animated-wrapper"
+
+const stats = [
+  {
+    title: "Total Staff",
+    value: "6",
+    icon: Users,
+    gradient: "from-indigo-500 to-purple-600",
+    shadow: "shadow-indigo-500/30",
+  },
+  {
+    title: "Active",
+    value: "5",
+    icon: CheckCircle,
+    gradient: "from-emerald-500 to-green-600",
+    shadow: "shadow-emerald-500/30",
+  },
+  {
+    title: "Pending Leaves",
+    value: "2",
+    icon: Clock,
+    gradient: "from-amber-500 to-orange-600",
+    shadow: "shadow-amber-500/30",
+  },
+  {
+    title: "Monthly Payroll",
+    value: "₹3,63,000",
+    icon: Banknote,
+    gradient: "from-purple-500 to-violet-600",
+    shadow: "shadow-purple-500/30",
+  },
+]
 
 const staff = [
   { id: "STF001", employeeId: "EMP2026001", name: "Dr. Priya Sharma", department: "Cardiology", designation: "Senior Doctor", joiningDate: "2020-03-15", contact: "9876543250", email: "priya@ssvhospital.com", salary: 150000, status: "Active" },
@@ -56,251 +112,446 @@ export default function HRPage() {
   const totalPayroll = payroll.reduce((acc, p) => acc + p.netPay, 0)
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Human Resources</h1>
-          <p className="text-slate-500">Manage staff, attendance, leaves, and payroll</p>
+    <AnimatedPage>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              Human Resources
+            </h1>
+            <p className="text-slate-500">Manage staff, attendance, leaves, and payroll</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50">
+              <Download className="mr-2 h-4 w-4" />
+              Export
+            </Button>
+            <Link href="/hr/staff/new">
+              <Button
+                size="sm"
+                className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/30"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Add Staff
+              </Button>
+            </Link>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm"><Download className="mr-2 h-4 w-4" />Export</Button>
-          <Link href="/hr/staff/new"><Button size="sm"><Plus className="mr-2 h-4 w-4" />Add Staff</Button></Link>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-blue-100 p-2"><Users className="h-5 w-5 text-blue-600" /></div>
-              <div><p className="text-2xl font-bold">{staff.length}</p><p className="text-xs text-slate-500">Total Staff</p></div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-green-100 p-2"><CheckCircle className="h-5 w-5 text-green-600" /></div>
-              <div><p className="text-2xl font-bold text-green-600">{activeCount}</p><p className="text-xs text-slate-500">Active</p></div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-yellow-100 p-2"><Clock className="h-5 w-5 text-yellow-600" /></div>
-              <div><p className="text-2xl font-bold text-yellow-600">{pendingLeaves}</p><p className="text-xs text-slate-500">Pending Leaves</p></div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-purple-100 p-2"><Banknote className="h-5 w-5 text-purple-600" /></div>
-              <div><p className="text-2xl font-bold">₹{totalPayroll.toLocaleString()}</p><p className="text-xs text-slate-500">Monthly Payroll</p></div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+        <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+          {stats.map((stat) => (
+            <StaggerItem key={stat.title}>
+              <motion.div whileHover={{ scale: 1.02, y: -2 }} transition={{ type: "spring", stiffness: 300 }}>
+                <Card className={`overflow-hidden shadow-lg ${stat.shadow} hover:shadow-xl transition-shadow duration-300`}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-2xl font-bold">{stat.value}</div>
+                        <p className="text-xs text-slate-500">{stat.title}</p>
+                      </div>
+                      <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg`}>
+                        <stat.icon className="h-6 w-6 text-white" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
 
-      <Tabs defaultValue="staff">
-        <TabsList>
-          <TabsTrigger value="staff">Staff</TabsTrigger>
-          <TabsTrigger value="attendance">Attendance</TabsTrigger>
-          <TabsTrigger value="leaves">Leaves</TabsTrigger>
-          <TabsTrigger value="payroll">Payroll</TabsTrigger>
-        </TabsList>
+        <Tabs defaultValue="staff">
+          <TabsList className="bg-white border border-slate-200 p-1 shadow-sm">
+            <TabsTrigger
+              value="staff"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-md"
+            >
+              Staff
+            </TabsTrigger>
+            <TabsTrigger
+              value="attendance"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-md"
+            >
+              Attendance
+            </TabsTrigger>
+            <TabsTrigger
+              value="leaves"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-md"
+            >
+              Leaves
+            </TabsTrigger>
+            <TabsTrigger
+              value="payroll"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-md"
+            >
+              Payroll
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="staff">
-          <Card>
-            <CardHeader>
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <CardTitle>Staff Directory</CardTitle>
-                <div className="flex items-center gap-2">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 text-slate-400 -translate-y-1/2" />
-                    <Input type="search" placeholder="Search staff..." className="pl-10 w-64" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          <TabsContent value="staff">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Card className="shadow-lg border-0">
+                <CardHeader>
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <CardTitle className="text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                      Staff Directory
+                    </CardTitle>
+                    <div className="flex items-center gap-2">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 text-slate-400 -translate-y-1/2" />
+                        <Input
+                          type="search"
+                          placeholder="Search staff..."
+                          className="pl-10 w-64 border-slate-200 focus:border-indigo-500 focus:ring-indigo-500"
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                      </div>
+                      <Button variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50">
+                        <Filter className="mr-2 h-4 w-4" />
+                        Filter
+                      </Button>
+                    </div>
                   </div>
-                  <Button variant="outline" size="sm"><Filter className="mr-2 h-4 w-4" />Filter</Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Employee ID</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Department</TableHead>
-                    <TableHead>Designation</TableHead>
-                    <TableHead>Joining Date</TableHead>
-                    <TableHead>Contact</TableHead>
-                    <TableHead>Salary</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredStaff.map((s) => (
-                    <TableRow key={s.id}>
-                      <TableCell className="font-medium">{s.employeeId}</TableCell>
-                      <TableCell>
-                        <div><p className="font-medium">{s.name}</p><p className="text-xs text-slate-500">{s.email}</p></div>
-                      </TableCell>
-                      <TableCell>{s.department}</TableCell>
-                      <TableCell><Badge variant="outline">{s.designation}</Badge></TableCell>
-                      <TableCell>{s.joiningDate}</TableCell>
-                      <TableCell>{s.contact}</TableCell>
-                      <TableCell>₹{s.salary.toLocaleString()}</TableCell>
-                      <TableCell>
-                        <Badge variant={s.status === "Active" ? "success" : "warning"}>{s.status}</Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8"><Eye className="h-4 w-4" /></Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8"><Edit className="h-4 w-4" /></Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-slate-100">
+                        <TableHead className="font-semibold text-slate-700">Employee ID</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Name</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Department</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Designation</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Joining Date</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Contact</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Salary</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
+                        <TableHead className="text-right font-semibold text-slate-700">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredStaff.map((s, index) => (
+                        <motion.tr
+                          key={s.id}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="border-slate-100 hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-purple-50/50 transition-colors duration-200"
+                        >
+                          <TableCell className="font-medium text-slate-700">{s.employeeId}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <div className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
+                                <span className="text-xs font-bold text-white">
+                                  {s.name.split(" ").map((n) => n[0]).join("")}
+                                </span>
+                              </div>
+                              <div>
+                                <p className="font-medium text-slate-800">{s.name}</p>
+                                <p className="text-xs text-slate-500">{s.email}</p>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-slate-600">{s.department}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">
+                              {s.designation}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-slate-600">{s.joiningDate}</TableCell>
+                          <TableCell className="text-slate-600">{s.contact}</TableCell>
+                          <TableCell className="text-slate-700 font-medium">₹{s.salary.toLocaleString()}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={s.status === "Active" ? "success" : "warning"}
+                              className={
+                                s.status === "Active"
+                                  ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                                  : "bg-amber-100 text-amber-700 border-amber-200"
+                              }
+                            >
+                              {s.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-indigo-50 hover:text-indigo-600">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-amber-50 hover:text-amber-600">
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </motion.tr>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
 
-        <TabsContent value="attendance">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Today&apos;s Attendance</CardTitle>
-                <Button size="sm"><Clock className="mr-2 h-4 w-4" />Mark Attendance</Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Employee ID</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Clock In</TableHead>
-                    <TableHead>Clock Out</TableHead>
-                    <TableHead>Hours</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {attendance.map((att) => (
-                    <TableRow key={att.id}>
-                      <TableCell className="font-medium">{att.employeeId}</TableCell>
-                      <TableCell>{att.name}</TableCell>
-                      <TableCell>{att.date}</TableCell>
-                      <TableCell>{att.clockIn}</TableCell>
-                      <TableCell>{att.clockOut}</TableCell>
-                      <TableCell>{att.hours}</TableCell>
-                      <TableCell>
-                        <Badge variant={att.status === "Present" ? "success" : att.status === "On Leave" ? "warning" : "destructive"}>{att.status}</Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
+          <TabsContent value="attendance">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Card className="shadow-lg border-0">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                      Today&apos;s Attendance
+                    </CardTitle>
+                    <Button
+                      size="sm"
+                      className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/30"
+                    >
+                      <Clock className="mr-2 h-4 w-4" />
+                      Mark Attendance
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-slate-100">
+                        <TableHead className="font-semibold text-slate-700">Employee ID</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Name</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Date</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Clock In</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Clock Out</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Hours</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {attendance.map((att, index) => (
+                        <motion.tr
+                          key={att.id}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="border-slate-100 hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-purple-50/50 transition-colors duration-200"
+                        >
+                          <TableCell className="font-medium text-slate-700">{att.employeeId}</TableCell>
+                          <TableCell className="text-slate-600">{att.name}</TableCell>
+                          <TableCell className="text-slate-600">{att.date}</TableCell>
+                          <TableCell className="text-slate-600">{att.clockIn}</TableCell>
+                          <TableCell className="text-slate-600">{att.clockOut}</TableCell>
+                          <TableCell className="text-slate-600">{att.hours}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={att.status === "Present" ? "success" : att.status === "On Leave" ? "warning" : "destructive"}
+                              className={
+                                att.status === "Present"
+                                  ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                                  : att.status === "On Leave"
+                                    ? "bg-amber-100 text-amber-700 border-amber-200"
+                                    : "bg-red-100 text-red-700 border-red-200"
+                              }
+                            >
+                              {att.status}
+                            </Badge>
+                          </TableCell>
+                        </motion.tr>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
 
-        <TabsContent value="leaves">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Leave Requests</CardTitle>
-                <Link href="/hr/leave/new"><Button size="sm"><Plus className="mr-2 h-4 w-4" />Apply Leave</Button></Link>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Employee</TableHead>
-                    <TableHead>Leave Type</TableHead>
-                    <TableHead>Start Date</TableHead>
-                    <TableHead>End Date</TableHead>
-                    <TableHead>Days</TableHead>
-                    <TableHead>Reason</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {leaves.map((leave) => (
-                    <TableRow key={leave.id}>
-                      <TableCell>
-                        <div><p className="font-medium">{leave.name}</p><p className="text-xs text-slate-500">{leave.employeeId}</p></div>
-                      </TableCell>
-                      <TableCell><Badge variant="outline">{leave.leaveType}</Badge></TableCell>
-                      <TableCell>{leave.startDate}</TableCell>
-                      <TableCell>{leave.endDate}</TableCell>
-                      <TableCell>{leave.days}</TableCell>
-                      <TableCell className="max-w-[200px] truncate">{leave.reason}</TableCell>
-                      <TableCell>
-                        <Badge variant={leave.status === "Approved" ? "success" : leave.status === "Pending" ? "warning" : "destructive"}>{leave.status}</Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8"><Eye className="h-4 w-4" /></Button>
-                          {leave.status === "Pending" && <Button variant="ghost" size="icon" className="h-8 w-8"><CheckCircle className="h-4 w-4" /></Button>}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
+          <TabsContent value="leaves">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Card className="shadow-lg border-0">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                      Leave Requests
+                    </CardTitle>
+                    <Link href="/hr/leave/new">
+                      <Button
+                        size="sm"
+                        className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/30"
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Apply Leave
+                      </Button>
+                    </Link>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-slate-100">
+                        <TableHead className="font-semibold text-slate-700">Employee</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Leave Type</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Start Date</TableHead>
+                        <TableHead className="font-semibold text-slate-700">End Date</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Days</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Reason</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
+                        <TableHead className="text-right font-semibold text-slate-700">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {leaves.map((leave, index) => (
+                        <motion.tr
+                          key={leave.id}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="border-slate-100 hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-purple-50/50 transition-colors duration-200"
+                        >
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <div className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
+                                <span className="text-xs font-bold text-white">
+                                  {leave.name.split(" ").map((n) => n[0]).join("")}
+                                </span>
+                              </div>
+                              <div>
+                                <p className="font-medium text-slate-800">{leave.name}</p>
+                                <p className="text-xs text-slate-500">{leave.employeeId}</p>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                              {leave.leaveType}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-slate-600">{leave.startDate}</TableCell>
+                          <TableCell className="text-slate-600">{leave.endDate}</TableCell>
+                          <TableCell className="text-slate-700 font-medium">{leave.days}</TableCell>
+                          <TableCell className="max-w-[200px] truncate text-slate-600">{leave.reason}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={leave.status === "Approved" ? "success" : leave.status === "Pending" ? "warning" : "destructive"}
+                              className={
+                                leave.status === "Approved"
+                                  ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                                  : leave.status === "Pending"
+                                    ? "bg-amber-100 text-amber-700 border-amber-200"
+                                    : "bg-red-100 text-red-700 border-red-200"
+                              }
+                            >
+                              {leave.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-1">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-indigo-50 hover:text-indigo-600">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              {leave.status === "Pending" && (
+                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-emerald-50 hover:text-emerald-600">
+                                  <CheckCircle className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </motion.tr>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
 
-        <TabsContent value="payroll">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Payroll - July 2026</CardTitle>
-                <Button size="sm"><Banknote className="mr-2 h-4 w-4" />Process Payroll</Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Employee</TableHead>
-                    <TableHead>Basic</TableHead>
-                    <TableHead>Allowances</TableHead>
-                    <TableHead>Deductions</TableHead>
-                    <TableHead className="text-right">Net Pay</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {payroll.map((pay) => (
-                    <TableRow key={pay.id}>
-                      <TableCell>
-                        <div><p className="font-medium">{pay.name}</p><p className="text-xs text-slate-500">{pay.employeeId}</p></div>
-                      </TableCell>
-                      <TableCell>₹{pay.basic.toLocaleString()}</TableCell>
-                      <TableCell>₹{pay.allowances.toLocaleString()}</TableCell>
-                      <TableCell className="text-red-600">₹{pay.deductions.toLocaleString()}</TableCell>
-                      <TableCell className="text-right font-bold">₹{pay.netPay.toLocaleString()}</TableCell>
-                      <TableCell>
-                        <Badge variant={pay.status === "Paid" ? "success" : "warning"}>{pay.status}</Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+          <TabsContent value="payroll">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Card className="shadow-lg border-0">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                      Payroll - July 2026
+                    </CardTitle>
+                    <Button
+                      size="sm"
+                      className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/30"
+                    >
+                      <Banknote className="mr-2 h-4 w-4" />
+                      Process Payroll
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-slate-100">
+                        <TableHead className="font-semibold text-slate-700">Employee</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Basic</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Allowances</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Deductions</TableHead>
+                        <TableHead className="text-right font-semibold text-slate-700">Net Pay</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {payroll.map((pay, index) => (
+                        <motion.tr
+                          key={pay.id}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="border-slate-100 hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-purple-50/50 transition-colors duration-200"
+                        >
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <div className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
+                                <span className="text-xs font-bold text-white">
+                                  {pay.name.split(" ").map((n) => n[0]).join("")}
+                                </span>
+                              </div>
+                              <div>
+                                <p className="font-medium text-slate-800">{pay.name}</p>
+                                <p className="text-xs text-slate-500">{pay.employeeId}</p>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-slate-700">₹{pay.basic.toLocaleString()}</TableCell>
+                          <TableCell className="text-slate-700">₹{pay.allowances.toLocaleString()}</TableCell>
+                          <TableCell className="text-red-600 font-medium">₹{pay.deductions.toLocaleString()}</TableCell>
+                          <TableCell className="text-right font-bold text-slate-900">₹{pay.netPay.toLocaleString()}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={pay.status === "Paid" ? "success" : "warning"}
+                              className={
+                                pay.status === "Paid"
+                                  ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                                  : "bg-amber-100 text-amber-700 border-amber-200"
+                              }
+                            >
+                              {pay.status}
+                            </Badge>
+                          </TableCell>
+                        </motion.tr>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </AnimatedPage>
   )
 }

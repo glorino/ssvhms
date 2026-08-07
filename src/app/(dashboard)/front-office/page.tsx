@@ -2,13 +2,70 @@
 
 import React, { useState } from "react"
 import Link from "next/link"
-import { Plus, Search, Filter, Download, Eye, Edit, Users, Phone, Mail, Clock, CheckCircle, AlertCircle } from "lucide-react"
+import { motion } from "framer-motion"
+import {
+  Plus,
+  Search,
+  Filter,
+  Download,
+  Eye,
+  Edit,
+  Users,
+  Phone,
+  Mail,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  AnimatedPage,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/animated-wrapper"
+
+const stats = [
+  {
+    title: "Total Visitors",
+    value: "128",
+    icon: Users,
+    gradient: "from-teal-500 to-cyan-600",
+    shadow: "shadow-teal-500/30",
+  },
+  {
+    title: "Currently In",
+    value: "4",
+    icon: CheckCircle,
+    gradient: "from-emerald-500 to-green-600",
+    shadow: "shadow-emerald-500/30",
+  },
+  {
+    title: "Calls Today",
+    value: "5",
+    icon: Phone,
+    gradient: "from-amber-500 to-orange-600",
+    shadow: "shadow-amber-500/30",
+  },
+  {
+    title: "Postal Items",
+    value: "5",
+    icon: Mail,
+    gradient: "from-purple-500 to-violet-600",
+    shadow: "shadow-purple-500/30",
+  },
+]
 
 const visitors = [
   { id: "VIS001", visitorName: "Rahul Sharma", contact: "9876543230", patientName: "Rajesh Kumar", relation: "Son", purpose: "Visiting", inTime: "08:30 AM", outTime: "-", floor: "3rd Floor", status: "In" },
@@ -54,194 +111,317 @@ export default function FrontOfficePage() {
   const resolvedCalls = phoneCalls.filter((c) => c.status === "Resolved").length
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Front Office</h1>
-          <p className="text-slate-500">Manage visitors, phone calls, and postal services</p>
+    <AnimatedPage>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+              Front Office
+            </h1>
+            <p className="text-slate-500">Manage visitors, phone calls, and postal services</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50">
+              <Download className="mr-2 h-4 w-4" />
+              Export
+            </Button>
+            <Link href="/front-office/visitor/new">
+              <Button
+                size="sm"
+                className="bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 shadow-lg shadow-teal-500/30"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Register Visitor
+              </Button>
+            </Link>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm"><Download className="mr-2 h-4 w-4" />Export</Button>
-          <Link href="/front-office/visitor/new"><Button size="sm"><Plus className="mr-2 h-4 w-4" />Register Visitor</Button></Link>
-        </div>
+
+        <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+          {stats.map((stat) => (
+            <StaggerItem key={stat.title}>
+              <motion.div whileHover={{ scale: 1.02, y: -2 }} transition={{ type: "spring", stiffness: 300 }}>
+                <Card className={`overflow-hidden shadow-lg ${stat.shadow} hover:shadow-xl transition-shadow duration-300`}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-2xl font-bold">{stat.value}</div>
+                        <p className="text-xs text-slate-500">{stat.title}</p>
+                      </div>
+                      <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg`}>
+                        <stat.icon className="h-6 w-6 text-white" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+
+        <Tabs defaultValue="visitors">
+          <TabsList className="bg-white border border-slate-200 p-1 shadow-sm">
+            <TabsTrigger
+              value="visitors"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white data-[state=active]:shadow-md"
+            >
+              Visitors
+            </TabsTrigger>
+            <TabsTrigger
+              value="calls"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white data-[state=active]:shadow-md"
+            >
+              Phone Calls
+            </TabsTrigger>
+            <TabsTrigger
+              value="postal"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white data-[state=active]:shadow-md"
+            >
+              Postal
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="visitors">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Card className="shadow-lg border-0">
+                <CardHeader>
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <CardTitle className="text-lg font-semibold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+                      Visitor Log
+                    </CardTitle>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 text-slate-400 -translate-y-1/2" />
+                      <Input
+                        type="search"
+                        placeholder="Search visitors..."
+                        className="pl-10 w-64 border-slate-200 focus:border-teal-500 focus:ring-teal-500"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-slate-100">
+                        <TableHead className="font-semibold text-slate-700">Visitor</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Contact</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Patient</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Relation</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Purpose</TableHead>
+                        <TableHead className="font-semibold text-slate-700">In Time</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Out Time</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Floor</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredVisitors.map((visitor, index) => (
+                        <motion.tr
+                          key={visitor.id}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="border-slate-100 hover:bg-gradient-to-r hover:from-teal-50/50 hover:to-cyan-50/50 transition-colors duration-200"
+                        >
+                          <TableCell className="font-medium text-slate-700">{visitor.visitorName}</TableCell>
+                          <TableCell className="text-slate-600">{visitor.contact}</TableCell>
+                          <TableCell className="text-slate-600">{visitor.patientName}</TableCell>
+                          <TableCell className="text-slate-600">{visitor.relation}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200">
+                              {visitor.purpose}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-slate-600">{visitor.inTime}</TableCell>
+                          <TableCell className="text-slate-600">{visitor.outTime}</TableCell>
+                          <TableCell className="text-slate-600">{visitor.floor}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={visitor.status === "In" ? "success" : "secondary"}
+                              className={
+                                visitor.status === "In"
+                                  ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                                  : "bg-slate-100 text-slate-600 border-slate-200"
+                              }
+                            >
+                              {visitor.status}
+                            </Badge>
+                          </TableCell>
+                        </motion.tr>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
+
+          <TabsContent value="calls">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Card className="shadow-lg border-0">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-semibold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+                      Phone Call Log
+                    </CardTitle>
+                    <Link href="/front-office/call/new">
+                      <Button
+                        size="sm"
+                        className="bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 shadow-lg shadow-teal-500/30"
+                      >
+                        <Phone className="mr-2 h-4 w-4" />
+                        Log Call
+                      </Button>
+                    </Link>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-slate-100">
+                        <TableHead className="font-semibold text-slate-700">Caller</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Contact</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Department</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Call Time</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Duration</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Purpose</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Handled By</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredCalls.map((call, index) => (
+                        <motion.tr
+                          key={call.id}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="border-slate-100 hover:bg-gradient-to-r hover:from-teal-50/50 hover:to-cyan-50/50 transition-colors duration-200"
+                        >
+                          <TableCell className="font-medium text-slate-700">{call.callerName}</TableCell>
+                          <TableCell className="text-slate-600">{call.contact}</TableCell>
+                          <TableCell className="text-slate-600">{call.department}</TableCell>
+                          <TableCell className="text-slate-600">{call.callTime}</TableCell>
+                          <TableCell className="text-slate-600">{call.duration}</TableCell>
+                          <TableCell className="text-slate-600">{call.purpose}</TableCell>
+                          <TableCell className="text-slate-600">{call.handledBy}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={call.status === "Resolved" ? "success" : "destructive"}
+                              className={
+                                call.status === "Resolved"
+                                  ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                                  : "bg-red-100 text-red-700 border-red-200"
+                              }
+                            >
+                              {call.status}
+                            </Badge>
+                          </TableCell>
+                        </motion.tr>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
+
+          <TabsContent value="postal">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Card className="shadow-lg border-0">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg font-semibold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+                      Postal Register
+                    </CardTitle>
+                    <Link href="/front-office/postal/new">
+                      <Button
+                        size="sm"
+                        className="bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 shadow-lg shadow-teal-500/30"
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Postal
+                      </Button>
+                    </Link>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-slate-100">
+                        <TableHead className="font-semibold text-slate-700">Tracking No.</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Type</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Sender</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Recipient</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Description</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Date</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Received By</TableHead>
+                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredPostal.map((post, index) => (
+                        <motion.tr
+                          key={post.id}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="border-slate-100 hover:bg-gradient-to-r hover:from-teal-50/50 hover:to-cyan-50/50 transition-colors duration-200"
+                        >
+                          <TableCell className="font-medium text-slate-700">{post.trackingNumber}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={post.type === "Incoming" ? "info" : "outline"}
+                              className={
+                                post.type === "Incoming"
+                                  ? "bg-blue-100 text-blue-700 border-blue-200"
+                                  : "bg-orange-100 text-orange-700 border-orange-200"
+                              }
+                            >
+                              {post.type}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-slate-600">{post.sender}</TableCell>
+                          <TableCell className="text-slate-600">{post.recipient}</TableCell>
+                          <TableCell className="text-slate-600">{post.description}</TableCell>
+                          <TableCell className="text-slate-600">{post.receivedDate}</TableCell>
+                          <TableCell className="text-slate-600">{post.receivedBy}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={post.status === "Delivered" ? "success" : "info"}
+                              className={
+                                post.status === "Delivered"
+                                  ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                                  : "bg-blue-100 text-blue-700 border-blue-200"
+                              }
+                            >
+                              {post.status}
+                            </Badge>
+                          </TableCell>
+                        </motion.tr>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
+        </Tabs>
       </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-blue-100 p-2"><Users className="h-5 w-5 text-blue-600" /></div>
-              <div><p className="text-2xl font-bold">{visitors.length}</p><p className="text-xs text-slate-500">Total Visitors</p></div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-green-100 p-2"><CheckCircle className="h-5 w-5 text-green-600" /></div>
-              <div><p className="text-2xl font-bold text-green-600">{currentVisitors}</p><p className="text-xs text-slate-500">Currently In</p></div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-yellow-100 p-2"><Phone className="h-5 w-5 text-yellow-600" /></div>
-              <div><p className="text-2xl font-bold">{phoneCalls.length}</p><p className="text-xs text-slate-500">Calls Today</p></div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-purple-100 p-2"><Mail className="h-5 w-5 text-purple-600" /></div>
-              <div><p className="text-2xl font-bold">{postal.length}</p><p className="text-xs text-slate-500">Postal Items</p></div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="visitors">
-        <TabsList>
-          <TabsTrigger value="visitors">Visitors</TabsTrigger>
-          <TabsTrigger value="calls">Phone Calls</TabsTrigger>
-          <TabsTrigger value="postal">Postal</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="visitors">
-          <Card>
-            <CardHeader>
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <CardTitle>Visitor Log</CardTitle>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 text-slate-400 -translate-y-1/2" />
-                  <Input type="search" placeholder="Search visitors..." className="pl-10 w-64" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Visitor</TableHead>
-                    <TableHead>Contact</TableHead>
-                    <TableHead>Patient</TableHead>
-                    <TableHead>Relation</TableHead>
-                    <TableHead>Purpose</TableHead>
-                    <TableHead>In Time</TableHead>
-                    <TableHead>Out Time</TableHead>
-                    <TableHead>Floor</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredVisitors.map((visitor) => (
-                    <TableRow key={visitor.id}>
-                      <TableCell className="font-medium">{visitor.visitorName}</TableCell>
-                      <TableCell>{visitor.contact}</TableCell>
-                      <TableCell>{visitor.patientName}</TableCell>
-                      <TableCell>{visitor.relation}</TableCell>
-                      <TableCell><Badge variant="outline">{visitor.purpose}</Badge></TableCell>
-                      <TableCell>{visitor.inTime}</TableCell>
-                      <TableCell>{visitor.outTime}</TableCell>
-                      <TableCell>{visitor.floor}</TableCell>
-                      <TableCell>
-                        <Badge variant={visitor.status === "In" ? "success" : "secondary"}>{visitor.status}</Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="calls">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Phone Call Log</CardTitle>
-                <Link href="/front-office/call/new"><Button size="sm"><Phone className="mr-2 h-4 w-4" />Log Call</Button></Link>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Caller</TableHead>
-                    <TableHead>Contact</TableHead>
-                    <TableHead>Department</TableHead>
-                    <TableHead>Call Time</TableHead>
-                    <TableHead>Duration</TableHead>
-                    <TableHead>Purpose</TableHead>
-                    <TableHead>Handled By</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredCalls.map((call) => (
-                    <TableRow key={call.id}>
-                      <TableCell className="font-medium">{call.callerName}</TableCell>
-                      <TableCell>{call.contact}</TableCell>
-                      <TableCell>{call.department}</TableCell>
-                      <TableCell>{call.callTime}</TableCell>
-                      <TableCell>{call.duration}</TableCell>
-                      <TableCell>{call.purpose}</TableCell>
-                      <TableCell>{call.handledBy}</TableCell>
-                      <TableCell>
-                        <Badge variant={call.status === "Resolved" ? "success" : "destructive"}>{call.status}</Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="postal">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Postal Register</CardTitle>
-                <Link href="/front-office/postal/new"><Button size="sm"><Plus className="mr-2 h-4 w-4" />Add Postal</Button></Link>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tracking No.</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Sender</TableHead>
-                    <TableHead>Recipient</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Received By</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredPostal.map((post) => (
-                    <TableRow key={post.id}>
-                      <TableCell className="font-medium">{post.trackingNumber}</TableCell>
-                      <TableCell><Badge variant={post.type === "Incoming" ? "info" : "outline"}>{post.type}</Badge></TableCell>
-                      <TableCell>{post.sender}</TableCell>
-                      <TableCell>{post.recipient}</TableCell>
-                      <TableCell>{post.description}</TableCell>
-                      <TableCell>{post.receivedDate}</TableCell>
-                      <TableCell>{post.receivedBy}</TableCell>
-                      <TableCell>
-                        <Badge variant={post.status === "Delivered" ? "success" : "info"}>{post.status}</Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+    </AnimatedPage>
   )
 }
