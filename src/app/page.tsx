@@ -417,7 +417,7 @@ export default function HomePage() {
             </div>
           </div>
           <div style={{ borderTop: "1px solid #1f2937", paddingTop: 24, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <p>© 2026 Smart Hospital & Research Center · All rights reserved</p>
+            <p>© 2026 SSV Hospital & Research Center · All rights reserved</p>
             <div style={{ display: "flex", gap: 20 }}>
               <a href="#" style={{ color: "inherit", textDecoration: "none" }}>Privacy</a>
               <a href="#" style={{ color: "inherit", textDecoration: "none" }}>Terms</a>

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Bell, Search, User, LogOut, Settings, Moon, Sun, ChevronDown, Check, CheckCheck } from "lucide-react"
+import { Bell, Search, User, LogOut, Settings, Moon, Sun, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
@@ -22,16 +22,16 @@ export function Header() {
   const unreadCount = notifications.filter((n) => !n.read).length
 
   return (
-    <header className="sticky top-0 z-30 h-16 border-b bg-white/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 h-16 border-b border-slate-200 bg-white/80 backdrop-blur-xl">
       <div className="flex h-full items-center gap-4 px-6">
         {/* Search */}
         <div className="flex-1 max-w-md">
           <div className="relative group">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 text-slate-400 -translate-y-1/2 group-focus-within:text-blue-500 transition-colors" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 text-slate-400 -translate-y-1/2 group-focus-within:text-[#14b8a6] transition-colors" />
             <Input
               type="search"
               placeholder="Search patients, doctors, bills..."
-              className="pl-10 bg-slate-50 border-slate-200 focus:bg-white focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all"
+              className="pl-10 bg-slate-50 border-slate-200 focus:bg-white focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/10 transition-all h-10"
             />
           </div>
         </div>
@@ -73,9 +73,9 @@ export function Header() {
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-2xl border overflow-hidden"
+                  className="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden"
                 >
-                  <div className="p-4 border-b bg-gradient-to-r from-blue-500 to-purple-500">
+                  <div className="p-4 border-b border-slate-100 bg-gradient-to-r from-[#0f766e] to-[#14b8a6]">
                     <h3 className="font-semibold text-white">Notifications</h3>
                     <p className="text-xs text-white/80">{unreadCount} unread</p>
                   </div>
@@ -84,17 +84,11 @@ export function Header() {
                       <motion.div
                         key={notif.id}
                         whileHover={{ backgroundColor: "#f8fafc" }}
-                        className={`p-4 border-b cursor-pointer ${
-                          !notif.read ? "bg-blue-50/50" : ""
-                        }`}
+                        className={`p-4 border-b border-slate-100 cursor-pointer ${!notif.read ? "bg-teal-50/50" : ""}`}
                       >
                         <div className="flex items-start gap-3">
-                          <div
-                            className={`h-2 w-2 rounded-full mt-2 ${
-                              !notif.read ? "bg-blue-500" : "bg-transparent"
-                            }`}
-                          />
-                          <div className="flex-1">
+                          <div className={`h-2 w-2 rounded-full mt-2 flex-shrink-0 ${!notif.read ? "bg-[#14b8a6]" : "bg-transparent"}`} />
+                          <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-slate-900">{notif.title}</p>
                             <p className="text-xs text-slate-500">{notif.message}</p>
                             <p className="text-xs text-slate-400 mt-1">{notif.time}</p>
@@ -103,8 +97,8 @@ export function Header() {
                       </motion.div>
                     ))}
                   </div>
-                  <div className="p-3 border-t">
-                    <Button variant="ghost" className="w-full text-sm">
+                  <div className="p-3 border-t border-slate-100">
+                    <Button variant="ghost" className="w-full text-sm text-[#14b8a6] hover:text-[#0f766e] hover:bg-[#14b8a6]/5">
                       View All Notifications
                     </Button>
                   </div>
@@ -123,7 +117,7 @@ export function Header() {
               onClick={() => setShowProfile(!showProfile)}
               className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-100 transition-colors"
             >
-              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-lg">
+              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#0f766e] to-[#14b8a6] flex items-center justify-center text-white font-semibold text-sm shadow-lg shadow-teal-500/25">
                 SA
               </div>
               <div className="hidden sm:block text-left">
@@ -139,9 +133,9 @@ export function Header() {
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute right-0 top-12 w-56 bg-white rounded-2xl shadow-2xl border overflow-hidden"
+                  className="absolute right-0 top-12 w-56 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden"
                 >
-                  <div className="p-4 border-b">
+                  <div className="p-4 border-b border-slate-100">
                     <p className="font-semibold text-slate-900">Super Admin</p>
                     <p className="text-sm text-slate-500">admin@ssvhms.com</p>
                   </div>

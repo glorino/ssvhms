@@ -75,7 +75,7 @@ export default function LoginPage() {
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-4h4v-2h-4V7h-2v4H7v2h4v4z"/>
                 </svg>
               </div>
-              <span style={{ fontSize: 18, fontWeight: 700, color: "#1f2937" }}>Smart Hospital & Research Center</span>
+              <span style={{ fontSize: 18, fontWeight: 700, color: "#1f2937" }}>SSV Hospital & Research Center</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: 60 }}>
               <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#14b8a6" }} />
@@ -86,7 +86,7 @@ export default function LoginPage() {
           </div>
 
           <h2 style={{ fontSize: 24, fontWeight: 800, color: "#111827", lineHeight: 1.3, marginBottom: 32 }}>
-            What&apos;s new in Smart Hospital & Research Center
+            What&apos;s new in SSV Hospital & Research Center
           </h2>
 
           {/* Timeline */}
@@ -120,7 +120,7 @@ export default function LoginPage() {
         </div>
 
         <div style={{ padding: "16px 50px", fontSize: 12, color: "#9ca3af" }}>
-          © 2026 Smart Hospital & Research Center · All rights reserved
+          © 2026 SSV Hospital & Research Center · All rights reserved
         </div>
       </div>
 

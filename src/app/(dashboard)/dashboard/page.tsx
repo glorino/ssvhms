@@ -4,26 +4,9 @@ import React from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import {
-  Users,
-  Stethoscope,
-  Calendar,
-  CreditCard,
-  BedDouble,
-  TrendingUp,
-  ArrowUpRight,
-  ArrowDownRight,
-  Activity,
-  UserPlus,
-  CalendarCheck,
-  FileText,
-  Droplets,
-  Pill,
-  FlaskConical,
-  Scan,
-  Heart,
-  Brain,
-  Bone,
-  Eye,
+  Users, Stethoscope, Calendar, CreditCard, BedDouble, TrendingUp,
+  ArrowUpRight, ArrowDownRight, Activity, UserPlus, CalendarCheck,
+  FileText, Droplets, Pill, FlaskConical, Scan, Heart, Brain, Bone, Eye,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -32,60 +15,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AnimatedStat, StaggerContainer, StaggerItem } from "@/components/animated-wrapper"
 
 const stats = [
-  {
-    title: "Total Patients",
-    value: "12,847",
-    change: "+12.5%",
-    trend: "up",
-    icon: Users,
-    gradient: "from-blue-500 to-cyan-500",
-    bgLight: "bg-blue-50",
-  },
-  {
-    title: "Today's Appointments",
-    value: "48",
-    change: "+8.2%",
-    trend: "up",
-    icon: Calendar,
-    gradient: "from-violet-500 to-purple-500",
-    bgLight: "bg-violet-50",
-  },
-  {
-    title: "Active Doctors",
-    value: "32",
-    change: "+2.1%",
-    trend: "up",
-    icon: Stethoscope,
-    gradient: "from-emerald-500 to-green-500",
-    bgLight: "bg-emerald-50",
-  },
-  {
-    title: "Revenue Today",
-    value: "₹2,84,500",
-    change: "+15.3%",
-    trend: "up",
-    icon: CreditCard,
-    gradient: "from-amber-500 to-orange-500",
-    bgLight: "bg-amber-50",
-  },
-  {
-    title: "Beds Occupied",
-    value: "156/200",
-    change: "78%",
-    trend: "neutral",
-    icon: BedDouble,
-    gradient: "from-rose-500 to-pink-500",
-    bgLight: "bg-rose-50",
-  },
-  {
-    title: "Pending Bills",
-    value: "₹4,25,000",
-    change: "-5.2%",
-    trend: "down",
-    icon: TrendingUp,
-    gradient: "from-red-500 to-rose-500",
-    bgLight: "bg-red-50",
-  },
+  { title: "Total Patients", value: "12,847", change: "+12.5%", trend: "up", icon: Users, gradient: "from-blue-500 to-cyan-500", bgLight: "bg-blue-50" },
+  { title: "Today's Appointments", value: "48", change: "+8.2%", trend: "up", icon: Calendar, gradient: "from-violet-500 to-purple-500", bgLight: "bg-violet-50" },
+  { title: "Active Doctors", value: "32", change: "+2.1%", trend: "up", icon: Stethoscope, gradient: "from-[#0f766e] to-[#14b8a6]", bgLight: "bg-teal-50" },
+  { title: "Revenue Today", value: "₹2,84,500", change: "+15.3%", trend: "up", icon: CreditCard, gradient: "from-amber-500 to-orange-500", bgLight: "bg-amber-50" },
+  { title: "Beds Occupied", value: "156/200", change: "78%", trend: "neutral", icon: BedDouble, gradient: "from-rose-500 to-pink-500", bgLight: "bg-rose-50" },
+  { title: "Pending Bills", value: "₹4,25,000", change: "-5.2%", trend: "down", icon: TrendingUp, gradient: "from-red-500 to-rose-500", bgLight: "bg-red-50" },
 ]
 
 const recentAppointments = [
@@ -100,7 +35,7 @@ const bedStatus = [
   { ward: "ICU", total: 10, occupied: 9, color: "from-red-500 to-rose-500" },
   { ward: "General Ward", total: 40, occupied: 32, color: "from-blue-500 to-cyan-500" },
   { ward: "Private", total: 20, occupied: 15, color: "from-violet-500 to-purple-500" },
-  { ward: "Semi-Private", total: 30, occupied: 22, color: "from-emerald-500 to-green-500" },
+  { ward: "Semi-Private", total: 30, occupied: 22, color: "from-[#0f766e] to-[#14b8a6]" },
   { ward: "Emergency", total: 10, occupied: 7, color: "from-amber-500 to-orange-500" },
   { ward: "Maternity", total: 15, occupied: 11, color: "from-pink-500 to-rose-500" },
 ]
@@ -109,7 +44,18 @@ const departmentStats = [
   { name: "Cardiology", patients: 45, revenue: "₹4,50,000", icon: Heart, color: "from-red-500 to-pink-500" },
   { name: "Neurology", patients: 28, revenue: "₹5,10,000", icon: Brain, color: "from-violet-500 to-purple-500" },
   { name: "Orthopedics", patients: 38, revenue: "₹3,20,000", icon: Bone, color: "from-blue-500 to-cyan-500" },
-  { name: "Ophthalmology", patients: 22, revenue: "₹1,80,000", icon: Eye, color: "from-emerald-500 to-green-500" },
+  { name: "Ophthalmology", patients: 22, revenue: "₹1,80,000", icon: Eye, color: "from-[#0f766e] to-[#14b8a6]" },
+]
+
+const quickActions = [
+  { icon: UserPlus, label: "New Patient", color: "from-blue-500 to-cyan-500", href: "/patients/new" },
+  { icon: CalendarCheck, label: "Appointment", color: "from-violet-500 to-purple-500", href: "/appointments" },
+  { icon: Stethoscope, label: "OPD Visit", color: "from-[#0f766e] to-[#14b8a6]", href: "/opd" },
+  { icon: BedDouble, label: "Admission", color: "from-rose-500 to-pink-500", href: "/ipd" },
+  { icon: CreditCard, label: "New Bill", color: "from-amber-500 to-orange-500", href: "/billing" },
+  { icon: FlaskConical, label: "Lab Test", color: "from-cyan-500 to-blue-500", href: "/pathology" },
+  { icon: Droplets, label: "Blood Bank", color: "from-red-500 to-rose-500", href: "/blood-bank" },
+  { icon: Pill, label: "Pharmacy", color: "from-green-500 to-emerald-500", href: "/pharmacy" },
 ]
 
 export default function DashboardPage() {
@@ -123,15 +69,15 @@ export default function DashboardPage() {
       >
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-          <p className="text-slate-500">Welcome back, Super Admin</p>
+          <p className="text-slate-500 text-sm">Welcome back, Super Admin</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="border-slate-200">
+          <Button variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50">
             <Activity className="mr-2 h-4 w-4" />
             Refresh
           </Button>
           <Link href="/patients/new">
-            <Button size="sm" className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 shadow-lg">
+            <Button size="sm" className="bg-gradient-to-r from-[#0f766e] to-[#14b8a6] hover:from-[#0d6d65] hover:to-[#0f766e] shadow-lg shadow-teal-500/25">
               <UserPlus className="mr-2 h-4 w-4" />
               New Patient
             </Button>
@@ -144,23 +90,23 @@ export default function DashboardPage() {
         {stats.map((stat, index) => (
           <StaggerItem key={stat.title}>
             <AnimatedStat delay={index * 0.1}>
-              <Card className="overflow-hidden border-0 shadow-lg hover:shadow-xl transition-shadow">
+              <Card className="overflow-hidden border-0 shadow-md hover:shadow-lg transition-all duration-200 border border-slate-100">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
-                    <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg`}>
-                      <stat.icon className="h-6 w-6 text-white" />
+                    <div className={`h-11 w-11 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg`}>
+                      <stat.icon className="h-5 w-5 text-white" />
                     </div>
                     <div className="flex items-center text-sm">
                       {stat.trend === "up" && <ArrowUpRight className="mr-1 h-4 w-4 text-green-500" />}
                       {stat.trend === "down" && <ArrowDownRight className="mr-1 h-4 w-4 text-red-500" />}
-                      <span className={stat.trend === "up" ? "text-green-500" : stat.trend === "down" ? "text-red-500" : "text-slate-500"}>
+                      <span className={stat.trend === "up" ? "text-green-500 font-medium" : stat.trend === "down" ? "text-red-500 font-medium" : "text-slate-500"}>
                         {stat.change}
                       </span>
                     </div>
                   </div>
                   <div className="mt-3">
                     <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
-                    <p className="text-xs text-slate-500">{stat.title}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{stat.title}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -178,29 +124,28 @@ export default function DashboardPage() {
           transition={{ delay: 0.3 }}
           className="xl:col-span-2"
         >
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="flex flex-row items-center justify-between border-b">
-              <CardTitle className="flex items-center gap-2">
+          <Card className="border-0 shadow-md border border-slate-100">
+            <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100 pb-4">
+              <CardTitle className="flex items-center gap-2 text-base">
                 <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center">
                   <Calendar className="h-4 w-4 text-white" />
                 </div>
                 Recent Appointments
               </CardTitle>
               <Link href="/appointments">
-                <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
-                  View All
-                  <ArrowUpRight className="ml-2 h-4 w-4" />
+                <Button variant="ghost" size="sm" className="text-[#14b8a6] hover:text-[#0f766e] hover:bg-[#14b8a6]/5 text-sm font-medium">
+                  View All <ArrowUpRight className="ml-1 h-4 w-4" />
                 </Button>
               </Link>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-slate-50">
-                    <TableHead>Patient</TableHead>
-                    <TableHead>Doctor</TableHead>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Status</TableHead>
+                  <TableRow className="bg-slate-50/80">
+                    <TableHead className="font-semibold text-slate-600">Patient</TableHead>
+                    <TableHead className="font-semibold text-slate-600">Doctor</TableHead>
+                    <TableHead className="font-semibold text-slate-600">Time</TableHead>
+                    <TableHead className="font-semibold text-slate-600">Status</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -210,33 +155,30 @@ export default function DashboardPage() {
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.4 + index * 0.05 }}
-                      className="border-b hover:bg-slate-50 transition-colors"
+                      className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors"
                     >
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-semibold text-xs shadow-md">
+                          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#0f766e] to-[#14b8a6] flex items-center justify-center text-white font-semibold text-xs shadow-md">
                             {apt.avatar}
                           </div>
                           <div>
-                            <p className="font-medium">{apt.patient}</p>
+                            <p className="font-medium text-slate-900">{apt.patient}</p>
                             <p className="text-xs text-slate-500">{apt.department}</p>
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>{apt.doctor}</TableCell>
-                      <TableCell>{apt.time}</TableCell>
+                      <TableCell className="text-slate-600">{apt.doctor}</TableCell>
+                      <TableCell className="text-slate-600">{apt.time}</TableCell>
                       <TableCell>
                         <Badge
                           variant={
-                            apt.status === "Completed"
-                              ? "success"
-                              : apt.status === "In Progress"
-                              ? "warning"
-                              : apt.status === "Cancelled"
-                              ? "destructive"
+                            apt.status === "Completed" ? "success"
+                              : apt.status === "In Progress" ? "warning"
+                              : apt.status === "Cancelled" ? "destructive"
                               : "info"
                           }
-                          className="rounded-full"
+                          className="rounded-full text-xs"
                         >
                           {apt.status}
                         </Badge>
@@ -255,9 +197,9 @@ export default function DashboardPage() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="border-b">
-              <CardTitle className="flex items-center gap-2">
+          <Card className="border-0 shadow-md border border-slate-100">
+            <CardHeader className="border-b border-slate-100 pb-4">
+              <CardTitle className="flex items-center gap-2 text-base">
                 <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center">
                   <BedDouble className="h-4 w-4 text-white" />
                 </div>
@@ -273,13 +215,13 @@ export default function DashboardPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 + index * 0.05 }}
                   >
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between mb-1.5">
                       <span className="text-sm font-medium text-slate-700">{ward.ward}</span>
-                      <span className="text-sm text-slate-500">
+                      <span className="text-sm text-slate-500 font-medium">
                         {ward.occupied}/{ward.total}
                       </span>
                     </div>
-                    <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${(ward.occupied / ward.total) * 100}%` }}
@@ -301,10 +243,10 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
       >
-        <Card className="border-0 shadow-lg">
-          <CardHeader className="border-b">
-            <CardTitle className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center">
+        <Card className="border-0 shadow-md border border-slate-100">
+          <CardHeader className="border-b border-slate-100 pb-4">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#0f766e] to-[#14b8a6] flex items-center justify-center">
                 <Activity className="h-4 w-4 text-white" />
               </div>
               Department Performance
@@ -318,16 +260,16 @@ export default function DashboardPage() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.6 + index * 0.1 }}
-                  whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-                  className="relative overflow-hidden rounded-2xl border p-4 cursor-pointer"
+                  whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
+                  className="relative overflow-hidden rounded-xl border border-slate-100 p-4 cursor-pointer hover:shadow-md transition-all"
                 >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${dept.color} opacity-10`} />
+                  <div className={`absolute inset-0 bg-gradient-to-br ${dept.color} opacity-5`} />
                   <div className="relative">
-                    <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${dept.color} flex items-center justify-center mb-3 shadow-lg`}>
-                      <dept.icon className="h-6 w-6 text-white" />
+                    <div className={`h-11 w-11 rounded-xl bg-gradient-to-br ${dept.color} flex items-center justify-center mb-3 shadow-lg`}>
+                      <dept.icon className="h-5 w-5 text-white" />
                     </div>
-                    <h3 className="font-semibold text-slate-900">{dept.name}</h3>
-                    <p className="text-sm text-slate-500">{dept.patients} patients</p>
+                    <h3 className="font-semibold text-slate-900 text-sm">{dept.name}</h3>
+                    <p className="text-xs text-slate-500 mt-0.5">{dept.patients} patients</p>
                     <p className="text-lg font-bold text-slate-900 mt-2">{dept.revenue}</p>
                   </div>
                 </motion.div>
@@ -343,33 +285,24 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
       >
-        <Card className="border-0 shadow-lg">
-          <CardHeader className="border-b">
-            <CardTitle>Quick Actions</CardTitle>
+        <Card className="border-0 shadow-md border border-slate-100">
+          <CardHeader className="border-b border-slate-100 pb-4">
+            <CardTitle className="text-base">Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="p-6">
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-8">
-              {[
-                { icon: UserPlus, label: "New Patient", color: "from-blue-500 to-cyan-500", href: "/patients/new" },
-                { icon: CalendarCheck, label: "Appointment", color: "from-violet-500 to-purple-500", href: "/appointments/new" },
-                { icon: Stethoscope, label: "OPD Visit", color: "from-emerald-500 to-green-500", href: "/opd/new" },
-                { icon: BedDouble, label: "Admission", color: "from-rose-500 to-pink-500", href: "/ipd/new" },
-                { icon: CreditCard, label: "New Bill", color: "from-amber-500 to-orange-500", href: "/billing/new" },
-                { icon: FlaskConical, label: "Lab Test", color: "from-cyan-500 to-blue-500", href: "/pathology/new" },
-                { icon: Droplets, label: "Blood Bank", color: "from-red-500 to-rose-500", href: "/blood-bank" },
-                { icon: Pill, label: "Pharmacy", color: "from-green-500 to-emerald-500", href: "/pharmacy" },
-              ].map((action, index) => (
+              {quickActions.map((action, index) => (
                 <motion.div
                   key={action.label}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.7 + index * 0.05 }}
-                  whileHover={{ scale: 1.1, transition: { duration: 0.2 } }}
+                  whileHover={{ scale: 1.08, transition: { duration: 0.2 } }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <Link href={action.href}>
-                    <div className={`h-20 rounded-2xl bg-gradient-to-br ${action.color} flex flex-col items-center justify-center gap-2 shadow-lg cursor-pointer hover:shadow-xl transition-shadow`}>
-                      <action.icon className="h-6 w-6 text-white" />
+                    <div className={`h-20 rounded-xl bg-gradient-to-br ${action.color} flex flex-col items-center justify-center gap-2 shadow-md cursor-pointer hover:shadow-lg transition-shadow`}>
+                      <action.icon className="h-5 w-5 text-white" />
                       <span className="text-xs font-medium text-white">{action.label}</span>
                     </div>
                   </Link>
