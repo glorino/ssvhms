@@ -93,7 +93,7 @@ export default function LoginPage() {
           }} />
         </div>
 
-        <div className="relative z-10 flex flex-col w-full p-16 lg:p-20">
+        <div className="relative z-10 flex flex-col w-full pl-16 pb-16 pr-14 pt-10 lg:pl-20 lg:pb-20 lg:pr-14 lg:pt-14">
           {/* Logo */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
