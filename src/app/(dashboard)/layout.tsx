@@ -12,9 +12,9 @@ export default function DashboardLayout({
   return (
     <div className="min-h-screen bg-slate-50">
       <Sidebar />
-      <div className="pl-[280px] transition-all duration-300">
+      <div className="pl-[280px] transition-all duration-300 min-w-0 overflow-x-hidden">
         <Header />
-        <main className="p-6">{children}</main>
+        <main className="p-6 overflow-x-hidden">{children}</main>
       </div>
     </div>
   )
