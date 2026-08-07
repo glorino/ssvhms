@@ -10,9 +10,6 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "SSVHMS - Smart Hospital Management System",
   description: "Complete Hospital Management System with OPD, IPD, Pharmacy, Pathology, Radiology, Blood Bank, Billing, and more",
-  icons: {
-    icon: "/favicon.ico",
-  },
 };
 
 export default function RootLayout({
