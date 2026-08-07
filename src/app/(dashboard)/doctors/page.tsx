@@ -1,182 +1,461 @@
 ﻿"use client"
 
-import React, { useState } from "react"
-import Link from "next/link"
-import { motion } from "framer-motion"
-import {
-  Plus,
-  Search,
-  Download,
-  Eye,
-  Edit,
-  Star,
-  Stethoscope,
-  Users,
-  Calendar,
-  Award,
-} from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { AnimatedPage, StaggerContainer, StaggerItem } from "@/components/animated-wrapper"
+import React, { useState, useMemo } from "react"
+import { useSession } from "next-auth/react"
+import { usePatients, Patient } from "@/lib/patient-context"
+import { Search, User, Heart, Activity, Thermometer, Weight, Ruler, Wind, FileText, FlaskConical, Pill, CreditCard, Plus, X, Check, AlertCircle, Clock, UserCheck } from "lucide-react"
 
-const stats = [
-  { title: "Total Doctors", value: "32", icon: Stethoscope, gradient: "from-violet-500 to-purple-600", shadow: "shadow-violet-500/30" },
-  { title: "Available Today", value: "28", icon: Users, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/30" },
-  { title: "Departments", value: "15", icon: Award, gradient: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/30" },
-  { title: "Appointments Today", value: "48", icon: Calendar, gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30" },
-]
+const accent = "#14b8a6"
+const accentLight = "#ccfbf1"
+const accentDark = "#0d9488"
+const accentHover = "#115e59"
 
-const doctors = [
-  { id: "DOC001", name: "Dr. Priya Sharma", specialization: "Cardiology", qualification: "MD, DM Cardiology", experience: 15, consultationFee: 1500, rating: 4.8, patients: 1250, status: "Available", schedule: "Mon-Sat", gradient: "from-rose-500 to-pink-600" },
-  { id: "DOC002", name: "Dr. Amit Singh", specialization: "Orthopedics", qualification: "MS Orthopedics", experience: 12, consultationFee: 1200, rating: 4.7, patients: 980, status: "Available", schedule: "Mon-Fri", gradient: "from-blue-500 to-cyan-600" },
-  { id: "DOC003", name: "Dr. Neha Gupta", specialization: "Neurology", qualification: "MD, DM Neurology", experience: 18, consultationFee: 2000, rating: 4.9, patients: 1500, status: "On Leave", schedule: "Tue-Sat", gradient: "from-violet-500 to-purple-600" },
-  { id: "DOC004", name: "Dr. Rahul Joshi", specialization: "Dermatology", qualification: "MD Dermatology", experience: 8, consultationFee: 1000, rating: 4.6, patients: 750, status: "Available", schedule: "Mon-Sat", gradient: "from-amber-500 to-orange-600" },
-  { id: "DOC005", name: "Dr. Sanjay Mehta", specialization: "General Medicine", qualification: "MBBS, MD", experience: 20, consultationFee: 800, rating: 4.8, patients: 2000, status: "Available", schedule: "Mon-Sun", gradient: "from-emerald-500 to-teal-600" },
-  { id: "DOC006", name: "Dr. Anita Kulkarni", specialization: "Pediatrics", qualification: "MD Pediatrics", experience: 10, consultationFee: 1000, rating: 4.7, patients: 890, status: "Available", schedule: "Mon-Sat", gradient: "from-cyan-500 to-blue-600" },
-]
+const departments = ["Cardiology", "Neurology", "Orthopedics", "Dermatology", "General Medicine", "Pediatrics", "Oncology", "ENT", "Ophthalmology", "Urology"]
+const labCategories = ["Hematology", "Biochemistry", "Endocrinology", "Clinical Pathology", "Radiology"]
+
+type Tab = "vitals" | "visits" | "lab" | "prescriptions" | "bills"
 
 export default function DoctorsPage() {
-  const [searchTerm, setSearchTerm] = useState("")
+  const { data: session } = useSession()
+  const { searchPatients, getPatientByNumber, updateVitals, addVisit, addLabResult, addPrescription } = usePatients()
 
-  const filteredDoctors = doctors.filter((doctor) =>
-    doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    doctor.specialization.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const [searchQuery, setSearchQuery] = useState("")
+  const [searchResults, setSearchResults] = useState<Patient[]>([])
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
+  const [activeTab, setActiveTab] = useState<Tab>("vitals")
+
+  const [showVitalsForm, setShowVitalsForm] = useState(false)
+  const [showVisitForm, setShowVisitForm] = useState(false)
+  const [showLabForm, setShowLabForm] = useState(false)
+  const [showPrescriptionForm, setShowPrescriptionForm] = useState(false)
+
+  const [vitalsData, setVitalsData] = useState({ temperature: "", bloodPressure: "", heartRate: "", weight: "", height: "", oxygenSaturation: "" })
+  const [visitData, setVisitData] = useState({ type: "OPD" as "OPD" | "IPD", department: "", symptoms: "", diagnosis: "", prescription: "", notes: "", status: "Scheduled" as "Scheduled" | "In Progress" | "Completed" })
+  const [labData, setLabData] = useState({ testName: "", category: "Hematology", notes: "" })
+  const [prescriptionText, setPrescriptionText] = useState("")
+
+  const doctorName = session?.user?.name || "Doctor"
+
+  const handleSearch = (q: string) => {
+    setSearchQuery(q)
+    if (q.trim().length === 0) { setSearchResults([]); return }
+    const results = searchPatients(q)
+    setSearchResults(results)
+  }
+
+  const handleSelectPatient = (patient: Patient) => {
+    setSelectedPatient(patient)
+    setSearchQuery(patient.uniqueNumber)
+    setSearchResults([])
+    setActiveTab("vitals")
+  }
+
+  const handleLookupByNumber = (e: React.FormEvent) => {
+    e.preventDefault()
+    const patient = getPatientByNumber(searchQuery.trim())
+    if (patient) handleSelectPatient(patient)
+  }
+
+  const handleUpdateVitals = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedPatient) return
+    updateVitals(selectedPatient.id, {
+      ...vitalsData,
+      recordedAt: new Date().toLocaleString("en-NG", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }),
+      recordedBy: doctorName,
+    })
+    setSelectedPatient({ ...selectedPatient, vitals: { ...selectedPatient.vitals, ...vitalsData, recordedAt: new Date().toLocaleString("en-NG"), recordedBy: doctorName } })
+    setShowVitalsForm(false)
+    setVitalsData({ temperature: "", bloodPressure: "", heartRate: "", weight: "", height: "", oxygenSaturation: "" })
+  }
+
+  const handleAddVisit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedPatient) return
+    addVisit(selectedPatient.id, { ...visitData, doctor: doctorName, date: new Date().toISOString().split("T")[0] })
+    setSelectedPatient({ ...selectedPatient, visits: [...selectedPatient.visits, { id: "V" + Date.now(), date: new Date().toISOString().split("T")[0], doctor: doctorName, ...visitData }] })
+    setShowVisitForm(false)
+    setVisitData({ type: "OPD", department: "", symptoms: "", diagnosis: "", prescription: "", notes: "", status: "Scheduled" })
+  }
+
+  const handleAddLabResult = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedPatient) return
+    addLabResult(selectedPatient.id, { ...labData, result: "", status: "Pending", date: new Date().toISOString().split("T")[0], orderedBy: doctorName })
+    setSelectedPatient({ ...selectedPatient, labResults: [...selectedPatient.labResults, { id: "L" + Date.now(), ...labData, result: "", status: "Pending", date: new Date().toISOString().split("T")[0], orderedBy: doctorName }] })
+    setShowLabForm(false)
+    setLabData({ testName: "", category: "Hematology", notes: "" })
+  }
+
+  const handleAddPrescription = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedPatient || !prescriptionText.trim()) return
+    addPrescription(selectedPatient.id, prescriptionText.trim())
+    setSelectedPatient({ ...selectedPatient, prescriptions: [...selectedPatient.prescriptions, prescriptionText.trim()] })
+    setShowPrescriptionForm(false)
+    setPrescriptionText("")
+  }
+
+  const s = (base: string, extra?: React.CSSProperties): React.CSSProperties => ({ ...base, ...extra } as React.CSSProperties)
+  const cardStyle: React.CSSProperties = { background: "#fff", borderRadius: "12px", border: "1px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }
+  const inputStyle: React.CSSProperties = { width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px", outline: "none", boxSizing: "border-box" }
+  const labelStyle: React.CSSProperties = { fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px", display: "block" }
+  const btnPrimary: React.CSSProperties = { background: accent, color: "#fff", border: "none", padding: "10px 20px", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "8px" }
+  const btnOutline: React.CSSProperties = { background: "transparent", color: accent, border: `1px solid ${accent}`, padding: "10px 20px", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }
+  const tabStyle = (active: boolean): React.CSSProperties => ({ padding: "10px 20px", borderRadius: "8px 8px 0 0", fontSize: "14px", fontWeight: 600, cursor: "pointer", border: "none", background: active ? accent : "#f1f5f9", color: active ? "#fff" : "#64748b", transition: "all 0.2s" })
 
   return (
-    <AnimatedPage>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">Doctors</h1>
-            <p className="text-slate-500">Manage doctor profiles and schedules</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50">
-              <Download className="mr-2 h-4 w-4" />
-              Export
-            </Button>
-            <Link href="/doctors/new">
-              <Button size="sm" className="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-lg shadow-violet-500/30">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Doctor
-              </Button>
-            </Link>
-          </div>
+    <div style={{ padding: "24px", maxWidth: "1400px", margin: "0 auto", fontFamily: "'Inter', system-ui, sans-serif" }}>
+      <div style={{ marginBottom: "24px" }}>
+        <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#1e293b", margin: 0 }}>Doctor&apos;s Workstation</h1>
+        <p style={{ color: "#64748b", margin: "4px 0 0", fontSize: "14px" }}>Look up patients by number or name</p>
+      </div>
+
+      <form onSubmit={handleLookupByNumber} style={{ marginBottom: "24px", position: "relative" }}>
+        <div style={{ position: "relative" }}>
+          <Search size={20} style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder="Enter patient number (e.g., SSV-2026-1001) or search by name..."
+            style={{ ...inputStyle, paddingLeft: "48px", fontSize: "16px", padding: "14px 16px 14px 48px", borderRadius: "12px", border: "2px solid #e2e8f0", boxShadow: "0 4px 6px rgba(0,0,0,0.05)" }}
+          />
+          {searchQuery && (
+            <button type="submit" style={{ position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)", ...btnPrimary, padding: "8px 20px" }}>
+              Search
+            </button>
+          )}
         </div>
+        {searchResults.length > 0 && (
+          <div style={{ position: "absolute", zIndex: 50, top: "100%", left: 0, right: 0, background: "#fff", border: "1px solid #e2e8f0", borderRadius: "12px", boxShadow: "0 10px 40px rgba(0,0,0,0.12)", marginTop: "4px", maxHeight: "320px", overflowY: "auto" }}>
+            {searchResults.map((p) => (
+              <div key={p.id} onClick={() => handleSelectPatient(p)} style={{ padding: "12px 16px", cursor: "pointer", borderBottom: "1px solid #f1f5f9", display: "flex", justifyContent: "space-between", alignItems: "center", transition: "background 0.15s" }} onMouseEnter={(e) => (e.currentTarget.style.background = "#f8fafc")} onMouseLeave={(e) => (e.currentTarget.style.background = "#fff")}>
+                <div>
+                  <span style={{ fontWeight: 600, color: "#1e293b" }}>{p.firstName} {p.lastName}</span>
+                  <span style={{ marginLeft: "12px", color: "#94a3b8", fontSize: "13px" }}>{p.uniqueNumber}</span>
+                </div>
+                <span style={{ padding: "3px 10px", borderRadius: "20px", fontSize: "12px", fontWeight: 600, background: p.status === "Active" ? "#dcfce7" : p.status === "Admitted" ? "#fef3c7" : "#fee2e2", color: p.status === "Active" ? "#166534" : p.status === "Admitted" ? "#92400e" : "#991b1b" }}>{p.status}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </form>
 
-        <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-          {stats.map((stat) => (
-            <StaggerItem key={stat.title}>
-              <motion.div whileHover={{ scale: 1.02, y: -2 }} transition={{ type: "spring", stiffness: 300 }}>
-                <Card className={`overflow-hidden shadow-lg ${stat.shadow} hover:shadow-xl transition-shadow duration-300`}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-2xl font-bold">{stat.value}</div>
-                        <p className="text-xs text-slate-500">{stat.title}</p>
-                      </div>
-                      <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg`}>
-                        <stat.icon className="h-6 w-6 text-white" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
+      {!selectedPatient && (
+        <div style={{ ...cardStyle, padding: "80px 40px", textAlign: "center" }}>
+          <div style={{ width: "80px", height: "80px", borderRadius: "50%", background: accentLight, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+            <User size={36} style={{ color: accent }} />
+          </div>
+          <h2 style={{ fontSize: "20px", fontWeight: 700, color: "#1e293b", margin: "0 0 8px" }}>No Patient Selected</h2>
+          <p style={{ color: "#64748b", fontSize: "14px" }}>Enter a patient number or search by name to load their profile</p>
+        </div>
+      )}
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-          <Card className="shadow-lg border-0">
-            <CardHeader>
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <CardTitle className="text-lg font-semibold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">Doctor Directory</CardTitle>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 text-slate-400 -translate-y-1/2" />
-                  <Input
-                    type="search"
-                    placeholder="Search doctors..."
-                    className="pl-10 w-64 border-slate-200 focus:border-violet-500 focus:ring-violet-500"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
+      {selectedPatient && (
+        <>
+          <div style={{ ...cardStyle, padding: "24px", marginBottom: "20px", background: "linear-gradient(135deg, #f0fdfa 0%, #fff 100%)", borderLeft: `4px solid ${accent}` }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px" }}>
+              <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+                <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: accent, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "20px", fontWeight: 700, flexShrink: 0 }}>
+                  {selectedPatient.firstName[0]}{selectedPatient.lastName[0]}
+                </div>
+                <div>
+                  <span style={{ display: "inline-block", background: accent, color: "#fff", padding: "4px 14px", borderRadius: "20px", fontSize: "13px", fontWeight: 700, letterSpacing: "0.5px", marginBottom: "6px" }}>{selectedPatient.uniqueNumber}</span>
+                  <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#1e293b", margin: 0 }}>{selectedPatient.firstName} {selectedPatient.lastName}</h2>
+                  <div style={{ display: "flex", gap: "16px", marginTop: "4px", fontSize: "14px", color: "#475569" }}>
+                    <span>{selectedPatient.age || Math.floor((Date.now() - new Date(selectedPatient.dateOfBirth).getTime()) / 31557600000)} yrs</span>
+                    <span>{selectedPatient.gender}</span>
+                    <span>Blood: {selectedPatient.bloodGroup}</span>
+                    <span>{selectedPatient.phone}</span>
+                  </div>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {filteredDoctors.map((doctor, index) => (
-                  <motion.div
-                    key={doctor.id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ scale: 1.03, y: -5 }}
-                  >
-                    <Card className="overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border-0">
-                      <CardContent className="p-0">
-                        <div className={`bg-gradient-to-br ${doctor.gradient} p-6 text-white relative overflow-hidden`}>
-                          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
-                          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12" />
-                          <div className="relative flex items-center gap-4">
-                            <div className="h-16 w-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-xl">
-                              <span className="text-xl font-bold">
-                                {doctor.name.split(" ").slice(1).map((n) => n[0]).join("")}
-                              </span>
-                            </div>
-                            <div>
-                              <h3 className="font-bold text-lg">{doctor.name}</h3>
-                              <p className="text-sm text-white/80">{doctor.specialization}</p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="p-5 space-y-3">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-slate-500">Experience</span>
-                            <span className="font-semibold text-slate-800">{doctor.experience} years</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-slate-500">Qualification</span>
-                            <span className="font-semibold text-slate-800">{doctor.qualification}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-slate-500">Fee</span>
-                            <span className="font-semibold text-slate-800">₦{doctor.consultationFee}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-slate-500">Rating</span>
-                            <div className="flex items-center gap-1">
-                              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                              <span className="font-semibold text-slate-800">{doctor.rating}</span>
-                            </div>
-                          </div>
-                          <div className="flex gap-2 pt-3">
-                            <Link href={`/doctors/${doctor.id}`} className="flex-1">
-                              <Button variant="outline" size="sm" className="w-full border-slate-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200">
-                                <Eye className="mr-2 h-4 w-4" />
-                                View
-                              </Button>
-                            </Link>
-                            <Link href={`/doctors/${doctor.id}/edit`} className="flex-1">
-                              <Button variant="outline" size="sm" className="w-full border-slate-200 hover:bg-violet-50 hover:text-violet-600 hover:border-violet-200">
-                                <Edit className="mr-2 h-4 w-4" />
-                                Edit
-                              </Button>
-                            </Link>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
+              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                <span style={{ padding: "5px 14px", borderRadius: "20px", fontSize: "13px", fontWeight: 600, background: selectedPatient.status === "Active" ? "#dcfce7" : selectedPatient.status === "Admitted" ? "#fef3c7" : "#fee2e2", color: selectedPatient.status === "Active" ? "#166534" : selectedPatient.status === "Admitted" ? "#92400e" : "#991b1b" }}>{selectedPatient.status}</span>
+                <button onClick={() => setSelectedPatient(null)} style={{ background: "#f1f5f9", border: "none", borderRadius: "8px", padding: "8px 12px", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", fontSize: "13px", color: "#64748b" }}><X size={14} /> Close</button>
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-    </AnimatedPage>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "20px" }}>
+            {[
+              { title: "Personal Info", icon: <User size={18} color={accent} />, items: [`DOB: ${selectedPatient.dateOfBirth}`, `Email: ${selectedPatient.email}`, `Address: ${selectedPatient.address}`, `${selectedPatient.city}, ${selectedPatient.state}`] },
+              { title: "Emergency Contact", icon: <AlertCircle size={18} color="#ef4444" />, items: [selectedPatient.emergencyContact, selectedPatient.emergencyPhone] },
+              { title: "Insurance", icon: <CreditCard size={18} color="#8b5cf6" />, items: [selectedPatient.insuranceProvider, selectedPatient.insuranceNumber] },
+              { title: "Medical", icon: <Heart size={18} color="#ec4899" />, items: [`Allergies: ${selectedPatient.allergies || "None"}`, `History: ${selectedPatient.medicalHistory || "None"}`] },
+            ].map((card, i) => (
+              <div key={i} style={{ ...cardStyle, padding: "18px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+                  {card.icon}
+                  <span style={{ fontSize: "14px", fontWeight: 700, color: "#1e293b" }}>{card.title}</span>
+                </div>
+                {card.items.map((item, j) => <div key={j} style={{ fontSize: "13px", color: "#475569", marginBottom: "4px", lineHeight: "1.5" }}>{item}</div>)}
+              </div>
+            ))}
+          </div>
+
+          <div style={{ ...cardStyle, marginBottom: "20px" }}>
+            <div style={{ display: "flex", borderBottom: "2px solid #f1f5f9", padding: "0 16px" }}>
+              {(["vitals", "visits", "lab", "prescriptions", "bills"] as Tab[]).map((tab) => {
+                const icons: Record<Tab, React.ReactNode> = { vitals: <Activity size={14} />, visits: <Clock size={14} />, lab: <FlaskConical size={14} />, prescriptions: <Pill size={14} />, bills: <CreditCard size={14} /> }
+                const labels: Record<Tab, string> = { vitals: "Vitals", visits: "Visits", lab: "Lab Results", prescriptions: "Prescriptions", bills: "Bills" }
+                return (
+                  <button key={tab} onClick={() => setActiveTab(tab)} style={tabStyle(activeTab === tab)}>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>{icons[tab]}{labels[tab]}</span>
+                  </button>
+                )
+              })}
+            </div>
+
+            <div style={{ padding: "20px" }}>
+              {activeTab === "vitals" && (
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                    <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#1e293b", margin: 0 }}>Patient Vitals</h3>
+                    <button onClick={() => setShowVitalsForm(!showVitalsForm)} style={btnPrimary}>
+                      {showVitalsForm ? <><X size={14} /> Cancel</> : <><Plus size={14} /> Update Vitals</>}
+                    </button>
+                  </div>
+
+                  {showVitalsForm && (
+                    <form onSubmit={handleUpdateVitals} style={{ ...cardStyle, padding: "20px", marginBottom: "16px", background: "#f8fafc", border: `1px solid ${accentLight}` }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
+                        {[{ key: "temperature", label: "Temperature", placeholder: "36.8°C" }, { key: "bloodPressure", label: "Blood Pressure", placeholder: "120/80 mmHg" }, { key: "heartRate", label: "Heart Rate", placeholder: "72 bpm" }, { key: "weight", label: "Weight", placeholder: "70 kg" }, { key: "height", label: "Height", placeholder: "170 cm" }, { key: "oxygenSaturation", label: "O₂ Saturation", placeholder: "98%" }].map((field) => (
+                          <div key={field.key}>
+                            <label style={labelStyle}>{field.label}</label>
+                            <input value={(vitalsData as any)[field.key]} onChange={(e) => setVitalsData({ ...vitalsData, [field.key]: e.target.value })} placeholder={field.placeholder} style={inputStyle} required />
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ marginTop: "16px", display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                        <button type="button" onClick={() => setShowVitalsForm(false)} style={btnOutline}>Cancel</button>
+                        <button type="submit" style={btnPrimary}><Check size={14} /> Save Vitals</button>
+                      </div>
+                    </form>
+                  )}
+
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }}>
+                    {[
+                      { label: "Temperature", value: selectedPatient.vitals?.temperature || "--", icon: <Thermometer size={16} color="#ef4444" /> },
+                      { label: "Blood Pressure", value: selectedPatient.vitals?.bloodPressure || "--", icon: <Heart size={16} color="#ec4899" /> },
+                      { label: "Heart Rate", value: selectedPatient.vitals?.heartRate || "--", icon: <Activity size={16} color="#f59e0b" /> },
+                      { label: "Weight", value: selectedPatient.vitals?.weight || "--", icon: <Weight size={16} color="#3b82f6" /> },
+                      { label: "Height", value: selectedPatient.vitals?.height || "--", icon: <Ruler size={16} color="#8b5cf6" /> },
+                      { label: "O₂ Saturation", value: selectedPatient.vitals?.oxygenSaturation || "--", icon: <Wind size={16} color={accent} /> },
+                    ].map((v, i) => (
+                      <div key={i} style={{ background: "#f8fafc", borderRadius: "10px", padding: "16px", border: "1px solid #f1f5f9" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>{v.icon}<span style={{ fontSize: "13px", color: "#64748b" }}>{v.label}</span></div>
+                        <div style={{ fontSize: "20px", fontWeight: 700, color: "#1e293b" }}>{v.value}</div>
+                      </div>
+                    ))}
+                  </div>
+                  {selectedPatient.vitals?.recordedAt && (
+                    <div style={{ marginTop: "12px", fontSize: "13px", color: "#94a3b8" }}>
+                      Last recorded: {selectedPatient.vitals.recordedAt} by {selectedPatient.vitals.recordedBy}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === "visits" && (
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                    <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#1e293b", margin: 0 }}>Visit History</h3>
+                    <button onClick={() => setShowVisitForm(!showVisitForm)} style={btnPrimary}>
+                      {showVisitForm ? <><X size={14} /> Cancel</> : <><Plus size={14} /> New Visit</>}
+                    </button>
+                  </div>
+
+                  {showVisitForm && (
+                    <form onSubmit={handleAddVisit} style={{ ...cardStyle, padding: "20px", marginBottom: "16px", background: "#f8fafc", border: `1px solid ${accentLight}` }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px" }}>
+                        <div><label style={labelStyle}>Doctor Name</label><input value={doctorName} readOnly style={{ ...inputStyle, background: "#f1f5f9" }} /></div>
+                        <div><label style={labelStyle}>Department</label>
+                          <select value={visitData.department} onChange={(e) => setVisitData({ ...visitData, department: e.target.value })} style={inputStyle} required>
+                            <option value="">Select department</option>
+                            {departments.map((d) => <option key={d} value={d}>{d}</option>)}
+                          </select>
+                        </div>
+                        <div style={{ gridColumn: "1 / -1" }}><label style={labelStyle}>Symptoms</label><textarea value={visitData.symptoms} onChange={(e) => setVisitData({ ...visitData, symptoms: e.target.value })} style={{ ...inputStyle, minHeight: "60px", resize: "vertical" }} placeholder="Patient symptoms..." required /></div>
+                        <div style={{ gridColumn: "1 / -1" }}><label style={labelStyle}>Diagnosis</label><textarea value={visitData.diagnosis} onChange={(e) => setVisitData({ ...visitData, diagnosis: e.target.value })} style={{ ...inputStyle, minHeight: "60px", resize: "vertical" }} placeholder="Your diagnosis..." required /></div>
+                        <div style={{ gridColumn: "1 / -1" }}><label style={labelStyle}>Prescription</label><textarea value={visitData.prescription} onChange={(e) => setVisitData({ ...visitData, prescription: e.target.value })} style={{ ...inputStyle, minHeight: "60px", resize: "vertical" }} placeholder="Prescribed medication..." /></div>
+                        <div style={{ gridColumn: "1 / -1" }}><label style={labelStyle}>Notes</label><textarea value={visitData.notes} onChange={(e) => setVisitData({ ...visitData, notes: e.target.value })} style={{ ...inputStyle, minHeight: "60px", resize: "vertical" }} placeholder="Additional notes..." /></div>
+                        <div><label style={labelStyle}>Status</label>
+                          <select value={visitData.status} onChange={(e) => setVisitData({ ...visitData, status: e.target.value as any })} style={inputStyle}>
+                            {["Scheduled", "In Progress", "Completed"].map((s) => <option key={s} value={s}>{s}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                      <div style={{ marginTop: "16px", display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                        <button type="button" onClick={() => setShowVisitForm(false)} style={btnOutline}>Cancel</button>
+                        <button type="submit" style={btnPrimary}><Check size={14} /> Save Visit</button>
+                      </div>
+                    </form>
+                  )}
+
+                  {selectedPatient.visits.length === 0 ? (
+                    <div style={{ padding: "40px", textAlign: "center", color: "#94a3b8" }}>No visits recorded yet</div>
+                  ) : (
+                    <div style={{ overflowX: "auto" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                        <thead>
+                          <tr style={{ background: "#f8fafc", borderBottom: "2px solid #e2e8f0" }}>
+                            {["Date", "Type", "Doctor", "Department", "Symptoms", "Diagnosis", "Status"].map((h) => (
+                              <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#475569", whiteSpace: "nowrap" }}>{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedPatient.visits.map((v) => (
+                            <tr key={v.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                              <td style={{ padding: "12px 16px", color: "#1e293b", fontWeight: 500 }}>{v.date}</td>
+                              <td style={{ padding: "12px 16px" }}><span style={{ padding: "3px 10px", borderRadius: "12px", fontSize: "12px", fontWeight: 600, background: v.type === "OPD" ? "#dbeafe" : v.type === "IPD" ? "#fef3c7" : "#fee2e2", color: v.type === "OPD" ? "#1e40af" : v.type === "IPD" ? "#92400e" : "#991b1b" }}>{v.type}</span></td>
+                              <td style={{ padding: "12px 16px", color: "#475569" }}>{v.doctor}</td>
+                              <td style={{ padding: "12px 16px", color: "#475569" }}>{v.department}</td>
+                              <td style={{ padding: "12px 16px", color: "#475569", maxWidth: "150px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.symptoms}</td>
+                              <td style={{ padding: "12px 16px", color: "#475569", maxWidth: "150px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.diagnosis}</td>
+                              <td style={{ padding: "12px 16px" }}><span style={{ padding: "3px 10px", borderRadius: "12px", fontSize: "12px", fontWeight: 600, background: v.status === "Completed" ? "#dcfce7" : v.status === "In Progress" ? "#dbeafe" : "#f1f5f9", color: v.status === "Completed" ? "#166534" : v.status === "In Progress" ? "#1e40af" : "#64748b" }}>{v.status}</span></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === "lab" && (
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                    <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#1e293b", margin: 0 }}>Lab Results</h3>
+                    <button onClick={() => setShowLabForm(!showLabForm)} style={btnPrimary}>
+                      {showLabForm ? <><X size={14} /> Cancel</> : <><Plus size={14} /> Order Test</>}
+                    </button>
+                  </div>
+
+                  {showLabForm && (
+                    <form onSubmit={handleAddLabResult} style={{ ...cardStyle, padding: "20px", marginBottom: "16px", background: "#f8fafc", border: `1px solid ${accentLight}` }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px" }}>
+                        <div><label style={labelStyle}>Test Name</label><input value={labData.testName} onChange={(e) => setLabData({ ...labData, testName: e.target.value })} style={inputStyle} placeholder="e.g. Complete Blood Count" required /></div>
+                        <div><label style={labelStyle}>Category</label>
+                          <select value={labData.category} onChange={(e) => setLabData({ ...labData, category: e.target.value })} style={inputStyle}>
+                            {labCategories.map((c) => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                        </div>
+                        <div style={{ gridColumn: "1 / -1" }}><label style={labelStyle}>Notes</label><textarea value={labData.notes} onChange={(e) => setLabData({ ...labData, notes: e.target.value })} style={{ ...inputStyle, minHeight: "60px", resize: "vertical" }} placeholder="Additional notes..." /></div>
+                      </div>
+                      <div style={{ marginTop: "16px", display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                        <button type="button" onClick={() => setShowLabForm(false)} style={btnOutline}>Cancel</button>
+                        <button type="submit" style={btnPrimary}><Check size={14} /> Order Test</button>
+                      </div>
+                    </form>
+                  )}
+
+                  {selectedPatient.labResults.length === 0 ? (
+                    <div style={{ padding: "40px", textAlign: "center", color: "#94a3b8" }}>No lab results yet</div>
+                  ) : (
+                    <div style={{ overflowX: "auto" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                        <thead>
+                          <tr style={{ background: "#f8fafc", borderBottom: "2px solid #e2e8f0" }}>
+                            {["Test Name", "Category", "Result", "Date", "Ordered By", "Status"].map((h) => (
+                              <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#475569", whiteSpace: "nowrap" }}>{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedPatient.labResults.map((lr) => (
+                            <tr key={lr.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                              <td style={{ padding: "12px 16px", color: "#1e293b", fontWeight: 500 }}>{lr.testName}</td>
+                              <td style={{ padding: "12px 16px" }}><span style={{ padding: "3px 10px", borderRadius: "12px", fontSize: "12px", fontWeight: 600, background: "#ede9fe", color: "#6d28d9" }}>{lr.category}</span></td>
+                              <td style={{ padding: "12px 16px", color: "#475569" }}>{lr.result || "Pending"}</td>
+                              <td style={{ padding: "12px 16px", color: "#475569" }}>{lr.date}</td>
+                              <td style={{ padding: "12px 16px", color: "#475569" }}>{lr.orderedBy}</td>
+                              <td style={{ padding: "12px 16px" }}><span style={{ padding: "3px 10px", borderRadius: "12px", fontSize: "12px", fontWeight: 600, background: lr.status === "Completed" ? "#dcfce7" : lr.status === "In Progress" ? "#dbeafe" : "#fef3c7", color: lr.status === "Completed" ? "#166534" : lr.status === "In Progress" ? "#1e40af" : "#92400e" }}>{lr.status}</span></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === "prescriptions" && (
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                    <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#1e293b", margin: 0 }}>Prescriptions</h3>
+                    <button onClick={() => setShowPrescriptionForm(!showPrescriptionForm)} style={btnPrimary}>
+                      {showPrescriptionForm ? <><X size={14} /> Cancel</> : <><Plus size={14} /> Add Prescription</>}
+                    </button>
+                  </div>
+
+                  {showPrescriptionForm && (
+                    <form onSubmit={handleAddPrescription} style={{ ...cardStyle, padding: "20px", marginBottom: "16px", background: "#f8fafc", border: `1px solid ${accentLight}` }}>
+                      <label style={labelStyle}>Prescription</label>
+                      <textarea value={prescriptionText} onChange={(e) => setPrescriptionText(e.target.value)} style={{ ...inputStyle, minHeight: "80px", resize: "vertical" }} placeholder="e.g. Amoxicillin 500mg - Three times daily for 7 days" required />
+                      <div style={{ marginTop: "12px", display: "flex", gap: "8px", justifyContent: "flex-end" }}>
+                        <button type="button" onClick={() => setShowPrescriptionForm(false)} style={btnOutline}>Cancel</button>
+                        <button type="submit" style={btnPrimary}><Check size={14} /> Add</button>
+                      </div>
+                    </form>
+                  )}
+
+                  {selectedPatient.prescriptions.length === 0 ? (
+                    <div style={{ padding: "40px", textAlign: "center", color: "#94a3b8" }}>No prescriptions yet</div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                      {selectedPatient.prescriptions.map((p, i) => (
+                        <div key={i} style={{ ...cardStyle, padding: "16px 20px", display: "flex", alignItems: "center", gap: "12px", borderLeft: `3px solid ${accent}` }}>
+                          <Pill size={16} color={accent} style={{ flexShrink: 0 }} />
+                          <span style={{ fontSize: "14px", color: "#1e293b" }}>{p}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === "bills" && (
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                    <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#1e293b", margin: 0 }}>Bills</h3>
+                  </div>
+
+                  {selectedPatient.bills.length === 0 ? (
+                    <div style={{ padding: "40px", textAlign: "center", color: "#94a3b8" }}>No bills yet</div>
+                  ) : (
+                    <div style={{ overflowX: "auto" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                        <thead>
+                          <tr style={{ background: "#f8fafc", borderBottom: "2px solid #e2e8f0" }}>
+                            {["Date", "Items", "Amount", "Paid", "Due", "Status"].map((h) => (
+                              <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontWeight: 700, color: "#475569", whiteSpace: "nowrap" }}>{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedPatient.bills.map((b) => (
+                            <tr key={b.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                              <td style={{ padding: "12px 16px", color: "#1e293b", fontWeight: 500 }}>{b.date}</td>
+                              <td style={{ padding: "12px 16px", color: "#475569", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{b.items}</td>
+                              <td style={{ padding: "12px 16px", color: "#1e293b", fontWeight: 600 }}>₦{b.amount.toLocaleString()}</td>
+                              <td style={{ padding: "12px 16px", color: "#16a34a", fontWeight: 600 }}>₦{b.paid.toLocaleString()}</td>
+                              <td style={{ padding: "12px 16px", color: b.due > 0 ? "#dc2626" : "#16a34a", fontWeight: 600 }}>₦{b.due.toLocaleString()}</td>
+                              <td style={{ padding: "12px 16px" }}><span style={{ padding: "3px 10px", borderRadius: "12px", fontSize: "12px", fontWeight: 600, background: b.status === "Paid" ? "#dcfce7" : b.status === "Partial" ? "#fef3c7" : "#fee2e2", color: b.status === "Paid" ? "#166534" : b.status === "Partial" ? "#92400e" : "#991b1b" }}>{b.status}</span></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
   )
 }
