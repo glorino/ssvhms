@@ -1,71 +1,95 @@
 "use client"
 
 import React, { useState } from "react"
+import { useSession, signOut } from "next-auth/react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Bell, Search, User, LogOut, Settings, Moon, Sun, ChevronDown } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 const notifications = [
-  { id: 1, title: "New patient registered", message: "Rajesh Kumar has been added", time: "5 min ago", read: false, type: "patient" },
-  { id: 2, title: "Appointment confirmed", message: "Dr. Priya Sharma - 10:00 AM", time: "15 min ago", read: false, type: "appointment" },
-  { id: 3, title: "Lab results ready", message: "CBC test completed for Anita Patel", time: "1 hour ago", read: true, type: "lab" },
-  { id: 4, title: "Payment received", message: "₹15,000 from Suresh Reddy", time: "2 hours ago", read: true, type: "payment" },
-  { id: 5, title: "Bed status update", message: "ICU-03 now available", time: "3 hours ago", read: true, type: "bed" },
+  { id: 1, title: "New patient registered", message: "Rajesh Kumar has been added", time: "5 min ago", read: false },
+  { id: 2, title: "Appointment confirmed", message: "Dr. Priya Sharma - 10:00 AM", time: "15 min ago", read: false },
+  { id: 3, title: "Lab results ready", message: "CBC test completed for Anita Patel", time: "1 hour ago", read: true },
+  { id: 4, title: "Payment received", message: "₹15,000 from Suresh Reddy", time: "2 hours ago", read: true },
+  { id: 5, title: "Bed status update", message: "ICU-03 now available", time: "3 hours ago", read: true },
 ]
 
+function getInitials(name: string) {
+  return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
+}
+
+function getRoleLabel(role: string) {
+  return role.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+}
+
 export function Header() {
+  const { data: session } = useSession()
   const [showNotifications, setShowNotifications] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
-  const [isDark, setIsDark] = useState(false)
+
+  const user = session?.user as any
+  const userName = user?.name || "User"
+  const userEmail = user?.email || ""
+  const userRole = user?.role || "USER"
+  const initials = getInitials(userName)
 
   const unreadCount = notifications.filter((n) => !n.read).length
 
   return (
-    <header className="sticky top-0 z-30 h-16 border-b border-slate-200 bg-white/80 backdrop-blur-xl">
-      <div className="flex h-full items-center gap-4 px-6">
+    <header style={{
+      position: "sticky", top: 0, zIndex: 30, height: 64,
+      borderBottom: "1px solid #e2e8f0", background: "rgba(255,255,255,0.85)",
+      backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
+    }}>
+      <div style={{ display: "flex", alignItems: "center", height: "100%", gap: 16, padding: "0 24px" }}>
         {/* Search */}
-        <div className="flex-1 max-w-md">
-          <div className="relative group">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 text-slate-400 -translate-y-1/2 group-focus-within:text-[#14b8a6] transition-colors" />
-            <Input
+        <div style={{ flex: 1, maxWidth: 400 }}>
+          <div style={{ position: "relative" }}>
+            <Search style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", width: 16, height: 16, color: "#94a3b8" }} />
+            <input
               type="search"
               placeholder="Search patients, doctors, bills..."
-              className="pl-10 bg-slate-50 border-slate-200 focus:bg-white focus:border-[#14b8a6] focus:ring-2 focus:ring-[#14b8a6]/10 transition-all h-10"
+              style={{
+                width: "100%", padding: "10px 12px 10px 40px", borderRadius: 10,
+                border: "1px solid #e2e8f0", fontSize: 13, color: "#0f172a",
+                background: "#f8fafc", outline: "none",
+              }}
             />
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {/* Theme Toggle */}
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={() => setIsDark(!isDark)}
-            className="h-9 w-9 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors"
-          >
-            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </motion.button>
+          <button style={{
+            width: 36, height: 36, borderRadius: 10, border: "none", background: "none",
+            display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#64748b",
+          }}>
+            <Moon size={18} />
+          </button>
 
           {/* Notifications */}
-          <div className="relative">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+          <div style={{ position: "relative" }}>
+            <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="h-9 w-9 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-500 relative transition-colors"
+              style={{
+                width: 36, height: 36, borderRadius: 10, border: "none", background: "none",
+                display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
+                color: "#64748b", position: "relative",
+              }}
             >
-              <Bell className="h-5 w-5" />
+              <Bell size={18} />
               {unreadCount > 0 && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-gradient-to-r from-red-500 to-pink-500 text-[10px] font-bold text-white flex items-center justify-center shadow-lg"
-                >
+                <span style={{
+                  position: "absolute", top: -2, right: -2,
+                  width: 18, height: 18, borderRadius: "50%",
+                  background: "linear-gradient(135deg, #ef4444, #ec4899)",
+                  color: "#fff", fontSize: 10, fontWeight: 700,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
                   {unreadCount}
-                </motion.span>
+                </span>
               )}
-            </motion.button>
+            </button>
 
             <AnimatePresence>
               {showNotifications && (
@@ -73,34 +97,40 @@ export function Header() {
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden"
+                  style={{
+                    position: "absolute", right: 0, top: 44, width: 320,
+                    background: "#fff", borderRadius: 12, boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+                    border: "1px solid #e2e8f0", overflow: "hidden", zIndex: 50,
+                  }}
                 >
-                  <div className="p-4 border-b border-slate-100 bg-gradient-to-r from-[#0f766e] to-[#14b8a6]">
-                    <h3 className="font-semibold text-white">Notifications</h3>
-                    <p className="text-xs text-white/80">{unreadCount} unread</p>
+                  <div style={{ padding: 16, borderBottom: "1px solid #f1f5f9", background: "linear-gradient(135deg, #0f766e, #14b8a6)" }}>
+                    <h3 style={{ fontWeight: 600, color: "#fff", fontSize: 14 }}>Notifications</h3>
+                    <p style={{ fontSize: 12, color: "rgba(255,255,255,0.8)" }}>{unreadCount} unread</p>
                   </div>
-                  <div className="max-h-80 overflow-y-auto">
+                  <div style={{ maxHeight: 320, overflowY: "auto" }}>
                     {notifications.map((notif) => (
-                      <motion.div
-                        key={notif.id}
-                        whileHover={{ backgroundColor: "#f8fafc" }}
-                        className={`p-4 border-b border-slate-100 cursor-pointer ${!notif.read ? "bg-teal-50/50" : ""}`}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className={`h-2 w-2 rounded-full mt-2 flex-shrink-0 ${!notif.read ? "bg-[#14b8a6]" : "bg-transparent"}`} />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-900">{notif.title}</p>
-                            <p className="text-xs text-slate-500">{notif.message}</p>
-                            <p className="text-xs text-slate-400 mt-1">{notif.time}</p>
+                      <div key={notif.id} style={{
+                        padding: "12px 16px", borderBottom: "1px solid #f1f5f9",
+                        background: !notif.read ? "rgba(20,184,166,0.04)" : "#fff", cursor: "pointer",
+                      }}>
+                        <div style={{ display: "flex", gap: 10 }}>
+                          <div style={{
+                            width: 8, height: 8, borderRadius: "50%", marginTop: 6, flexShrink: 0,
+                            background: !notif.read ? "#14b8a6" : "transparent",
+                          }} />
+                          <div>
+                            <p style={{ fontSize: 13, fontWeight: 500, color: "#0f172a" }}>{notif.title}</p>
+                            <p style={{ fontSize: 12, color: "#64748b" }}>{notif.message}</p>
+                            <p style={{ fontSize: 11, color: "#94a3b8", marginTop: 4 }}>{notif.time}</p>
                           </div>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
-                  <div className="p-3 border-t border-slate-100">
-                    <Button variant="ghost" className="w-full text-sm text-[#14b8a6] hover:text-[#0f766e] hover:bg-[#14b8a6]/5">
+                  <div style={{ padding: 12, borderTop: "1px solid #f1f5f9", textAlign: "center" }}>
+                    <button style={{ fontSize: 13, fontWeight: 500, color: "#14b8a6", background: "none", border: "none", cursor: "pointer" }}>
                       View All Notifications
-                    </Button>
+                    </button>
                   </div>
                 </motion.div>
               )}
@@ -108,24 +138,32 @@ export function Header() {
           </div>
 
           {/* Divider */}
-          <div className="h-8 w-px bg-slate-200 mx-1" />
+          <div style={{ width: 1, height: 32, background: "#e2e8f0", margin: "0 4px" }} />
 
           {/* Profile */}
-          <div className="relative">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
+          <div style={{ position: "relative" }}>
+            <button
               onClick={() => setShowProfile(!showProfile)}
-              className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-100 transition-colors"
+              style={{
+                display: "flex", alignItems: "center", gap: 10, padding: 6, borderRadius: 12,
+                border: "none", background: "none", cursor: "pointer",
+              }}
             >
-              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#0f766e] to-[#14b8a6] flex items-center justify-center text-white font-semibold text-sm shadow-lg shadow-teal-500/25">
-                SA
+              <div style={{
+                width: 36, height: 36, borderRadius: 10,
+                background: "linear-gradient(135deg, #0f766e, #14b8a6)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                color: "#fff", fontSize: 13, fontWeight: 600,
+                boxShadow: "0 2px 8px rgba(20,184,166,0.3)",
+              }}>
+                {initials}
               </div>
-              <div className="hidden sm:block text-left">
-                <p className="text-sm font-semibold text-slate-900">Super Admin</p>
-                <p className="text-xs text-slate-500">admin@ssvhms.com</p>
+              <div style={{ textAlign: "left" }}>
+                <p style={{ fontSize: 13, fontWeight: 600, color: "#0f172a", lineHeight: 1.2 }}>{userName}</p>
+                <p style={{ fontSize: 11, color: "#94a3b8" }}>{getRoleLabel(userRole)}</p>
               </div>
-              <ChevronDown className="h-4 w-4 text-slate-400" />
-            </motion.button>
+              <ChevronDown style={{ width: 14, height: 14, color: "#94a3b8" }} />
+            </button>
 
             <AnimatePresence>
               {showProfile && (
@@ -133,25 +171,35 @@ export function Header() {
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute right-0 top-12 w-56 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden"
+                  style={{
+                    position: "absolute", right: 0, top: 48, width: 220,
+                    background: "#fff", borderRadius: 12, boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+                    border: "1px solid #e2e8f0", overflow: "hidden", zIndex: 50,
+                  }}
                 >
-                  <div className="p-4 border-b border-slate-100">
-                    <p className="font-semibold text-slate-900">Super Admin</p>
-                    <p className="text-sm text-slate-500">admin@ssvhms.com</p>
+                  <div style={{ padding: 16, borderBottom: "1px solid #f1f5f9" }}>
+                    <p style={{ fontWeight: 600, color: "#0f172a", fontSize: 14 }}>{userName}</p>
+                    <p style={{ fontSize: 12, color: "#64748b" }}>{userEmail}</p>
+                    <span style={{
+                      display: "inline-block", marginTop: 4, padding: "2px 8px", borderRadius: 6,
+                      fontSize: 10, fontWeight: 600, background: "rgba(20,184,166,0.1)", color: "#0f766e",
+                    }}>
+                      {getRoleLabel(userRole)}
+                    </span>
                   </div>
-                  <div className="p-2">
-                    <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100 transition-colors">
-                      <User className="h-4 w-4" />
-                      My Profile
+                  <div style={{ padding: 8 }}>
+                    <button style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, border: "none", background: "none", fontSize: 13, color: "#475569", cursor: "pointer" }}>
+                      <User size={16} /> My Profile
                     </button>
-                    <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100 transition-colors">
-                      <Settings className="h-4 w-4" />
-                      Settings
+                    <button style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, border: "none", background: "none", fontSize: 13, color: "#475569", cursor: "pointer" }}>
+                      <Settings size={16} /> Settings
                     </button>
-                    <div className="my-2 h-px bg-slate-100" />
-                    <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50 transition-colors">
-                      <LogOut className="h-4 w-4" />
-                      Sign Out
+                    <div style={{ height: 1, background: "#f1f5f9", margin: "4px 0" }} />
+                    <button
+                      onClick={() => signOut({ callbackUrl: "/login" })}
+                      style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, border: "none", background: "none", fontSize: 13, color: "#dc2626", cursor: "pointer" }}
+                    >
+                      <LogOut size={16} /> Sign Out
                     </button>
                   </div>
                 </motion.div>

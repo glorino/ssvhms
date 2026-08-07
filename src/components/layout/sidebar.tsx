@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useSession, signOut } from "next-auth/react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import {
@@ -219,8 +220,14 @@ function NavItemComponent({
 
 export function Sidebar({ userRole = "SUPER_ADMIN" }: { userRole?: string }) {
   const pathname = usePathname()
+  const { data: session } = useSession()
   const [isCollapsed, setIsCollapsed] = useState(false)
   const navigation = getNavigationForRole(userRole)
+
+  const user = session?.user as any
+  const userName = user?.name || "User"
+  const userEmail = user?.email || ""
+  const initials = userName.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
 
   return (
     <motion.aside
@@ -271,16 +278,19 @@ export function Sidebar({ userRole = "SUPER_ADMIN" }: { userRole?: string }) {
       <div className="absolute bottom-0 left-0 right-0 border-t border-slate-100 bg-gradient-to-r from-slate-50 to-white p-3">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#0f766e] to-[#14b8a6] flex items-center justify-center text-white font-semibold text-sm shadow-lg shadow-teal-500/25">
-            SA
+            {initials}
           </div>
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-slate-900 truncate">Super Admin</p>
-              <p className="text-xs text-slate-500 truncate">admin@ssvhms.com</p>
+              <p className="text-sm font-semibold text-slate-900 truncate">{userName}</p>
+              <p className="text-xs text-slate-500 truncate">{userEmail}</p>
             </div>
           )}
           {!isCollapsed && (
-            <button className="h-8 w-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
+            <button
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="h-8 w-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors"
+            >
               <LogOut className="h-4 w-4" />
             </button>
           )}
