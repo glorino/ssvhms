@@ -93,7 +93,7 @@ export default function LoginPage() {
           }} />
         </div>
 
-        <div className="relative z-10 flex flex-col w-full p-10 lg:p-14">
+        <div className="relative z-10 flex flex-col w-full p-6 lg:pl-6 lg:pr-14 lg:pt-14 lg:pb-6">
           {/* Logo */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -174,7 +174,7 @@ export default function LoginPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7 }}
-            className="flex items-center gap-10 pt-8 mt-8 border-t border-white/10"
+            className="flex items-center gap-10 pt-8 mt-8 pb-2 border-t border-white/10"
           >
             {[
               { value: "10K+", label: "Patients Managed" },
@@ -191,7 +191,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full lg:w-[48%] flex items-center justify-center p-8 lg:p-12">
+      <div className="w-full lg:w-[48%] flex items-center justify-center pl-6 pr-8 py-6 lg:pl-6 lg:pr-16 lg:pt-14 lg:pb-6">
         <div className="w-full max-w-[420px]">
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center gap-3 mb-12 justify-center">
@@ -206,8 +206,8 @@ export default function LoginPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <h2 className="text-[28px] font-bold text-gray-900 mb-1.5">Welcome back</h2>
-            <p className="text-gray-500 mb-8">Sign in to your account to continue</p>
+            <h2 className="text-[28px] font-bold text-gray-900 mb-2">Welcome back</h2>
+            <p className="text-gray-500 mb-8 text-[15px]">Sign in to your account to continue</p>
 
             <AnimatePresence>
               {error && (
@@ -230,12 +230,12 @@ export default function LoginPage() {
                   Email address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] text-gray-400" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-[15px] text-gray-900 placeholder:text-gray-400"
+                    className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-200 bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-[15px] text-gray-900 placeholder:text-gray-400"
                     placeholder="you@example.com"
                     required
                   />
@@ -247,21 +247,21 @@ export default function LoginPage() {
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-[18px] text-gray-400" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-11 py-3 rounded-lg border border-gray-200 bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-[15px] text-gray-900 placeholder:text-gray-400"
+                    className="w-full pl-12 pr-12 py-3 rounded-lg border border-gray-200 bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-[15px] text-gray-900 placeholder:text-gray-400"
                     placeholder="Enter your password"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
                   >
-                    {showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
               </div>
