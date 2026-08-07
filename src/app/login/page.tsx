@@ -191,7 +191,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full lg:w-[48%] flex items-center justify-center pl-6 pr-8 py-6 lg:pl-6 lg:pr-16 lg:pt-14 lg:pb-6">
+      <div className="w-full lg:w-[48%] flex items-center justify-center pl-16 pb-16 pr-12 pt-10 lg:pl-20 lg:pb-20 lg:pr-16 lg:pt-14">
         <div className="w-full max-w-[420px]">
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center gap-3 mb-12 justify-center">
