@@ -22,10 +22,10 @@ const quickActions = [
 ]
 
 const departments = [
-  { icon: Heart, name: "Cardiology", count: "2 Specialists" },
-  { icon: Stethoscope, name: "General Medicine", count: "4 Specialists" },
-  { icon: Activity, name: "Neurology", count: "1 Specialist" },
-  { icon: Pill, name: "Pharmacy", count: "3 Pharmacists" },
+  { icon: Heart, name: "Cardiology", count: "2 Specialists", href: "/doctors" },
+  { icon: Stethoscope, name: "General Medicine", count: "4 Specialists", href: "/doctors" },
+  { icon: Activity, name: "Neurology", count: "1 Specialist", href: "/doctors" },
+  { icon: Pill, name: "Pharmacy", count: "3 Pharmacists", href: "/pharmacy" },
 ]
 
 const stats = [
@@ -90,7 +90,7 @@ export default function HomePage() {
             <div style={{ width: 40, height: 40, background: "#dc2626", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-4h4v-2h-4V7h-2v4H7v2h4v4z"/></svg>
             </div>
-            <span style={{ fontSize: 22, fontWeight: 800, color: "#111827", letterSpacing: -0.5 }}>SMART HOSPITAL</span>
+            <span style={{ fontSize: 22, fontWeight: 800, color: "#111827", letterSpacing: -0.5 }}>SSV HOSPITAL</span>
           </Link>
 
           <nav style={{ display: "flex", alignItems: "center", gap: 28 }}>
@@ -227,16 +227,20 @@ export default function HomePage() {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
             {departments.map((dept) => (
-              <div key={dept.name} style={{
+              <Link key={dept.name} href={dept.href} style={{
                 background: "#fff", borderRadius: 12, border: "1px solid #f3f4f6",
-                padding: 24, textAlign: "center", cursor: "pointer",
-              }}>
+                padding: 24, textAlign: "center", cursor: "pointer", textDecoration: "none",
+                display: "block", transition: "all 0.2s",
+              }}
+                onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 8px 25px rgba(0,0,0,0.08)"; e.currentTarget.style.transform = "translateY(-2px)" }}
+                onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "none" }}
+              >
                 <div style={{ width: 56, height: 56, borderRadius: 12, background: "rgba(20,184,166,0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
                   <dept.icon size={28} color="#14b8a6" />
                 </div>
                 <h3 style={{ fontSize: 14, fontWeight: 700, color: "#111827", marginBottom: 4 }}>{dept.name}</h3>
                 <p style={{ fontSize: 12, color: "#6b7280" }}>{dept.count}</p>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -298,7 +302,7 @@ export default function HomePage() {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
             {doctors.map((doc) => (
-              <div key={doc.name} style={{ background: "#fff", borderRadius: 12, border: "1px solid #f3f4f6", overflow: "hidden" }}>
+              <Link key={doc.name} href="/login" style={{ background: "#fff", borderRadius: 12, border: "1px solid #f3f4f6", overflow: "hidden", display: "block", textDecoration: "none" }}>
                 <div style={{ height: 192, background: "linear-gradient(135deg, #f9fafb, #e5e7eb)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
                   <Stethoscope size={64} color="#d1d5db" />
                   <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.6))", padding: "32px 16px 12px" }}>
@@ -319,7 +323,7 @@ export default function HomePage() {
                     Book Appointment →
                   </Link>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -387,7 +391,7 @@ export default function HomePage() {
                 <div style={{ width: 32, height: 32, background: "#dc2626", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-4h4v-2h-4V7h-2v4H7v2h4v4z"/></svg>
                 </div>
-                <span style={{ fontWeight: 700, color: "#fff", fontSize: 15 }}>SMART HOSPITAL</span>
+                <span style={{ fontWeight: 700, color: "#fff", fontSize: 15 }}>SSV HOSPITAL</span>
               </div>
               <p style={{ lineHeight: 1.6, fontSize: 12 }}>Delivering exceptional healthcare with compassion and precision.</p>
             </div>
