@@ -96,7 +96,7 @@ export default function DoctorsPage() {
     setPrescriptionText("")
   }
 
-  const s = (base: string, extra?: React.CSSProperties): React.CSSProperties => ({ ...base, ...extra } as React.CSSProperties)
+  const s = (base: React.CSSProperties, extra?: React.CSSProperties): React.CSSProperties => ({ ...base, ...extra })
   const cardStyle: React.CSSProperties = { background: "#fff", borderRadius: "12px", border: "1px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }
   const inputStyle: React.CSSProperties = { width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px", outline: "none", boxSizing: "border-box" }
   const labelStyle: React.CSSProperties = { fontSize: "13px", fontWeight: 600, color: "#475569", marginBottom: "6px", display: "block" }
@@ -164,7 +164,7 @@ export default function DoctorsPage() {
                   <span style={{ display: "inline-block", background: accent, color: "#fff", padding: "4px 14px", borderRadius: "20px", fontSize: "13px", fontWeight: 700, letterSpacing: "0.5px", marginBottom: "6px" }}>{selectedPatient.uniqueNumber}</span>
                   <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#1e293b", margin: 0 }}>{selectedPatient.firstName} {selectedPatient.lastName}</h2>
                   <div style={{ display: "flex", gap: "16px", marginTop: "4px", fontSize: "14px", color: "#475569" }}>
-                    <span>{selectedPatient.age || Math.floor((Date.now() - new Date(selectedPatient.dateOfBirth).getTime()) / 31557600000)} yrs</span>
+                    <span>{Math.floor((Date.now() - new Date(selectedPatient.dateOfBirth).getTime()) / 31557600000)} yrs</span>
                     <span>{selectedPatient.gender}</span>
                     <span>Blood: {selectedPatient.bloodGroup}</span>
                     <span>{selectedPatient.phone}</span>
