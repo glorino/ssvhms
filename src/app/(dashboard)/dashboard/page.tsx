@@ -89,7 +89,6 @@ export default function DashboardPage() {
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <div style={{
                     width: 44, height: 44, borderRadius: 12,
-                    background: stat.gradient.includes("#") ? undefined : undefined,
                     background: `linear-gradient(135deg, ${stat.gradient.includes("blue") ? "#3b82f6,#06b6d4" : stat.gradient.includes("violet") ? "#8b5cf6,#a855f7" : stat.gradient.includes("#0f766e") ? "#0f766e,#14b8a6" : stat.gradient.includes("amber") ? "#f59e0b,#f97316" : stat.gradient.includes("rose") ? "#f43f5e,#ec4899" : "#ef4444,#f43f5e"})`,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
