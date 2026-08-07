@@ -14,11 +14,15 @@ const bills = [
   { id: "BILL006", billNo: "BL2026006", patient: "Ibrahim Musa", umr: "UMR2026006", type: "IPD", amount: 620000, paid: 480000, due: 140000, date: "2026-08-02", status: "Partial" },
 ]
 
+const totalRevenue = bills.reduce((acc, b) => acc + b.amount, 0)
+const totalCollected = bills.reduce((acc, b) => acc + b.paid, 0)
+const totalPending = bills.reduce((acc, b) => acc + b.due, 0)
+
 const stats = [
-  { title: "Total Revenue", value: "₦3,850,000", color: "#14b8a6", bg: "#f0fdfa" },
-  { title: "Collected", value: "₦2,950,000", color: "#059669", bg: "#ecfdf5" },
-  { title: "Pending", value: "₦900,000", color: "#d97706", bg: "#fffbeb" },
-  { title: "Overdue", value: "₦120,000", color: "#dc2626", bg: "#fef2f2" },
+  { title: "Total Revenue", value: formatNaira(totalRevenue), color: "#14b8a6", bg: "#f0fdfa" },
+  { title: "Collected", value: formatNaira(totalCollected), color: "#059669", bg: "#ecfdf5" },
+  { title: "Pending", value: formatNaira(totalPending), color: "#d97706", bg: "#fffbeb" },
+  { title: "Overdue", value: formatNaira(bills.filter((b) => b.status === "Pending").reduce((acc, b) => acc + b.due, 0)), color: "#dc2626", bg: "#fef2f2" },
 ]
 
 const statusStyles: Record<string, { bg: string; color: string; border: string }> = {

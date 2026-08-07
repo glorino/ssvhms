@@ -1,6 +1,7 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
+import { usePatients } from "@/lib/patient-context"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import {
@@ -31,62 +32,83 @@ import {
 } from "@/components/ui/table"
 import { AnimatedPage, StaggerContainer, StaggerItem } from "@/components/animated-wrapper"
 
-const stats = [
-  {
-    title: "Total Patients",
-    value: "12,847",
-    icon: Users,
-    gradient: "from-blue-500 to-indigo-600",
-    shadow: "shadow-blue-500/30",
-    change: "+12%",
-  },
-  {
-    title: "Active Patients",
-    value: "11,234",
-    icon: Activity,
-    gradient: "from-emerald-500 to-teal-600",
-    shadow: "shadow-emerald-500/30",
-    change: "+8%",
-  },
-  {
-    title: "New This Month",
-    value: "48",
-    icon: TrendingUp,
-    gradient: "from-orange-500 to-amber-600",
-    shadow: "shadow-orange-500/30",
-    change: "+23%",
-  },
-  {
-    title: "Currently Admitted",
-    value: "156",
-    icon: Heart,
-    gradient: "from-rose-500 to-pink-600",
-    shadow: "shadow-rose-500/30",
-    change: "+5%",
-  },
-]
+function getAge(dob: string): number {
+  const birth = new Date(dob)
+  const today = new Date()
+  let age = today.getFullYear() - birth.getFullYear()
+  const m = today.getMonth() - birth.getMonth()
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--
+  return age
+}
 
-const mockPatients = [
-  { id: "PT001", umr: "UMR2026001", name: "Rajesh Kumar", age: 45, gender: "Male", phone: "+91 98765 43210", email: "rajesh@email.com", bloodGroup: "O+", lastVisit: "2026-08-05", status: "Active" },
-  { id: "PT002", umr: "UMR2026002", name: "Anita Patel", age: 32, gender: "Female", phone: "+91 98765 43211", email: "anita@email.com", bloodGroup: "A+", lastVisit: "2026-08-04", status: "Active" },
-  { id: "PT003", umr: "UMR2026003", name: "Suresh Reddy", age: 58, gender: "Male", phone: "+91 98765 43212", email: "suresh@email.com", bloodGroup: "B+", lastVisit: "2026-08-03", status: "Active" },
-  { id: "PT004", umr: "UMR2026004", name: "Priya Verma", age: 28, gender: "Female", phone: "+91 98765 43213", email: "priya@email.com", bloodGroup: "AB+", lastVisit: "2026-08-02", status: "Inactive" },
-  { id: "PT005", umr: "UMR2026005", name: "Mohammed Ali", age: 67, gender: "Male", phone: "+91 98765 43214", email: "mohammed@email.com", bloodGroup: "O-", lastVisit: "2026-08-01", status: "Active" },
-  { id: "PT006", umr: "UMR2026006", name: "Deepika Singh", age: 41, gender: "Female", phone: "+91 98765 43215", email: "deepika@email.com", bloodGroup: "A-", lastVisit: "2026-07-30", status: "Active" },
-  { id: "PT007", umr: "UMR2026007", name: "Arun Sharma", age: 55, gender: "Male", phone: "+91 98765 43216", email: "arun@email.com", bloodGroup: "B-", lastVisit: "2026-07-28", status: "Active" },
-  { id: "PT008", umr: "UMR2026008", name: "Kavita Joshi", age: 36, gender: "Female", phone: "+91 98765 43217", email: "kavita@email.com", bloodGroup: "AB-", lastVisit: "2026-07-25", status: "Active" },
-]
+function getLastVisit(patient: { visits: { date: string }[] }): string {
+  if (patient.visits.length === 0) return "N/A"
+  return patient.visits.reduce((latest, v) => (v.date > latest ? v.date : latest), patient.visits[0].date)
+}
 
 export default function PatientsPage() {
   const [searchTerm, setSearchTerm] = useState("")
+  const { patients } = usePatients()
 
-  const filteredPatients = mockPatients.filter((patient) => {
-    const matchesSearch =
-      patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      patient.umr.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      patient.phone.includes(searchTerm)
-    return matchesSearch
-  })
+  const now = new Date()
+  const currentMonth = now.getMonth()
+  const currentYear = now.getFullYear()
+
+  const stats = useMemo(() => {
+    const totalPatients = patients.length
+    const activePatients = patients.filter((p) => p.status === "Active").length
+    const newThisMonth = patients.filter((p) => {
+      const d = new Date(p.registeredAt)
+      return d.getMonth() === currentMonth && d.getFullYear() === currentYear
+    }).length
+    const currentlyAdmitted = patients.filter((p) => p.status === "Admitted").length
+    return [
+      {
+        title: "Total Patients",
+        value: totalPatients.toLocaleString(),
+        icon: Users,
+        gradient: "from-blue-500 to-indigo-600",
+        shadow: "shadow-blue-500/30",
+        change: "",
+      },
+      {
+        title: "Active Patients",
+        value: activePatients.toLocaleString(),
+        icon: Activity,
+        gradient: "from-emerald-500 to-teal-600",
+        shadow: "shadow-emerald-500/30",
+        change: "",
+      },
+      {
+        title: "New This Month",
+        value: newThisMonth.toLocaleString(),
+        icon: TrendingUp,
+        gradient: "from-orange-500 to-amber-600",
+        shadow: "shadow-orange-500/30",
+        change: "",
+      },
+      {
+        title: "Currently Admitted",
+        value: currentlyAdmitted.toLocaleString(),
+        icon: Heart,
+        gradient: "from-rose-500 to-pink-600",
+        shadow: "shadow-rose-500/30",
+        change: "",
+      },
+    ]
+  }, [patients, currentMonth, currentYear])
+
+  const filteredPatients = useMemo(() => {
+    const q = searchTerm.toLowerCase()
+    return patients.filter((p) => {
+      const fullName = `${p.firstName} ${p.lastName}`.toLowerCase()
+      return (
+        fullName.includes(q) ||
+        p.uniqueNumber.toLowerCase().includes(q) ||
+        p.phone.includes(q)
+      )
+    })
+  }, [patients, searchTerm])
 
   return (
     <AnimatedPage>
@@ -183,19 +205,19 @@ export default function PatientsPage() {
                       transition={{ delay: index * 0.05 }}
                       className="border-slate-100 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 transition-colors duration-200"
                     >
-                      <TableCell className="font-medium text-slate-700">{patient.umr}</TableCell>
+                      <TableCell className="font-medium text-slate-700">{patient.uniqueNumber}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <div className="h-9 w-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md">
                             <span className="text-xs font-bold text-white">
-                              {patient.name.split(" ").map((n) => n[0]).join("")}
+                              {patient.firstName[0]}{patient.lastName[0]}
                             </span>
                           </div>
-                          <span className="font-medium text-slate-800">{patient.name}</span>
+                          <span className="font-medium text-slate-800">{patient.firstName} {patient.lastName}</span>
                         </div>
                       </TableCell>
                       <TableCell className="text-slate-600">
-                        {patient.age} / {patient.gender}
+                        {getAge(patient.dateOfBirth)} / {patient.gender}
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col">
@@ -206,11 +228,17 @@ export default function PatientsPage() {
                       <TableCell>
                         <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">{patient.bloodGroup}</Badge>
                       </TableCell>
-                      <TableCell className="text-slate-600">{patient.lastVisit}</TableCell>
+                      <TableCell className="text-slate-600">{getLastVisit(patient)}</TableCell>
                       <TableCell>
                         <Badge
                           variant={patient.status === "Active" ? "success" : "secondary"}
-                          className={patient.status === "Active" ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-slate-100 text-slate-600 border-slate-200"}
+                          className={
+                            patient.status === "Active"
+                              ? "bg-emerald-100 text-emerald-700 border-emerald-200"
+                              : patient.status === "Admitted"
+                                ? "bg-blue-100 text-blue-700 border-blue-200"
+                                : "bg-slate-100 text-slate-600 border-slate-200"
+                          }
                         >
                           {patient.status}
                         </Badge>

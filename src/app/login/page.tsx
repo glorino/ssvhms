@@ -41,7 +41,7 @@ export default function LoginPage() {
     try {
       const result = await signIn("credentials", { email, password, redirect: false })
       if (result?.error) {
-        setError("Invalid credentials. Try using 'password' as the password.")
+        setError("Invalid email or password. Please try again.")
         setIsLoading(false)
       } else {
         router.push("/dashboard")

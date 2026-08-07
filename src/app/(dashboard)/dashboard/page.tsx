@@ -9,38 +9,22 @@ import {
   FileText, Droplets, Pill, FlaskConical, Heart, Brain, Bone, Eye, Clock,
 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
-
-const stats = [
-  { title: "Total Patients", value: "12,847", change: "+12.5%", trend: "up" as const, icon: Users, gradient: "linear-gradient(135deg, #3b82f6, #06b6d4)" },
-  { title: "Appointments", value: "48", change: "+8.2%", trend: "up" as const, icon: Calendar, gradient: "linear-gradient(135deg, #8b5cf6, #a855f7)" },
-  { title: "Active Doctors", value: "32", change: "+2.1%", trend: "up" as const, icon: Stethoscope, gradient: "linear-gradient(135deg, #0f766e, #14b8a6)" },
-  { title: "Revenue Today", value: "₦2,84,500", change: "+15.3%", trend: "up" as const, icon: CreditCard, gradient: "linear-gradient(135deg, #f59e0b, #f97316)" },
-  { title: "Beds Occupied", value: "156/200", change: "78%", trend: "neutral" as const, icon: BedDouble, gradient: "linear-gradient(135deg, #f43f5e, #ec4899)" },
-  { title: "Pending Bills", value: "₦4,25,000", change: "-5.2%", trend: "down" as const, icon: TrendingUp, gradient: "linear-gradient(135deg, #ef4444, #f97316)" },
-]
-
-const recentAppointments = [
-  { id: "APT001", patient: "Rajesh Kumar", doctor: "Dr. Priya Sharma", dept: "Cardiology", time: "10:00 AM", status: "Completed", avatar: "RK" },
-  { id: "APT002", patient: "Anita Patel", doctor: "Dr. Amit Singh", dept: "Orthopedics", time: "10:30 AM", status: "In Progress", avatar: "AP" },
-  { id: "APT003", patient: "Suresh Reddy", doctor: "Dr. Neha Gupta", dept: "Neurology", time: "11:00 AM", status: "Scheduled", avatar: "SR" },
-  { id: "APT004", patient: "Priya Verma", doctor: "Dr. Rahul Joshi", dept: "Dermatology", time: "11:30 AM", status: "Scheduled", avatar: "PV" },
-  { id: "APT005", patient: "Mohammed Ali", doctor: "Dr. Sanjay Mehta", dept: "General Medicine", time: "12:00 PM", status: "Cancelled", avatar: "MA" },
-]
+import { usePatients } from "@/lib/patient-context"
 
 const bedStatus = [
-  { ward: "ICU", total: 10, occupied: 9, color: "#ef4444" },
-  { ward: "General Ward", total: 40, occupied: 32, color: "#3b82f6" },
-  { ward: "Private", total: 20, occupied: 15, color: "#8b5cf6" },
-  { ward: "Semi-Private", total: 30, occupied: 22, color: "#14b8a6" },
-  { ward: "Emergency", total: 10, occupied: 7, color: "#f59e0b" },
-  { ward: "Maternity", total: 15, occupied: 11, color: "#ec4899" },
+  { ward: "ICU", total: 20, occupied: 16, color: "#ef4444" },
+  { ward: "General Ward", total: 80, occupied: 62, color: "#3b82f6" },
+  { ward: "Private", total: 40, occupied: 30, color: "#8b5cf6" },
+  { ward: "Semi-Private", total: 35, occupied: 28, color: "#14b8a6" },
+  { ward: "Emergency", total: 15, occupied: 12, color: "#f59e0b" },
+  { ward: "Maternity", total: 10, occupied: 8, color: "#ec4899" },
 ]
 
 const departments = [
-  { name: "Cardiology", patients: 45, revenue: "₦4,50,000", icon: Heart, color: "linear-gradient(135deg, #ef4444, #ec4899)" },
-  { name: "Neurology", patients: 28, revenue: "₦5,10,000", icon: Brain, color: "linear-gradient(135deg, #8b5cf6, #a855f7)" },
-  { name: "Orthopedics", patients: 38, revenue: "₦3,20,000", icon: Bone, color: "linear-gradient(135deg, #3b82f6, #06b6d4)" },
-  { name: "Ophthalmology", patients: 22, revenue: "₦1,80,000", icon: Eye, color: "linear-gradient(135deg, #0f766e, #14b8a6)" },
+  { name: "Cardiology", patients: 45, revenue: "₦450,000", icon: Heart, color: "linear-gradient(135deg, #ef4444, #ec4899)" },
+  { name: "Neurology", patients: 28, revenue: "₦510,000", icon: Brain, color: "linear-gradient(135deg, #8b5cf6, #a855f7)" },
+  { name: "Orthopedics", patients: 38, revenue: "₦320,000", icon: Bone, color: "linear-gradient(135deg, #3b82f6, #06b6d4)" },
+  { name: "Ophthalmology", patients: 22, revenue: "₦180,000", icon: Eye, color: "linear-gradient(135deg, #0f766e, #14b8a6)" },
 ]
 
 const quickActions = [
@@ -65,6 +49,37 @@ export default function DashboardPage() {
   const { data: session } = useSession()
   const user = session?.user as any
   const userName = user?.name?.split(" ")[0] || "Admin"
+  const { patients } = usePatients()
+
+  const totalPatients = patients.length
+
+  const recentAppointments = patients.flatMap((p) =>
+    p.visits
+      .filter((v) => v.date === new Date().toISOString().split("T")[0])
+      .map((v) => ({
+        id: v.id,
+        patient: `${p.firstName} ${p.lastName}`,
+        doctor: v.doctor,
+        dept: v.department,
+        time: v.date,
+        status: v.status,
+        avatar: `${p.firstName[0]}${p.lastName[0]}`,
+      }))
+  )
+
+  const totalBeds = bedStatus.reduce((sum, w) => sum + w.total, 0)
+  const occupiedBeds = bedStatus.reduce((sum, w) => sum + w.occupied, 0)
+  const availableBeds = totalBeds - occupiedBeds
+  const occupancyRate = Math.round((occupiedBeds / totalBeds) * 100)
+
+  const stats = [
+    { title: "Total Patients", value: totalPatients.toLocaleString(), change: "+12.5%", trend: "up" as const, icon: Users, gradient: "linear-gradient(135deg, #3b82f6, #06b6d4)" },
+    { title: "Appointments", value: String(recentAppointments.length), change: "+8.2%", trend: "up" as const, icon: Calendar, gradient: "linear-gradient(135deg, #8b5cf6, #a855f7)" },
+    { title: "Active Doctors", value: "32", change: "+2.1%", trend: "up" as const, icon: Stethoscope, gradient: "linear-gradient(135deg, #0f766e, #14b8a6)" },
+    { title: "Revenue Today", value: "₦284,500", change: "+15.3%", trend: "up" as const, icon: CreditCard, gradient: "linear-gradient(135deg, #f59e0b, #f97316)" },
+    { title: "Beds Occupied", value: `${occupiedBeds}/${totalBeds}`, change: `${occupancyRate}%`, trend: "neutral" as const, icon: BedDouble, gradient: "linear-gradient(135deg, #f43f5e, #ec4899)" },
+    { title: "Pending Bills", value: "₦425,000", change: "-5.2%", trend: "down" as const, icon: TrendingUp, gradient: "linear-gradient(135deg, #ef4444, #f97316)" },
+  ]
 
   return (
     <div style={{ maxWidth: "100%", overflow: "hidden" }}>
@@ -244,15 +259,15 @@ export default function DashboardPage() {
               <div style={{ marginTop: 20, padding: 14, background: "#f8fafc", borderRadius: 10 }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span style={{ fontSize: 12, color: "#64748b" }}>Total Beds</span>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "#0f172a" }}>200</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "#0f172a" }}>{totalBeds}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
                   <span style={{ fontSize: 12, color: "#64748b" }}>Available</span>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "#22c55e" }}>44</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "#22c55e" }}>{availableBeds}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
                   <span style={{ fontSize: 12, color: "#64748b" }}>Occupancy Rate</span>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "#0f766e" }}>78%</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "#0f766e" }}>{occupancyRate}%</span>
                 </div>
               </div>
             </div>

@@ -27,13 +27,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { AnimatedPage, StaggerContainer, StaggerItem } from "@/components/animated-wrapper"
-
-const statsData = [
-  { title: "Today's Visits", value: "245", icon: Stethoscope, gradient: "from-cyan-500 to-blue-600", shadow: "shadow-cyan-500/30" },
-  { title: "Completed", value: "180", icon: Clock, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/30" },
-  { title: "In Progress", value: "45", icon: User, gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30" },
-  { title: "Scheduled", value: "20", icon: FileText, gradient: "from-violet-500 to-purple-600", shadow: "shadow-violet-500/30" },
-]
+import { usePatients } from "@/lib/patient-context"
 
 const opdVisits = [
   { id: "OPD001", visitNumber: "VIS2026001", patient: "Rajesh Kumar", umr: "UMR2026001", doctor: "Dr. Priya Sharma", department: "Cardiology", date: "2026-08-07", symptoms: "Chest pain, shortness of breath", diagnosis: "Angina Pectoris", status: "Completed" },
@@ -45,6 +39,20 @@ const opdVisits = [
 
 export default function OPDPage() {
   const [searchTerm, setSearchTerm] = useState("")
+  const { patients } = usePatients()
+
+  const allOpdVisits = patients.flatMap((p) => p.visits.filter((v) => v.type === "OPD"))
+  const totalVisits = allOpdVisits.length
+  const completedVisits = allOpdVisits.filter((v) => v.status === "Completed").length
+  const inProgressVisits = allOpdVisits.filter((v) => v.status === "In Progress").length
+  const scheduledVisits = allOpdVisits.filter((v) => v.status === "Scheduled").length
+
+  const statsData = [
+    { title: "Today's Visits", value: String(totalVisits), icon: Stethoscope, gradient: "from-cyan-500 to-blue-600", shadow: "shadow-cyan-500/30" },
+    { title: "Completed", value: String(completedVisits), icon: Clock, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/30" },
+    { title: "In Progress", value: String(inProgressVisits), icon: User, gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30" },
+    { title: "Scheduled", value: String(scheduledVisits), icon: FileText, gradient: "from-violet-500 to-purple-600", shadow: "shadow-violet-500/30" },
+  ]
 
   const filteredVisits = opdVisits.filter(
     (visit) =>
