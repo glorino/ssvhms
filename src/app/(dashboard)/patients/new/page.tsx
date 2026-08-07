@@ -3,6 +3,8 @@
 import React, { useState } from "react"
 import Link from "next/link"
 import { usePatients, Patient } from "@/lib/patient-context"
+import { z } from "zod"
+import { patientSchema, vitalsSchema } from "@/lib/validations"
 import {
   Search,
   ArrowLeft,
@@ -180,6 +182,9 @@ export default function NewPatientPage() {
     recordedBy: "",
   })
 
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({})
+  const [vitalsErrors, setVitalsErrors] = useState<Record<string, string>>({})
+
   const handleSearch = (value: string) => {
     setSearchQuery(value)
     if (value.trim().length >= 2) {
@@ -210,6 +215,33 @@ export default function NewPatientPage() {
 
   const handleRegisterPatient = (e: React.FormEvent) => {
     e.preventDefault()
+    setFormErrors({})
+    const result = patientSchema.safeParse({
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      phone: formData.phone,
+      dateOfBirth: formData.dateOfBirth,
+      gender: formData.gender,
+      bloodGroup: formData.bloodGroup,
+      address: formData.address,
+      city: formData.city,
+      state: formData.state,
+      emergencyContact: formData.emergencyContactName,
+      emergencyPhone: formData.emergencyPhone,
+      insuranceProvider: formData.insuranceProvider || undefined,
+      insuranceNumber: formData.insuranceNumber || undefined,
+      allergies: formData.allergies || undefined,
+      medicalHistory: formData.medicalHistory || undefined,
+    })
+    if (!result.success) {
+      const flat = z.flattenError(result.error)
+      const errors: Record<string, string> = {}
+      if (flat.formErrors.length > 0) errors._form = flat.formErrors.join(", ")
+      Object.entries(flat.fieldErrors).forEach(([k, v]) => { errors[k] = (v as string[]).join(", ") })
+      setFormErrors(errors)
+      return
+    }
     const newPatient = addPatient({
       firstName: formData.firstName,
       lastName: formData.lastName,
@@ -245,6 +277,15 @@ export default function NewPatientPage() {
   const handleSaveVitals = () => {
     const patient = selectedPatient || registeredPatient
     if (!patient) return
+    setVitalsErrors({})
+    const result = vitalsSchema.safeParse(vitalsData)
+    if (!result.success) {
+      const flat = z.flattenError(result.error)
+      const errors: Record<string, string> = {}
+      Object.entries(flat.fieldErrors).forEach(([k, v]) => { errors[k] = (v as string[]).join(", ") })
+      setVitalsErrors(errors)
+      return
+    }
     updateVitals(patient.id, {
       temperature: vitalsData.temperature ? `${vitalsData.temperature}°C` : undefined,
       bloodPressure: vitalsData.bloodPressure ? `${vitalsData.bloodPressure} mmHg` : undefined,
@@ -263,6 +304,18 @@ export default function NewPatientPage() {
   }
 
   const currentPatient = selectedPatient || registeredPatient
+
+  const FormError = ({ field }: { field: string }) => {
+    const msg = formErrors[field]
+    if (!msg) return null
+    return <p style={{ color: "#dc2626", fontSize: "12px", marginTop: "4px" }}>{msg}</p>
+  }
+
+  const VitalsError = ({ field }: { field: string }) => {
+    const msg = vitalsErrors[field]
+    if (!msg) return null
+    return <p style={{ color: "#dc2626", fontSize: "12px", marginTop: "4px" }}>{msg}</p>
+  }
 
   return (
     <div style={{ maxWidth: 1200, margin: "0 auto" }}>
@@ -573,6 +626,7 @@ export default function NewPatientPage() {
                           placeholder={item.placeholder}
                           style={inputStyle}
                         />
+                        <VitalsError field={item.field} />
                       </div>
                     ))}
                   </div>
@@ -781,24 +835,29 @@ export default function NewPatientPage() {
                     <div>
                       <label style={labelStyle}>First Name *</label>
                       <input required type="text" value={formData.firstName} onChange={(e) => handleFormChange("firstName", e.target.value)} placeholder="First name" style={inputStyle} />
+                      <FormError field="firstName" />
                     </div>
                     <div>
                       <label style={labelStyle}>Last Name *</label>
                       <input required type="text" value={formData.lastName} onChange={(e) => handleFormChange("lastName", e.target.value)} placeholder="Last name" style={inputStyle} />
+                      <FormError field="lastName" />
                     </div>
                   </div>
                   <div>
                     <label style={labelStyle}>Email</label>
                     <input type="email" value={formData.email} onChange={(e) => handleFormChange("email", e.target.value)} placeholder="Email address" style={inputStyle} />
+                    <FormError field="email" />
                   </div>
                   <div>
                     <label style={labelStyle}>Phone *</label>
                     <input required type="tel" value={formData.phone} onChange={(e) => handleFormChange("phone", e.target.value)} placeholder="+234 xxx xxx xxxx" style={inputStyle} />
+                    <FormError field="phone" />
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                     <div>
                       <label style={labelStyle}>Date of Birth *</label>
                       <input required type="date" value={formData.dateOfBirth} onChange={(e) => handleFormChange("dateOfBirth", e.target.value)} style={inputStyle} />
+                      <FormError field="dateOfBirth" />
                     </div>
                     <div>
                       <label style={labelStyle}>Gender *</label>
@@ -808,6 +867,7 @@ export default function NewPatientPage() {
                         <option value="Female">Female</option>
                         <option value="Other">Other</option>
                       </select>
+                      <FormError field="gender" />
                     </div>
                   </div>
                   <div>
@@ -823,6 +883,7 @@ export default function NewPatientPage() {
                       <option value="O+">O+</option>
                       <option value="O-">O-</option>
                     </select>
+                    <FormError field="bloodGroup" />
                   </div>
                 </div>
               </div>
@@ -837,25 +898,30 @@ export default function NewPatientPage() {
                   <div>
                     <label style={labelStyle}>Address</label>
                     <input type="text" value={formData.address} onChange={(e) => handleFormChange("address", e.target.value)} placeholder="Full address" style={inputStyle} />
+                    <FormError field="address" />
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                     <div>
                       <label style={labelStyle}>City</label>
                       <input type="text" value={formData.city} onChange={(e) => handleFormChange("city", e.target.value)} placeholder="City" style={inputStyle} />
+                      <FormError field="city" />
                     </div>
                     <div>
                       <label style={labelStyle}>State</label>
                       <input type="text" value={formData.state} onChange={(e) => handleFormChange("state", e.target.value)} placeholder="State" style={inputStyle} />
+                      <FormError field="state" />
                     </div>
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                     <div>
                       <label style={labelStyle}>Emergency Contact Name</label>
                       <input type="text" value={formData.emergencyContactName} onChange={(e) => handleFormChange("emergencyContactName", e.target.value)} placeholder="Contact name" style={inputStyle} />
+                      <FormError field="emergencyContact" />
                     </div>
                     <div>
                       <label style={labelStyle}>Emergency Phone</label>
                       <input type="tel" value={formData.emergencyPhone} onChange={(e) => handleFormChange("emergencyPhone", e.target.value)} placeholder="Contact phone" style={inputStyle} />
+                      <FormError field="emergencyPhone" />
                     </div>
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>

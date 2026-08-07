@@ -3,7 +3,9 @@
 import React, { useState, useMemo } from "react"
 import { useSession } from "next-auth/react"
 import { usePatients, Patient } from "@/lib/patient-context"
-import { Search, User, Heart, Activity, Thermometer, Weight, Ruler, Wind, FileText, FlaskConical, Pill, CreditCard, Plus, X, Check, AlertCircle, Clock, UserCheck } from "lucide-react"
+import { z } from "zod"
+import { vitalsSchema, visitSchema, labResultSchema, prescriptionSchema } from "@/lib/validations"
+import { Search, User, Heart, Activity, Thermometer, Weight, Ruler, Wind, FileText, FlaskConical, Pill, CreditCard, Plus, X, Check, AlertCircle, Clock, UserCheck, Stethoscope } from "lucide-react"
 
 const accent = "#14b8a6"
 const accentLight = "#ccfbf1"
@@ -34,6 +36,11 @@ export default function DoctorsPage() {
   const [labData, setLabData] = useState({ testName: "", category: "Hematology", notes: "" })
   const [prescriptionText, setPrescriptionText] = useState("")
 
+  const [vitalsErrors, setVitalsErrors] = useState<Record<string, string>>({})
+  const [visitErrors, setVisitErrors] = useState<Record<string, string>>({})
+  const [labErrors, setLabErrors] = useState<Record<string, string>>({})
+  const [prescriptionErrors, setPrescriptionErrors] = useState<Record<string, string>>({})
+
   const doctorName = session?.user?.name || "Doctor"
 
   const handleSearch = (q: string) => {
@@ -59,6 +66,15 @@ export default function DoctorsPage() {
   const handleUpdateVitals = (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedPatient) return
+    setVitalsErrors({})
+    const result = vitalsSchema.safeParse(vitalsData)
+    if (!result.success) {
+      const flat = z.flattenError(result.error)
+      const errors: Record<string, string> = {}
+      Object.entries(flat.fieldErrors).forEach(([k, v]) => { errors[k] = (v as string[]).join(", ") })
+      setVitalsErrors(errors)
+      return
+    }
     updateVitals(selectedPatient.id, {
       ...vitalsData,
       recordedAt: new Date().toLocaleString("en-NG", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }),
@@ -72,6 +88,15 @@ export default function DoctorsPage() {
   const handleAddVisit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedPatient) return
+    setVisitErrors({})
+    const result = visitSchema.safeParse({ department: visitData.department, symptoms: visitData.symptoms, diagnosis: visitData.diagnosis, prescription: visitData.prescription || undefined, notes: visitData.notes || undefined, status: visitData.status })
+    if (!result.success) {
+      const flat = z.flattenError(result.error)
+      const errors: Record<string, string> = {}
+      Object.entries(flat.fieldErrors).forEach(([k, v]) => { errors[k] = (v as string[]).join(", ") })
+      setVisitErrors(errors)
+      return
+    }
     addVisit(selectedPatient.id, { ...visitData, doctor: doctorName, date: new Date().toISOString().split("T")[0] })
     setSelectedPatient({ ...selectedPatient, visits: [...selectedPatient.visits, { id: "V" + Date.now(), date: new Date().toISOString().split("T")[0], doctor: doctorName, ...visitData }] })
     setShowVisitForm(false)
@@ -81,6 +106,15 @@ export default function DoctorsPage() {
   const handleAddLabResult = (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedPatient) return
+    setLabErrors({})
+    const result = labResultSchema.safeParse({ testName: labData.testName, category: labData.category, notes: labData.notes || undefined })
+    if (!result.success) {
+      const flat = z.flattenError(result.error)
+      const errors: Record<string, string> = {}
+      Object.entries(flat.fieldErrors).forEach(([k, v]) => { errors[k] = (v as string[]).join(", ") })
+      setLabErrors(errors)
+      return
+    }
     addLabResult(selectedPatient.id, { ...labData, result: "", status: "Pending", date: new Date().toISOString().split("T")[0], orderedBy: doctorName })
     setSelectedPatient({ ...selectedPatient, labResults: [...selectedPatient.labResults, { id: "L" + Date.now(), ...labData, result: "", status: "Pending", date: new Date().toISOString().split("T")[0], orderedBy: doctorName }] })
     setShowLabForm(false)
@@ -89,7 +123,16 @@ export default function DoctorsPage() {
 
   const handleAddPrescription = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!selectedPatient || !prescriptionText.trim()) return
+    if (!selectedPatient) return
+    setPrescriptionErrors({})
+    const result = prescriptionSchema.safeParse({ prescriptionText })
+    if (!result.success) {
+      const flat = z.flattenError(result.error)
+      const errors: Record<string, string> = {}
+      Object.entries(flat.fieldErrors).forEach(([k, v]) => { errors[k] = (v as string[]).join(", ") })
+      setPrescriptionErrors(errors)
+      return
+    }
     addPrescription(selectedPatient.id, prescriptionText.trim())
     setSelectedPatient({ ...selectedPatient, prescriptions: [...selectedPatient.prescriptions, prescriptionText.trim()] })
     setShowPrescriptionForm(false)
@@ -104,12 +147,41 @@ export default function DoctorsPage() {
   const btnOutline: React.CSSProperties = { background: "transparent", color: accent, border: `1px solid ${accent}`, padding: "10px 20px", borderRadius: "8px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }
   const tabStyle = (active: boolean): React.CSSProperties => ({ padding: "10px 20px", borderRadius: "8px 8px 0 0", fontSize: "14px", fontWeight: 600, cursor: "pointer", border: "none", background: active ? accent : "#f1f5f9", color: active ? "#fff" : "#64748b", transition: "all 0.2s" })
 
+  const FieldError = ({ error }: { error?: string }) => {
+    if (!error) return null
+    return <p style={{ color: "#dc2626", fontSize: "12px", marginTop: "4px" }}>{error}</p>
+  }
+
   return (
     <div style={{ padding: "24px", maxWidth: "1400px", margin: "0 auto", fontFamily: "'Inter', system-ui, sans-serif" }}>
       <div style={{ marginBottom: "24px" }}>
         <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#1e293b", margin: 0 }}>Doctor&apos;s Workstation</h1>
         <p style={{ color: "#64748b", margin: "4px 0 0", fontSize: "14px" }}>Look up patients by number or name</p>
       </div>
+
+      {(session?.user as any)?.role === "DOCTOR" && (
+        <div style={{ ...cardStyle, padding: "24px", marginBottom: "24px", background: "linear-gradient(135deg, #f0fdfa 0%, #fff 100%)", borderLeft: `4px solid ${accent}` }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px" }}>
+            <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+              <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: accent, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}>
+                <Stethoscope size={28} />
+              </div>
+              <div>
+                <h2 style={{ fontSize: "20px", fontWeight: 700, color: "#1e293b", margin: "0 0 4px" }}>My Profile</h2>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", fontSize: "14px", color: "#475569" }}>
+                  <span><strong>Name:</strong> {session?.user?.name || doctorName}</span>
+                  <span><strong>Email:</strong> {session?.user?.email || "N/A"}</span>
+                  <span><strong>Role:</strong> Doctor</span>
+                  <span><strong>Department:</strong> {(session?.user as any)?.department || "General Medicine"}</span>
+                </div>
+              </div>
+            </div>
+            <a href="/doctors" style={{ ...btnPrimary, textDecoration: "none", background: accentHover }}>
+              <Clock size={14} /> View My Schedule
+            </a>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleLookupByNumber} style={{ marginBottom: "24px", position: "relative" }}>
         <div style={{ position: "relative" }}>
@@ -225,6 +297,7 @@ export default function DoctorsPage() {
                           <div key={field.key}>
                             <label style={labelStyle}>{field.label}</label>
                             <input value={(vitalsData as any)[field.key]} onChange={(e) => setVitalsData({ ...vitalsData, [field.key]: e.target.value })} placeholder={field.placeholder} style={inputStyle} required />
+                            <FieldError error={vitalsErrors[field.key]} />
                           </div>
                         ))}
                       </div>
@@ -276,9 +349,10 @@ export default function DoctorsPage() {
                             <option value="">Select department</option>
                             {departments.map((d) => <option key={d} value={d}>{d}</option>)}
                           </select>
+                          <FieldError error={visitErrors.department} />
                         </div>
-                        <div style={{ gridColumn: "1 / -1" }}><label style={labelStyle}>Symptoms</label><textarea value={visitData.symptoms} onChange={(e) => setVisitData({ ...visitData, symptoms: e.target.value })} style={{ ...inputStyle, minHeight: "60px", resize: "vertical" }} placeholder="Patient symptoms..." required /></div>
-                        <div style={{ gridColumn: "1 / -1" }}><label style={labelStyle}>Diagnosis</label><textarea value={visitData.diagnosis} onChange={(e) => setVisitData({ ...visitData, diagnosis: e.target.value })} style={{ ...inputStyle, minHeight: "60px", resize: "vertical" }} placeholder="Your diagnosis..." required /></div>
+                        <div style={{ gridColumn: "1 / -1" }}><label style={labelStyle}>Symptoms</label><textarea value={visitData.symptoms} onChange={(e) => setVisitData({ ...visitData, symptoms: e.target.value })} style={{ ...inputStyle, minHeight: "60px", resize: "vertical" }} placeholder="Patient symptoms..." required /><FieldError error={visitErrors.symptoms} /></div>
+                        <div style={{ gridColumn: "1 / -1" }}><label style={labelStyle}>Diagnosis</label><textarea value={visitData.diagnosis} onChange={(e) => setVisitData({ ...visitData, diagnosis: e.target.value })} style={{ ...inputStyle, minHeight: "60px", resize: "vertical" }} placeholder="Your diagnosis..." required /><FieldError error={visitErrors.diagnosis} /></div>
                         <div style={{ gridColumn: "1 / -1" }}><label style={labelStyle}>Prescription</label><textarea value={visitData.prescription} onChange={(e) => setVisitData({ ...visitData, prescription: e.target.value })} style={{ ...inputStyle, minHeight: "60px", resize: "vertical" }} placeholder="Prescribed medication..." /></div>
                         <div style={{ gridColumn: "1 / -1" }}><label style={labelStyle}>Notes</label><textarea value={visitData.notes} onChange={(e) => setVisitData({ ...visitData, notes: e.target.value })} style={{ ...inputStyle, minHeight: "60px", resize: "vertical" }} placeholder="Additional notes..." /></div>
                         <div><label style={labelStyle}>Status</label>
@@ -337,11 +411,12 @@ export default function DoctorsPage() {
                   {showLabForm && (
                     <form onSubmit={handleAddLabResult} style={{ ...cardStyle, padding: "20px", marginBottom: "16px", background: "#f8fafc", border: `1px solid ${accentLight}` }}>
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px" }}>
-                        <div><label style={labelStyle}>Test Name</label><input value={labData.testName} onChange={(e) => setLabData({ ...labData, testName: e.target.value })} style={inputStyle} placeholder="e.g. Complete Blood Count" required /></div>
+                        <div><label style={labelStyle}>Test Name</label><input value={labData.testName} onChange={(e) => setLabData({ ...labData, testName: e.target.value })} style={inputStyle} placeholder="e.g. Complete Blood Count" required /><FieldError error={labErrors.testName} /></div>
                         <div><label style={labelStyle}>Category</label>
                           <select value={labData.category} onChange={(e) => setLabData({ ...labData, category: e.target.value })} style={inputStyle}>
                             {labCategories.map((c) => <option key={c} value={c}>{c}</option>)}
                           </select>
+                          <FieldError error={labErrors.category} />
                         </div>
                         <div style={{ gridColumn: "1 / -1" }}><label style={labelStyle}>Notes</label><textarea value={labData.notes} onChange={(e) => setLabData({ ...labData, notes: e.target.value })} style={{ ...inputStyle, minHeight: "60px", resize: "vertical" }} placeholder="Additional notes..." /></div>
                       </div>
@@ -395,6 +470,7 @@ export default function DoctorsPage() {
                     <form onSubmit={handleAddPrescription} style={{ ...cardStyle, padding: "20px", marginBottom: "16px", background: "#f8fafc", border: `1px solid ${accentLight}` }}>
                       <label style={labelStyle}>Prescription</label>
                       <textarea value={prescriptionText} onChange={(e) => setPrescriptionText(e.target.value)} style={{ ...inputStyle, minHeight: "80px", resize: "vertical" }} placeholder="e.g. Amoxicillin 500mg - Three times daily for 7 days" required />
+                      <FieldError error={prescriptionErrors.prescriptionText} />
                       <div style={{ marginTop: "12px", display: "flex", gap: "8px", justifyContent: "flex-end" }}>
                         <button type="button" onClick={() => setShowPrescriptionForm(false)} style={btnOutline}>Cancel</button>
                         <button type="submit" style={btnPrimary}><Check size={14} /> Add</button>

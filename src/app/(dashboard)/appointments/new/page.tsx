@@ -3,6 +3,8 @@
 import React, { useState } from "react"
 import Link from "next/link"
 import { usePatients } from "@/lib/patient-context"
+import { z } from "zod"
+import { appointmentSchema } from "@/lib/validations"
 import { ArrowLeft, Save, Calendar } from "lucide-react"
 
 const accent = "#14b8a6"
@@ -71,6 +73,7 @@ export default function NewAppointmentPage() {
     priority: "Medium",
   })
   const [success, setSuccess] = useState(false)
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({})
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -78,6 +81,16 @@ export default function NewAppointmentPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    setFormErrors({})
+    const result = appointmentSchema.safeParse(formData)
+    if (!result.success) {
+      const flat = z.flattenError(result.error)
+      const errors: Record<string, string> = {}
+      if (flat.formErrors.length > 0) errors._form = flat.formErrors.join(", ")
+      Object.entries(flat.fieldErrors).forEach(([k, v]) => { errors[k] = (v as string[]).join(", ") })
+      setFormErrors(errors)
+      return
+    }
     console.log("Appointment data:", formData)
     setSuccess(true)
     setTimeout(() => setSuccess(false), 5000)
@@ -103,6 +116,12 @@ export default function NewAppointmentPage() {
         </div>
       )}
 
+      {Object.keys(formErrors).length > 0 && (
+        <div style={{ padding: "14px 20px", borderRadius: "10px", background: "#fef2f2", border: "1px solid #fecaca", color: "#991b1b", marginBottom: "20px", fontSize: "14px", fontWeight: 500 }}>
+          Please fix the errors below.
+        </div>
+      )}
+
       <form onSubmit={handleSubmit}>
         <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "24px", alignItems: "start" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
@@ -119,6 +138,7 @@ export default function NewAppointmentPage() {
                       <option key={p.id} value={p.id}>{p.firstName} {p.lastName} ({p.uniqueNumber})</option>
                     ))}
                   </select>
+                  {formErrors.patientId && <p style={{ color: "#dc2626", fontSize: "12px", marginTop: "4px" }}>{formErrors.patientId}</p>}
                 </div>
                 <div>
                   <label style={labelStyle}>Doctor *</label>
@@ -128,6 +148,7 @@ export default function NewAppointmentPage() {
                       <option key={d} value={d}>{d}</option>
                     ))}
                   </select>
+                  {formErrors.doctor && <p style={{ color: "#dc2626", fontSize: "12px", marginTop: "4px" }}>{formErrors.doctor}</p>}
                 </div>
                 <div>
                   <label style={labelStyle}>Department *</label>
@@ -137,6 +158,7 @@ export default function NewAppointmentPage() {
                       <option key={d} value={d}>{d}</option>
                     ))}
                   </select>
+                  {formErrors.department && <p style={{ color: "#dc2626", fontSize: "12px", marginTop: "4px" }}>{formErrors.department}</p>}
                 </div>
                 <div>
                   <label style={labelStyle}>Priority *</label>
@@ -150,15 +172,18 @@ export default function NewAppointmentPage() {
                 <div>
                   <label style={labelStyle}>Date *</label>
                   <input type="date" name="date" value={formData.date} onChange={handleChange} required style={inputStyle} />
+                  {formErrors.date && <p style={{ color: "#dc2626", fontSize: "12px", marginTop: "4px" }}>{formErrors.date}</p>}
                 </div>
                 <div>
                   <label style={labelStyle}>Time *</label>
                   <input type="time" name="time" value={formData.time} onChange={handleChange} required style={inputStyle} />
+                  {formErrors.time && <p style={{ color: "#dc2626", fontSize: "12px", marginTop: "4px" }}>{formErrors.time}</p>}
                 </div>
               </div>
               <div style={{ marginTop: "16px" }}>
                 <label style={labelStyle}>Reason for Visit *</label>
                 <textarea name="reason" value={formData.reason} onChange={handleChange} placeholder="Describe the reason for the appointment..." rows={3} required style={{ ...inputStyle, resize: "vertical" as const, minHeight: "80px" }} />
+                {formErrors.reason && <p style={{ color: "#dc2626", fontSize: "12px", marginTop: "4px" }}>{formErrors.reason}</p>}
               </div>
             </div>
           </div>

@@ -104,7 +104,7 @@ const getNavigationForRole = (role: string): NavItem[] => {
     PHARMACIST: ["/dashboard", "/pharmacy", "/messages"],
     PATHOLOGIST: ["/dashboard", "/pathology", "/messages"],
     RADIOLOGIST: ["/dashboard", "/radiology", "/messages"],
-    ACCOUNTANT: ["/dashboard", "/billing", "/hr/payroll", "/reports", "/messages"],
+    ACCOUNTANT: ["/dashboard", "/billing", "/hr", "/reports", "/messages"],
     RECEPTIONIST: ["/dashboard", "/appointments", "/patients", "/front-office", "/messages"],
     PATIENT: ["/patient-portal"],
   }

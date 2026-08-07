@@ -1,7 +1,9 @@
 ﻿"use client"
 
-import React from "react"
+import React, { useMemo } from "react"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
+import { usePatients } from "@/lib/patient-context"
 import { motion } from "framer-motion"
 import {
   Heart,
@@ -25,31 +27,71 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { AnimatedStat, StaggerContainer, StaggerItem } from "@/components/animated-wrapper"
 
-const patientStats = [
-  { title: "Upcoming Appointments", value: "3", icon: Calendar, gradient: "from-blue-500 to-cyan-500" },
-  { title: "Active Prescriptions", value: "5", icon: Pill, gradient: "from-violet-500 to-purple-500" },
-  { title: "Pending Reports", value: "2", icon: FlaskConical, gradient: "from-amber-500 to-orange-500" },
-  { title: "Outstanding Bills", value: "₦4,500", icon: CreditCard, gradient: "from-rose-500 to-pink-500" },
-]
-
-const appointments = [
-  { id: 1, doctor: "Dr. Priya Sharma", department: "Cardiology", date: "2026-08-10", time: "10:00 AM", status: "Confirmed" },
-  { id: 2, doctor: "Dr. Amit Singh", department: "Orthopedics", date: "2026-08-15", time: "2:30 PM", status: "Scheduled" },
-  { id: 3, doctor: "Dr. Neha Gupta", department: "Neurology", date: "2026-08-20", time: "11:00 AM", status: "Scheduled" },
-]
-
-const prescriptions = [
-  { id: 1, doctor: "Dr. Priya Sharma", date: "2026-08-05", medicines: ["Amlodipine 5mg", "Aspirin 75mg"], status: "Active" },
-  { id: 2, doctor: "Dr. Amit Singh", date: "2026-07-20", medicines: ["Metformin 500mg"], status: "Active" },
-]
-
-const labResults = [
-  { id: 1, test: "Complete Blood Count", date: "2026-08-05", status: "Completed", result: "Normal" },
-  { id: 2, test: "Lipid Profile", date: "2026-08-05", status: "Completed", result: "High Cholesterol" },
-  { id: 3, test: "Blood Sugar Fasting", date: "2026-07-20", status: "Completed", result: "145 mg/dL (High)" },
-]
-
 export default function PatientPortalPage() {
+  const { data: session } = useSession()
+  const { patients } = usePatients()
+
+  const patient = useMemo(() => {
+    const email = session?.user?.email
+    if (!email) return null
+    return patients.find((p) => p.email.toLowerCase() === email.toLowerCase()) || null
+  }, [session, patients])
+
+  const patientStats = useMemo(() => {
+    if (!patient) return []
+    const upcomingVisits = patient.visits.filter((v) => v.status === "Scheduled" || v.status === "In Progress").length
+    const activePrescriptions = patient.prescriptions.length
+    const pendingReports = patient.labResults.filter((l) => l.status === "Pending" || l.status === "In Progress").length
+    const outstandingBills = patient.bills.reduce((sum, b) => sum + b.due, 0)
+    return [
+      { title: "Upcoming Appointments", value: String(upcomingVisits), icon: Calendar, gradient: "from-blue-500 to-cyan-500" },
+      { title: "Active Prescriptions", value: String(activePrescriptions), icon: Pill, gradient: "from-violet-500 to-purple-500" },
+      { title: "Pending Reports", value: String(pendingReports), icon: FlaskConical, gradient: "from-amber-500 to-orange-500" },
+      { title: "Outstanding Bills", value: `₦${outstandingBills.toLocaleString()}`, icon: CreditCard, gradient: "from-rose-500 to-pink-500" },
+    ]
+  }, [patient])
+
+  const appointments = useMemo(() => {
+    if (!patient) return []
+    return patient.visits.map((v) => ({
+      id: v.id,
+      doctor: v.doctor,
+      department: v.department,
+      date: v.date,
+      time: "N/A",
+      status: v.status,
+    }))
+  }, [patient])
+
+  const prescriptions = useMemo(() => {
+    if (!patient) return []
+    if (patient.prescriptions.length === 0) return []
+    const latestVisit = patient.visits.filter((v) => v.prescription).sort((a, b) => b.date.localeCompare(a.date))[0]
+    return [{
+      id: "presc-" + patient.id,
+      doctor: latestVisit?.doctor || "Doctor",
+      date: latestVisit?.date || "",
+      medicines: patient.prescriptions,
+      status: "Active",
+    }]
+  }, [patient])
+
+  const labResults = useMemo(() => {
+    if (!patient) return []
+    return patient.labResults.map((lr) => ({
+      id: lr.id,
+      test: lr.testName,
+      date: lr.date,
+      status: lr.status,
+      result: lr.result || "Pending",
+    }))
+  }, [patient])
+
+  const patientName = session?.user?.name?.split(" ")[0] || "Patient"
+  const patientInitials = session?.user?.name
+    ? session.user.name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
+    : "P"
+  const patientId = patient?.uniqueNumber || ""
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
@@ -76,11 +118,11 @@ export default function PatientPortalPage() {
               </Button>
               <div className="flex items-center gap-3">
                 <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-semibold text-sm shadow-md">
-                  RK
+                  {patientInitials}
                 </div>
                 <div className="hidden sm:block">
-                  <p className="text-sm font-semibold">Rajesh Kumar</p>
-                  <p className="text-xs text-slate-500">UMR: UMR2026001</p>
+                  <p className="text-sm font-semibold">{session?.user?.name || "Patient"}</p>
+                  <p className="text-xs text-slate-500">UMR: {patientId}</p>
                 </div>
               </div>
               <Link href="/login">
@@ -100,10 +142,20 @@ export default function PatientPortalPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h2 className="text-2xl font-bold text-slate-900">Welcome back, Rajesh!</h2>
+          <h2 className="text-2xl font-bold text-slate-900">Welcome back, {patientName}!</h2>
           <p className="text-slate-500">Here&apos;s your health summary</p>
         </motion.div>
 
+        {!patient ? (
+          <Card className="border-0 shadow-lg">
+            <CardContent className="p-12 text-center">
+              <AlertCircle className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-slate-700 mb-2">No patient record found</h3>
+              <p className="text-slate-500">No patient account is linked to your email ({session?.user?.email}). Please contact the front desk.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <>
         {/* Stats */}
         <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
           {patientStats.map((stat, index) => (
@@ -162,7 +214,7 @@ export default function PatientPortalPage() {
                           <span className="text-xs text-slate-500">{apt.date} at {apt.time}</span>
                         </div>
                       </div>
-                      <Badge variant={apt.status === "Confirmed" ? "success" : "info"} className="rounded-full">
+                      <Badge variant={apt.status === "Completed" ? "success" : apt.status === "In Progress" ? "warning" : "info"} className="rounded-full">
                         {apt.status}
                       </Badge>
                     </motion.div>
@@ -308,6 +360,8 @@ export default function PatientPortalPage() {
             </Card>
           </motion.div>
         </div>
+          </>
+        )}
       </main>
     </div>
   )

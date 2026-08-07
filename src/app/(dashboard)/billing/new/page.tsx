@@ -4,6 +4,8 @@ import React, { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowLeft, Plus, Trash2, Save } from "lucide-react"
 import Link from "next/link"
+import { z } from "zod"
+import { billSchema } from "@/lib/validations"
 
 interface BillItem {
   id: number
@@ -36,6 +38,8 @@ export default function NewBillPage() {
   ])
   const [discount, setDiscount] = useState(0)
   const [tax, setTax] = useState(0)
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({})
+  const [itemErrors, setItemErrors] = useState<Record<number, Record<string, string>>>({})
 
   const addItem = () => {
     setItems((prev) => [
@@ -65,6 +69,28 @@ export default function NewBillPage() {
 
   const subtotal = items.reduce((acc, item) => acc + item.total, 0)
   const grandTotal = subtotal - discount + (subtotal * tax) / 100
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setFormErrors({})
+    setItemErrors({})
+    const result = billSchema.safeParse({
+      patient,
+      billType,
+      items: items.map((item) => ({ name: item.name, quantity: item.quantity, unitPrice: item.unitPrice })),
+      discount: discount || undefined,
+      tax: tax || undefined,
+    })
+    if (!result.success) {
+      const flat = z.flattenError(result.error)
+      const errors: Record<string, string> = {}
+      if (flat.formErrors.length > 0) errors._form = flat.formErrors.join(", ")
+      Object.entries(flat.fieldErrors).forEach(([k, v]) => { errors[k] = (v as string[]).join(", ") })
+      setFormErrors(errors)
+      return
+    }
+    console.log("Bill submitted:", { patient, billType, items, discount, tax, grandTotal })
+  }
 
   const selectStyle: React.CSSProperties = {
     width: "100%",
@@ -121,6 +147,7 @@ export default function NewBillPage() {
         <p style={{ color: "#64748b", margin: "4px 0 0", fontSize: "14px" }}>Create a new patient bill</p>
       </div>
 
+      <form onSubmit={handleSubmit}>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "24px", alignItems: "start" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
           <Card style={{ border: "none", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}>
@@ -139,6 +166,7 @@ export default function NewBillPage() {
                       <option key={p} value={p}>{p}</option>
                     ))}
                   </select>
+                  {formErrors.patient && <p style={{ color: "#dc2626", fontSize: "12px", marginTop: "4px" }}>{formErrors.patient}</p>}
                 </div>
                 <div>
                   <label style={labelStyle}>Bill Type</label>
@@ -152,6 +180,7 @@ export default function NewBillPage() {
                       <option key={t} value={t}>{t}</option>
                     ))}
                   </select>
+                  {formErrors.billType && <p style={{ color: "#dc2626", fontSize: "12px", marginTop: "4px" }}>{formErrors.billType}</p>}
                 </div>
               </div>
             </CardContent>
@@ -312,6 +341,7 @@ export default function NewBillPage() {
             </div>
 
             <button
+              type="submit"
               style={{
                 width: "100%",
                 marginTop: "20px",
@@ -335,6 +365,7 @@ export default function NewBillPage() {
           </CardContent>
         </Card>
       </div>
+      </form>
     </div>
   )
 }
