@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 
 export async function GET() {
   return NextResponse.json({
-    name: "SSVHMS - Smart Hospital Management System",
+    name: "SSVHMS - SSV Hospital Management System",
     version: "1.0.0",
     status: "running",
     modules: [
