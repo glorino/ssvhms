@@ -52,7 +52,7 @@ export default function AllBillsPage() {
   )
 
   return (
-    <div style={{ padding: "24px", maxWidth: "1400px", margin: "0 auto" }}>
+    <div style={{ padding: "0", maxWidth: "1400px", margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
         <div>
           <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#14b8a6", margin: 0 }}>All Bills</h1>

@@ -47,7 +47,7 @@ export default function RevenueReportPage() {
   const [toDate, setToDate] = useState("2026-08-07")
 
   return (
-    <div style={{ padding: "24px", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ padding: "0", minHeight: "100vh", background: "#f8fafc" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           <Link href="/reports">

@@ -76,7 +76,6 @@ export default function NewSurgeryPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Surgery data:", formData)
     setSuccess(true)
     setTimeout(() => setSuccess(false), 5000)
   }

@@ -65,7 +65,6 @@ export default function NewRadiologyOrderPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Radiology order:", formData)
     setSuccess(true)
     setTimeout(() => setSuccess(false), 5000)
     setFormData({ patientId: "", doctor: "", modality: "", bodyPart: "", clinicalIndication: "", notes: "" })

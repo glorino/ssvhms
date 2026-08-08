@@ -89,7 +89,7 @@ export default function NewBillPage() {
       setFormErrors(errors)
       return
     }
-    console.log("Bill submitted:", { patient, billType, items, discount, tax, grandTotal })
+
   }
 
   const selectStyle: React.CSSProperties = {

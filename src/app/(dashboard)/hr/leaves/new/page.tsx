@@ -61,7 +61,6 @@ export default function NewLeaveRequestPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Leave request:", formData)
     setSuccess(true)
     setTimeout(() => setSuccess(false), 5000)
     setFormData({ staffName: "", leaveType: "", fromDate: "", toDate: "", reason: "" })

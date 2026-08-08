@@ -1092,3 +1092,17 @@ model Setting {
 
   @@index([group])
 }
+
+// ==================== MESSAGE ====================
+
+model Message {
+  id            String   @id @default(cuid())
+  senderId      String
+  senderName    String
+  receiverId    String
+  receiverName  String
+  subject       String
+  content       String
+  read          Boolean  @default(false)
+  createdAt     DateTime @default(now())
+}

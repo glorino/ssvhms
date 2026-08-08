@@ -55,7 +55,6 @@ export default function NewMedicinePage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Medicine data:", formData)
     setSuccess(true)
     setTimeout(() => setSuccess(false), 5000)
     setFormData({ name: "", category: "", batchNo: "", stockQty: "", unitPrice: "", expiryDate: "", supplier: "" })

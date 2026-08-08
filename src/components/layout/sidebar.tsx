@@ -99,13 +99,13 @@ const getNavigationForRole = (role: string): NavItem[] => {
   const roleAccess: Record<string, string[]> = {
     SUPER_ADMIN: allNav.map((n) => n.href),
     ADMIN: allNav.map((n) => n.href),
-    DOCTOR: ["/dashboard", "/appointments", "/patients", "/opd", "/ipd", "/pathology", "/radiology", "/messages"],
-    NURSE: ["/dashboard", "/patients", "/ipd", "/opd", "/blood-bank", "/messages"],
+    DOCTOR: ["/dashboard", "/appointments", "/patients", "/opd", "/ipd", "/pathology", "/radiology", "/surgery", "/messages"],
+    NURSE: ["/dashboard", "/patients", "/ipd", "/opd", "/pharmacy", "/blood-bank", "/messages"],
     PHARMACIST: ["/dashboard", "/pharmacy", "/messages"],
     PATHOLOGIST: ["/dashboard", "/pathology", "/messages"],
     RADIOLOGIST: ["/dashboard", "/radiology", "/messages"],
     ACCOUNTANT: ["/dashboard", "/billing", "/hr", "/reports", "/messages"],
-    RECEPTIONIST: ["/dashboard", "/appointments", "/patients", "/front-office", "/messages"],
+    RECEPTIONIST: ["/dashboard", "/appointments", "/patients", "/billing", "/front-office", "/messages"],
     PATIENT: ["/patient-portal"],
   }
 

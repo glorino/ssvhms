@@ -63,7 +63,6 @@ export default function NewBloodIssuePage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Blood issue:", formData)
     setSuccess(true)
     setTimeout(() => setSuccess(false), 5000)
     setFormData({ patientId: "", bloodGroup: "", units: "1", issuedBy: "", doctor: "", reason: "" })

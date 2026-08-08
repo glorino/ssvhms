@@ -50,7 +50,7 @@ export default function NewOPDVisitPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("OPD Visit data:", formData)
+
   }
 
   const labelStyle: React.CSSProperties = {

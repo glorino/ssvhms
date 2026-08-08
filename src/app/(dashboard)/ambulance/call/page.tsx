@@ -63,7 +63,6 @@ export default function NewAmbulanceCallPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Ambulance call:", formData)
     setSuccess(true)
     setTimeout(() => setSuccess(false), 5000)
     setFormData({ callerName: "", callerPhone: "", pickupLocation: "", dropLocation: "SSV Hospital", patientName: "", emergencyType: "", notes: "" })

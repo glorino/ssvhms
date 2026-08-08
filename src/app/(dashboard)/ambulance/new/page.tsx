@@ -51,7 +51,6 @@ export default function NewAmbulanceVehiclePage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Vehicle data:", formData)
     setSuccess(true)
     setTimeout(() => setSuccess(false), 5000)
     setFormData({ vehicleNumber: "", type: "Basic", driverName: "", driverPhone: "", status: "Available" })

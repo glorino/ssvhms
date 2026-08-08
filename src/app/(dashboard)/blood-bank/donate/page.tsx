@@ -57,7 +57,6 @@ export default function NewBloodDonationPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Donation data:", formData)
     setSuccess(true)
     setTimeout(() => setSuccess(false), 5000)
     setFormData({ donorName: "", phone: "", bloodGroup: "", units: "1", hemoglobin: "", bp: "", pulse: "", status: "Eligible" })

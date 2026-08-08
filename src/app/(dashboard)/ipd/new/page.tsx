@@ -89,7 +89,7 @@ export default function NewIPDAdmissionPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Admission data:", formData)
+
   }
 
   return (

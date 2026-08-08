@@ -88,7 +88,6 @@ export default function NewPurchasePage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Purchase:", { supplier, date, items, totalAmount, paidAmount })
     setSuccess(true)
     setTimeout(() => setSuccess(false), 5000)
     setSupplier("")

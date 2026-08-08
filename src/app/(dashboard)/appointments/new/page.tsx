@@ -91,7 +91,6 @@ export default function NewAppointmentPage() {
       setFormErrors(errors)
       return
     }
-    console.log("Appointment data:", formData)
     setSuccess(true)
     setTimeout(() => setSuccess(false), 5000)
   }

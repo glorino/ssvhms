@@ -39,7 +39,7 @@ export default function OPDVisitsPage() {
   )
 
   return (
-    <div style={{ padding: "24px", fontFamily: "'Inter', -apple-system, sans-serif" }}>
+    <div style={{ padding: "0", fontFamily: "'Inter', -apple-system, sans-serif" }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
         <div>

@@ -65,7 +65,6 @@ export default function NewPhoneCallPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Phone call:", formData)
     setSuccess(true)
     setTimeout(() => setSuccess(false), 5000)
     setFormData({ callerName: "", phone: "", department: "", subject: "", duration: "", handledBy: "", notes: "" })

@@ -29,7 +29,7 @@ function getOccupancyColor(pct: number) {
 
 export default function BedStatusPage() {
   return (
-    <div style={{ padding: "24px", minHeight: "100vh", background: "#f8fafc" }}>
+    <div style={{ padding: "0", minHeight: "100vh", background: "#f8fafc" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
         <Link href="/ipd">
           <button

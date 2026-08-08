@@ -58,7 +58,6 @@ export default function NewVisitorPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Visitor data:", formData)
     setSuccess(true)
     setTimeout(() => setSuccess(false), 5000)
     setFormData({ name: "", phone: "", purpose: "", personToVisit: "", floor: "", timeIn: "", timeOut: "", status: "Checked In" })

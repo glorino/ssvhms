@@ -55,7 +55,6 @@ export default function NewPostalPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Postal data:", formData)
     setSuccess(true)
     setTimeout(() => setSuccess(false), 5000)
     setFormData({ type: "Incoming", senderRecipient: "", subject: "", date: "", handledBy: "", status: "Received" })

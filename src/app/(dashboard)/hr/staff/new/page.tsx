@@ -86,7 +86,6 @@ export default function NewStaffPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Staff data:", formData)
     setSuccess(true)
     setTimeout(() => setSuccess(false), 5000)
     setFormData({ name: "", email: "", phone: "", department: "", designation: "", dateOfJoining: "", salary: "", status: "Active" })
