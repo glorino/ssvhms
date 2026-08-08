@@ -6,9 +6,10 @@ import { motion } from "framer-motion"
 interface AnimatedPageProps {
   children: React.ReactNode
   className?: string
+  style?: React.CSSProperties
 }
 
-export function AnimatedPage({ children, className }: AnimatedPageProps) {
+export function AnimatedPage({ children, className, style }: AnimatedPageProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -16,7 +17,7 @@ export function AnimatedPage({ children, className }: AnimatedPageProps) {
       exit={{ opacity: 0, y: 20 }}
       transition={{ duration: 0.3 }}
       className={className}
-      style={{ overflowX: "hidden" }}
+      style={{ overflowX: "hidden", ...style }}
     >
       {children}
     </motion.div>

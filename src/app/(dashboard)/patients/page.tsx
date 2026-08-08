@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react"
 import { usePatients } from "@/lib/patient-context"
+import { AnimatedPage } from "@/components/animated-wrapper"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import {

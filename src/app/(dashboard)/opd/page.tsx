@@ -60,7 +60,7 @@ export default function OPDPage() {
 
   return (
     <AnimatedPage>
-      <div style={{ padding: "24px", space: "y" }}>
+      <div style={{ padding: "24px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
           <div>
             <h1 style={{ fontSize: "28px", fontWeight: "bold", background: "linear-gradient(135deg, #14b8a6, #3b82f6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", margin: 0 }}>
