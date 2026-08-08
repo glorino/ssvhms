@@ -5,14 +5,7 @@ import { useSession, signOut } from "next-auth/react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Bell, Search, User, LogOut, Settings, Moon, Sun, ChevronDown } from "lucide-react"
 import { Input } from "@/components/ui/input"
-
-const notifications = [
-  { id: 1, title: "New patient registered", message: "Rajesh Kumar has been added", time: "5 min ago", read: false },
-  { id: 2, title: "Appointment confirmed", message: "Dr. Priya Sharma - 10:00 AM", time: "15 min ago", read: false },
-  { id: 3, title: "Lab results ready", message: "CBC test completed for Anita Patel", time: "1 hour ago", read: true },
-  { id: 4, title: "Payment received", message: "₦15,000 from Suresh Reddy", time: "2 hours ago", read: true },
-  { id: 5, title: "Bed status update", message: "ICU-03 now available", time: "3 hours ago", read: true },
-]
+import { useNotifications } from "@/lib/notification-context"
 
 function getInitials(name: string) {
   return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
@@ -26,14 +19,13 @@ export function Header() {
   const { data: session } = useSession()
   const [showNotifications, setShowNotifications] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
+  const { notifications, unreadCount, markAsRead, markAllRead } = useNotifications()
 
   const user = session?.user as any
   const userName = user?.name || "User"
   const userEmail = user?.email || ""
   const userRole = user?.role || "USER"
   const initials = getInitials(userName)
-
-  const unreadCount = notifications.filter((n) => !n.read).length
 
   return (
     <header style={{
@@ -109,7 +101,7 @@ export function Header() {
                   </div>
                   <div style={{ maxHeight: 320, overflowY: "auto" }}>
                     {notifications.map((notif) => (
-                      <div key={notif.id} style={{
+                      <div key={notif.id} onClick={() => markAsRead(notif.id)} style={{
                         padding: "12px 16px", borderBottom: "1px solid #f1f5f9",
                         background: !notif.read ? "rgba(20,184,166,0.04)" : "#fff", cursor: "pointer",
                       }}>
@@ -121,14 +113,14 @@ export function Header() {
                           <div>
                             <p style={{ fontSize: 13, fontWeight: 500, color: "#0f172a" }}>{notif.title}</p>
                             <p style={{ fontSize: 12, color: "#64748b" }}>{notif.message}</p>
-                            <p style={{ fontSize: 11, color: "#94a3b8", marginTop: 4 }}>{notif.time}</p>
+                            <p style={{ fontSize: 11, color: "#94a3b8", marginTop: 4 }}>{new Date(notif.createdAt).toLocaleString()}</p>
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
                   <div style={{ padding: 12, borderTop: "1px solid #f1f5f9", textAlign: "center" }}>
-                    <button style={{ fontSize: 13, fontWeight: 500, color: "#14b8a6", background: "none", border: "none", cursor: "pointer" }}>
+                    <button onClick={() => markAllRead()} style={{ fontSize: 13, fontWeight: 500, color: "#14b8a6", background: "none", border: "none", cursor: "pointer" }}>
                       View All Notifications
                     </button>
                   </div>

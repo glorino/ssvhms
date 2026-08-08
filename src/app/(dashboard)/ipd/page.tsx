@@ -28,6 +28,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { AnimatedPage, StaggerContainer, StaggerItem } from "@/components/animated-wrapper"
+import { usePatients } from "@/lib/patient-context"
 
 const bedStatus = [
   { ward: "ICU", total: 10, occupied: 9, vacant: 1, reserved: 0, gradient: "from-rose-500 to-pink-600" },
@@ -38,13 +39,14 @@ const bedStatus = [
   { ward: "Maternity", total: 15, occupied: 11, vacant: 3, reserved: 1, gradient: "from-emerald-500 to-teal-600" },
 ]
 
-const ipdAdmissions = [
-  { id: "IPD001", admissionNumber: "ADM2026001", patient: "Rajesh Kumar", umr: "UMR2026001", doctor: "Dr. Priya Sharma", department: "Cardiology", bed: "ICU-03", ward: "ICU", admissionDate: "2026-08-05", diagnosis: "Acute Myocardial Infarction", status: "Admitted" },
-  { id: "IPD002", admissionNumber: "ADM2026002", patient: "Anita Patel", umr: "UMR2026002", doctor: "Dr. Amit Singh", department: "Orthopedics", bed: "PW-12", ward: "Private", admissionDate: "2026-08-04", diagnosis: "Fracture Left Femur", status: "In Treatment" },
-  { id: "IPD003", admissionNumber: "ADM2026003", patient: "Suresh Reddy", umr: "UMR2026003", doctor: "Dr. Neha Gupta", department: "Neurology", bed: "GW-25", ward: "General Ward", admissionDate: "2026-08-03", diagnosis: "Stroke", status: "In Treatment" },
-  { id: "IPD004", admissionNumber: "ADM2026004", patient: "Priya Verma", umr: "UMR2026004", doctor: "Dr. Rahul Joshi", department: "Dermatology", bed: "SP-08", ward: "Semi-Private", admissionDate: "2026-08-02", diagnosis: "Severe Burns", status: "Discharged" },
-  { id: "IPD005", admissionNumber: "ADM2026005", patient: "Mohammed Ali", umr: "UMR2026005", doctor: "Dr. Sanjay Mehta", department: "General Medicine", bed: "GW-30", ward: "General Ward", admissionDate: "2026-08-01", diagnosis: "Pneumonia", status: "Admitted" },
-]
+function getIPDStatus(visitStatus: string) {
+  switch (visitStatus) {
+    case "In Progress": return "In Treatment"
+    case "Completed": return "Discharged"
+    case "Cancelled": return "Discharged"
+    default: return "Admitted"
+  }
+}
 
 const totalBeds = bedStatus.reduce((acc, ward) => acc + ward.total, 0)
 const totalOccupied = bedStatus.reduce((acc, ward) => acc + ward.occupied, 0)
@@ -60,6 +62,23 @@ const statsData = [
 
 export default function IPDPage() {
   const [searchTerm, setSearchTerm] = useState("")
+  const { patients } = usePatients()
+
+  const ipdAdmissions = patients.flatMap((p) =>
+    p.visits.filter((v) => v.type === "IPD").map((v, i) => ({
+      id: v.id,
+      admissionNumber: `ADM${v.date.replace(/-/g, "")}${String(i + 1).padStart(3, "0")}`,
+      patient: `${p.firstName} ${p.lastName}`,
+      umr: p.uniqueNumber,
+      doctor: v.doctor,
+      department: v.department,
+      bed: "-",
+      ward: "-",
+      admissionDate: v.date,
+      diagnosis: v.diagnosis,
+      status: getIPDStatus(v.status),
+    }))
+  )
 
   const filteredAdmissions = ipdAdmissions.filter(
     (admission) =>

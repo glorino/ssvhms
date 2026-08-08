@@ -4,26 +4,7 @@ import React, { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Search, Download, Eye, Printer, Plus } from "lucide-react"
 import Link from "next/link"
-
-const bills = [
-  { id: "BILL001", billNo: "BL2026001", patient: "Adaeze Okonkwo", umr: "UMR2026001", type: "OPD", amount: 45000, paid: 45000, due: 0, date: "2026-08-07", status: "Paid" },
-  { id: "BILL002", billNo: "BL2026002", patient: "Emeka Nwosu", umr: "UMR2026002", type: "IPD", amount: 870000, paid: 500000, due: 370000, date: "2026-08-06", status: "Partial" },
-  { id: "BILL003", billNo: "BL2026003", patient: "Fatima Abubakar", umr: "UMR2026003", type: "Pathology", amount: 32000, paid: 32000, due: 0, date: "2026-08-05", status: "Paid" },
-  { id: "BILL004", billNo: "BL2026004", patient: "Oluwaseun Adebayo", umr: "UMR2026004", type: "Pharmacy", amount: 185000, paid: 0, due: 185000, date: "2026-08-04", status: "Pending" },
-  { id: "BILL005", billNo: "BL2026005", patient: "Chidinma Eze", umr: "UMR2026005", type: "OPD", amount: 28000, paid: 28000, due: 0, date: "2026-08-03", status: "Paid" },
-  { id: "BILL006", billNo: "BL2026006", patient: "Ibrahim Musa", umr: "UMR2026006", type: "IPD", amount: 620000, paid: 480000, due: 140000, date: "2026-08-02", status: "Partial" },
-]
-
-const totalRevenue = bills.reduce((acc, b) => acc + b.amount, 0)
-const totalCollected = bills.reduce((acc, b) => acc + b.paid, 0)
-const totalPending = bills.reduce((acc, b) => acc + b.due, 0)
-
-const stats = [
-  { title: "Total Revenue", value: formatNaira(totalRevenue), color: "#14b8a6", bg: "#f0fdfa" },
-  { title: "Collected", value: formatNaira(totalCollected), color: "#059669", bg: "#ecfdf5" },
-  { title: "Pending", value: formatNaira(totalPending), color: "#d97706", bg: "#fffbeb" },
-  { title: "Overdue", value: formatNaira(bills.filter((b) => b.status === "Pending").reduce((acc, b) => acc + b.due, 0)), color: "#dc2626", bg: "#fef2f2" },
-]
+import { usePatients } from "@/lib/patient-context"
 
 const statusStyles: Record<string, { bg: string; color: string; border: string }> = {
   Paid: { bg: "#ecfdf5", color: "#059669", border: "#a7f3d0" },
@@ -43,6 +24,20 @@ function formatNaira(val: number) {
 }
 
 export default function AllBillsPage() {
+  const { patients } = usePatients()
+  const bills = patients.flatMap(p => p.bills.map(b => ({ ...b, billNo: b.id, patient: `${p.firstName} ${p.lastName}`, umr: p.uniqueNumber, type: b.items, amount: b.amount, paid: b.paid, due: b.due, date: b.date, status: b.status })))
+
+  const totalRevenue = bills.reduce((acc, b) => acc + b.amount, 0)
+  const totalCollected = bills.reduce((acc, b) => acc + b.paid, 0)
+  const totalPending = bills.reduce((acc, b) => acc + b.due, 0)
+
+  const stats = [
+    { title: "Total Revenue", value: formatNaira(totalRevenue), color: "#14b8a6", bg: "#f0fdfa" },
+    { title: "Collected", value: formatNaira(totalCollected), color: "#059669", bg: "#ecfdf5" },
+    { title: "Pending", value: formatNaira(totalPending), color: "#d97706", bg: "#fffbeb" },
+    { title: "Overdue", value: formatNaira(bills.filter((b) => b.status === "Pending").reduce((acc, b) => acc + b.due, 0)), color: "#dc2626", bg: "#fef2f2" },
+  ]
+
   const [search, setSearch] = useState("")
 
   const filtered = bills.filter(

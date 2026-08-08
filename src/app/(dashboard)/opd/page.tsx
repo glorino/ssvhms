@@ -29,19 +29,18 @@ import {
 import { AnimatedPage, StaggerContainer, StaggerItem } from "@/components/animated-wrapper"
 import { usePatients } from "@/lib/patient-context"
 
-const opdVisits = [
-  { id: "OPD001", visitNumber: "VIS2026001", patient: "Rajesh Kumar", umr: "UMR2026001", doctor: "Dr. Priya Sharma", department: "Cardiology", date: "2026-08-07", symptoms: "Chest pain, shortness of breath", diagnosis: "Angina Pectoris", status: "Completed" },
-  { id: "OPD002", visitNumber: "VIS2026002", patient: "Anita Patel", umr: "UMR2026002", doctor: "Dr. Amit Singh", department: "Orthopedics", date: "2026-08-07", symptoms: "Knee pain, swelling", diagnosis: "Osteoarthritis", status: "In Progress" },
-  { id: "OPD003", visitNumber: "VIS2026003", patient: "Suresh Reddy", umr: "UMR2026003", doctor: "Dr. Neha Gupta", department: "Neurology", date: "2026-08-07", symptoms: "Recurrent headaches, dizziness", diagnosis: "Migraine", status: "Scheduled" },
-  { id: "OPD004", visitNumber: "VIS2026004", patient: "Priya Verma", umr: "UMR2026004", doctor: "Dr. Rahul Joshi", department: "Dermatology", date: "2026-08-06", symptoms: "Skin rash, itching", diagnosis: "Eczema", status: "Completed" },
-  { id: "OPD005", visitNumber: "VIS2026005", patient: "Mohammed Ali", umr: "UMR2026005", doctor: "Dr. Sanjay Mehta", department: "General Medicine", date: "2026-08-06", symptoms: "Fever, cough, body ache", diagnosis: "Viral Fever", status: "Completed" },
-]
-
 export default function OPDPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const { patients } = usePatients()
 
-  const allOpdVisits = patients.flatMap((p) => p.visits.filter((v) => v.type === "OPD"))
+  const allOpdVisits = patients.flatMap((p) =>
+    p.visits.filter((v) => v.type === "OPD").map((v, i) => ({
+      ...v,
+      visitNumber: `VIS${v.date.replace(/-/g, "")}${String(i + 1).padStart(3, "0")}`,
+      patient: `${p.firstName} ${p.lastName}`,
+      umr: p.uniqueNumber,
+    }))
+  )
   const totalVisits = allOpdVisits.length
   const completedVisits = allOpdVisits.filter((v) => v.status === "Completed").length
   const inProgressVisits = allOpdVisits.filter((v) => v.status === "In Progress").length
@@ -54,7 +53,7 @@ export default function OPDPage() {
     { title: "Scheduled", value: String(scheduledVisits), icon: FileText, gradient: "from-violet-500 to-purple-600", shadow: "shadow-violet-500/30" },
   ]
 
-  const filteredVisits = opdVisits.filter(
+  const filteredVisits = allOpdVisits.filter(
     (visit) =>
       visit.patient.toLowerCase().includes(searchTerm.toLowerCase()) ||
       visit.visitNumber.toLowerCase().includes(searchTerm.toLowerCase())

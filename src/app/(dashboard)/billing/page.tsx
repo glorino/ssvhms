@@ -10,28 +10,23 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { AnimatedPage, StaggerContainer, StaggerItem } from "@/components/animated-wrapper"
-
-const bills = [
-  { id: "BILL001", billNumber: "BL2026001", patient: "Rajesh Kumar", umr: "UMR2026001", billType: "OPD", billDate: "2026-08-07", totalAmount: 1500, paidAmount: 1500, dueAmount: 0, paymentStatus: "Paid" },
-  { id: "BILL002", billNumber: "BL2026002", patient: "Anita Patel", umr: "UMR2026002", billType: "IPD", billDate: "2026-08-06", totalAmount: 87200, paidAmount: 50000, dueAmount: 37200, paymentStatus: "Partial" },
-  { id: "BILL003", billNumber: "BL2026003", patient: "Suresh Reddy", umr: "UMR2026003", billType: "Pathology", billDate: "2026-08-05", totalAmount: 3500, paidAmount: 3500, dueAmount: 0, paymentStatus: "Paid" },
-  { id: "BILL004", billNumber: "BL2026004", patient: "Priya Verma", umr: "UMR2026004", billType: "Pharmacy", billDate: "2026-08-04", totalAmount: 2800, paidAmount: 0, dueAmount: 2800, paymentStatus: "Pending" },
-  { id: "BILL005", billNumber: "BL2026005", patient: "Mohammed Ali", umr: "UMR2026005", billType: "Radiology", billDate: "2026-08-03", totalAmount: 5000, paidAmount: 5000, dueAmount: 0, paymentStatus: "Paid" },
-  { id: "BILL006", billNumber: "BL2026006", patient: "Deepika Singh", umr: "UMR2026006", billType: "IPD", billDate: "2026-08-02", totalAmount: 125000, paidAmount: 75000, dueAmount: 50000, paymentStatus: "Partial" },
-]
-
-const totalRevenue = bills.reduce((acc, bill) => acc + Number(bill.totalAmount), 0)
-const totalCollected = bills.reduce((acc, bill) => acc + Number(bill.paidAmount), 0)
-const totalPending = bills.reduce((acc, bill) => acc + Number(bill.dueAmount), 0)
-
-const statsData = [
-  { title: "Total Revenue", value: `₦${totalRevenue.toLocaleString()}`, icon: IndianRupee, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/30" },
-  { title: "Collected", value: `₦${totalCollected.toLocaleString()}`, icon: CheckCircle, gradient: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/30" },
-  { title: "Pending", value: `₦${totalPending.toLocaleString()}`, icon: AlertCircle, gradient: "from-rose-500 to-pink-600", shadow: "shadow-rose-500/30" },
-  { title: "Total Bills", value: "6", icon: FileText, gradient: "from-violet-500 to-purple-600", shadow: "shadow-violet-500/30" },
-]
+import { usePatients } from "@/lib/patient-context"
 
 export default function BillingPage() {
+  const { patients } = usePatients()
+  const bills = patients.flatMap(p => p.bills.map(b => ({ ...b, patient: `${p.firstName} ${p.lastName}`, umr: p.uniqueNumber, billNumber: b.id, billType: b.items, billDate: b.date, totalAmount: b.amount, paidAmount: b.paid, dueAmount: b.due, paymentStatus: b.status })))
+
+  const totalRevenue = bills.reduce((acc, bill) => acc + Number(bill.totalAmount), 0)
+  const totalCollected = bills.reduce((acc, bill) => acc + Number(bill.paidAmount), 0)
+  const totalPending = bills.reduce((acc, bill) => acc + Number(bill.dueAmount), 0)
+
+  const statsData = [
+    { title: "Total Revenue", value: `₦${totalRevenue.toLocaleString()}`, icon: IndianRupee, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/30" },
+    { title: "Collected", value: `₦${totalCollected.toLocaleString()}`, icon: CheckCircle, gradient: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/30" },
+    { title: "Pending", value: `₦${totalPending.toLocaleString()}`, icon: AlertCircle, gradient: "from-rose-500 to-pink-600", shadow: "shadow-rose-500/30" },
+    { title: "Total Bills", value: bills.length.toString(), icon: FileText, gradient: "from-violet-500 to-purple-600", shadow: "shadow-violet-500/30" },
+  ]
+
   const [searchTerm, setSearchTerm] = useState("")
 
   const filteredBills = bills.filter(

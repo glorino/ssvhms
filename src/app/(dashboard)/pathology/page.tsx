@@ -10,26 +10,24 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { AnimatedPage, StaggerContainer, StaggerItem } from "@/components/animated-wrapper"
-
-const tests = [
-  { id: "TS001", testNumber: "PAT2026001", patient: "Rajesh Kumar", umr: "UMR2026001", doctor: "Dr. Priya Sharma", testName: "Complete Blood Count", category: "Hematology", date: "2026-08-07", result: "Normal", status: "Completed" },
-  { id: "TS002", testNumber: "PAT2026002", patient: "Anita Patel", umr: "UMR2026002", doctor: "Dr. Amit Singh", testName: "Lipid Profile", category: "Biochemistry", date: "2026-08-07", result: "Abnormal", status: "Completed" },
-  { id: "TS003", testNumber: "PAT2026003", patient: "Suresh Reddy", umr: "UMR2026003", doctor: "Dr. Neha Gupta", testName: "Thyroid Function Test", category: "Endocrinology", date: "2026-08-07", result: "-", status: "In Progress" },
-  { id: "TS004", testNumber: "PAT2026004", patient: "Priya Verma", umr: "UMR2026004", doctor: "Dr. Rahul Joshi", testName: "Liver Function Test", category: "Biochemistry", date: "2026-08-06", result: "Normal", status: "Completed" },
-  { id: "TS005", testNumber: "PAT2026005", patient: "Mohammed Ali", umr: "UMR2026005", doctor: "Dr. Sanjay Mehta", testName: "Urine Routine", category: "Clinical Pathology", date: "2026-08-06", result: "-", status: "Pending" },
-  { id: "TS006", testNumber: "PAT2026006", patient: "Deepika Singh", umr: "UMR2026006", doctor: "Dr. Priya Sharma", testName: "HbA1c", category: "Endocrinology", date: "2026-08-06", result: "-", status: "Pending" },
-  { id: "TS007", testNumber: "PAT2026007", patient: "Vikram Rao", umr: "UMR2026007", doctor: "Dr. Amit Singh", testName: "ESR", category: "Hematology", date: "2026-08-05", result: "Normal", status: "Completed" },
-  { id: "TS008", testNumber: "PAT2026008", patient: "Kavita Joshi", umr: "UMR2026008", doctor: "Dr. Neha Gupta", testName: "Blood Sugar Fasting", category: "Biochemistry", date: "2026-08-05", result: "-", status: "In Progress" },
-]
-
-const statsData = [
-  { title: "Total Tests", value: "8", icon: FlaskConical, gradient: "from-indigo-500 to-purple-600", shadow: "shadow-indigo-500/30" },
-  { title: "Completed", value: "4", icon: CheckCircle, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/30" },
-  { title: "In Progress", value: "2", icon: Clock, gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30" },
-  { title: "Pending", value: "2", icon: AlertCircle, gradient: "from-rose-500 to-pink-600", shadow: "shadow-rose-500/30" },
-]
+import { usePatients } from "@/lib/patient-context"
 
 export default function PathologyPage() {
+  const { patients } = usePatients()
+  const tests = patients.flatMap(p => p.labResults.map(lr => ({ ...lr, patient: `${p.firstName} ${p.lastName}`, umr: p.uniqueNumber, testNumber: lr.id, doctor: lr.orderedBy })))
+
+  const totalTests = tests.length
+  const completedTests = tests.filter(t => t.status === "Completed").length
+  const inProgressTests = tests.filter(t => t.status === "In Progress").length
+  const pendingTests = tests.filter(t => t.status === "Pending").length
+
+  const statsData = [
+    { title: "Total Tests", value: totalTests.toString(), icon: FlaskConical, gradient: "from-indigo-500 to-purple-600", shadow: "shadow-indigo-500/30" },
+    { title: "Completed", value: completedTests.toString(), icon: CheckCircle, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/30" },
+    { title: "In Progress", value: inProgressTests.toString(), icon: Clock, gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30" },
+    { title: "Pending", value: pendingTests.toString(), icon: AlertCircle, gradient: "from-rose-500 to-pink-600", shadow: "shadow-rose-500/30" },
+  ]
+
   const [searchTerm, setSearchTerm] = useState("")
 
   const filteredTests = tests.filter(

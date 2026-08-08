@@ -28,27 +28,26 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { AnimatedPage, StaggerContainer, StaggerItem } from "@/components/animated-wrapper"
-
-const appointments = [
-  { id: "APT001", patient: "Rajesh Kumar", doctor: "Dr. Priya Sharma", department: "Cardiology", date: "2026-08-07", time: "10:00 AM", status: "Completed", priority: "Normal", reason: "Chest pain consultation" },
-  { id: "APT002", patient: "Anita Patel", doctor: "Dr. Amit Singh", department: "Orthopedics", date: "2026-08-07", time: "10:30 AM", status: "In Progress", priority: "High", reason: "Knee pain" },
-  { id: "APT003", patient: "Suresh Reddy", doctor: "Dr. Neha Gupta", department: "Neurology", date: "2026-08-07", time: "11:00 AM", status: "Scheduled", priority: "Normal", reason: "Headache follow-up" },
-  { id: "APT004", patient: "Priya Verma", doctor: "Dr. Rahul Joshi", department: "Dermatology", date: "2026-08-07", time: "11:30 AM", status: "Scheduled", priority: "Low", reason: "Skin rash" },
-  { id: "APT005", patient: "Mohammed Ali", doctor: "Dr. Sanjay Mehta", department: "General Medicine", date: "2026-08-07", time: "12:00 PM", status: "Cancelled", priority: "Normal", reason: "General checkup" },
-  { id: "APT006", patient: "Deepika Singh", doctor: "Dr. Anita Kulkarni", department: "Pediatrics", date: "2026-08-07", time: "12:30 PM", status: "Scheduled", priority: "Urgent", reason: "Fever and cough" },
-  { id: "APT007", patient: "Arun Sharma", doctor: "Dr. Priya Sharma", department: "Cardiology", date: "2026-08-07", time: "02:00 PM", status: "Scheduled", priority: "Normal", reason: "ECG review" },
-  { id: "APT008", patient: "Kavita Joshi", doctor: "Dr. Amit Singh", department: "Orthopedics", date: "2026-08-07", time: "02:30 PM", status: "Scheduled", priority: "High", reason: "Post-surgery follow-up" },
-]
-
-const statsData = [
-  { title: "Total", value: "8", icon: Calendar, gradient: "from-slate-500 to-slate-600", shadow: "shadow-slate-500/30" },
-  { title: "Completed", value: "1", icon: CheckCircle, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/30" },
-  { title: "In Progress", value: "1", icon: Clock, gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30" },
-  { title: "Scheduled", value: "5", icon: AlertCircle, gradient: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/30" },
-  { title: "Cancelled", value: "1", icon: XCircle, gradient: "from-rose-500 to-pink-600", shadow: "shadow-rose-500/30" },
-]
+import { usePatients } from "@/lib/patient-context"
 
 export default function AppointmentsPage() {
+  const { patients } = usePatients()
+  const appointments = patients.flatMap(p => p.visits.map(v => ({ ...v, patient: `${p.firstName} ${p.lastName}` })))
+
+  const totalApts = appointments.length
+  const completedApts = appointments.filter(a => a.status === "Completed").length
+  const inProgressApts = appointments.filter(a => a.status === "In Progress").length
+  const scheduledApts = appointments.filter(a => a.status === "Scheduled").length
+  const cancelledApts = appointments.filter(a => a.status === "Cancelled").length
+
+  const statsData = [
+    { title: "Total", value: totalApts.toString(), icon: Calendar, gradient: "from-slate-500 to-slate-600", shadow: "shadow-slate-500/30" },
+    { title: "Completed", value: completedApts.toString(), icon: CheckCircle, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/30" },
+    { title: "In Progress", value: inProgressApts.toString(), icon: Clock, gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30" },
+    { title: "Scheduled", value: scheduledApts.toString(), icon: AlertCircle, gradient: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/30" },
+    { title: "Cancelled", value: cancelledApts.toString(), icon: XCircle, gradient: "from-rose-500 to-pink-600", shadow: "shadow-rose-500/30" },
+  ]
+
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedDate, setSelectedDate] = useState("2026-08-07")
 
@@ -127,12 +126,11 @@ export default function AppointmentsPage() {
                 <TableHeader>
                   <TableRow className="border-slate-100">
                     <TableHead className="font-semibold text-slate-700">ID</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Time</TableHead>
+                    <TableHead className="font-semibold text-slate-700">Date</TableHead>
                     <TableHead className="font-semibold text-slate-700">Patient</TableHead>
                     <TableHead className="font-semibold text-slate-700">Doctor</TableHead>
                     <TableHead className="font-semibold text-slate-700">Department</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Reason</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Priority</TableHead>
+                    <TableHead className="font-semibold text-slate-700">Type</TableHead>
                     <TableHead className="font-semibold text-slate-700">Status</TableHead>
                     <TableHead className="text-right font-semibold text-slate-700">Actions</TableHead>
                   </TableRow>
@@ -150,25 +148,13 @@ export default function AppointmentsPage() {
                       <TableCell>
                         <div className="flex items-center gap-1 text-slate-600">
                           <Clock className="h-4 w-4 text-blue-400" />
-                          {apt.time}
+                          {apt.date}
                         </div>
                       </TableCell>
                       <TableCell className="font-medium text-slate-800">{apt.patient}</TableCell>
                       <TableCell className="text-slate-600">{apt.doctor}</TableCell>
                       <TableCell className="text-slate-600">{apt.department}</TableCell>
-                      <TableCell className="max-w-[200px] truncate text-slate-600">{apt.reason}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={apt.priority === "Urgent" ? "destructive" : apt.priority === "High" ? "warning" : "secondary"}
-                          className={
-                            apt.priority === "Urgent" ? "bg-red-100 text-red-700 border-red-200" :
-                            apt.priority === "High" ? "bg-amber-100 text-amber-700 border-amber-200" :
-                            "bg-slate-100 text-slate-600 border-slate-200"
-                          }
-                        >
-                          {apt.priority}
-                        </Badge>
-                      </TableCell>
+                      <TableCell><Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200">{apt.type}</Badge></TableCell>
                       <TableCell>
                         <Badge
                           variant={

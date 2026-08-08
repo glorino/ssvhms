@@ -41,10 +41,10 @@ const steps = [
 ]
 
 const doctors = [
-  { name: "Dr. Sonia Bush", spec: "Neurology", exp: "6 yrs", qual: "MS", image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop&crop=face" },
-  { name: "Dr. Sansa Gomez", spec: "Gynecology", exp: "6 yrs", qual: "MS", image: "https://images.unsplash.com/photo-1594824476967-48c8b964ac31?w=400&h=400&fit=crop&crop=face" },
-  { name: "Dr. Amit Singh", spec: "Pediatrics", exp: "7 yrs", qual: "MS", image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop&crop=face" },
-  { name: "Dr. Reyan Jain", spec: "Cardiology", exp: "5 yrs", qual: "MS", image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&h=400&fit=crop&crop=face" },
+  { name: "Dr. Chukwuemeka Okafor", spec: "Neurology", exp: "12 yrs", qual: "MBBS, MD", image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&h=400&fit=crop&crop=face" },
+  { name: "Dr. Adaeze Nwosu", spec: "Gynecology", exp: "10 yrs", qual: "MBBS, FWACS", image: "https://images.unsplash.com/photo-1594824476967-48c8b964ac31?w=400&h=400&fit=crop&crop=face" },
+  { name: "Dr. Olumide Adeyemi", spec: "Pediatrics", exp: "8 yrs", qual: "MBBS, DCH", image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop&crop=face" },
+  { name: "Dr. Fatima Bello", spec: "Cardiology", exp: "15 yrs", qual: "MBBS, FRCP", image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop&crop=face" },
 ]
 
 const roles = [
@@ -400,15 +400,15 @@ export default function HomePage() {
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 <Link href="/" style={{ color: "inherit", textDecoration: "none" }}>Home</Link>
                 <a href="#departments" style={{ color: "inherit", textDecoration: "none" }}>Departments</a>
-                <a href="#" style={{ color: "inherit", textDecoration: "none" }}>About Us</a>
+                <a href="#departments" style={{ color: "inherit", textDecoration: "none" }}>About Us</a>
               </div>
             </div>
             <div>
               <h4 style={{ fontWeight: 700, color: "#fff", marginBottom: 12, fontSize: 13 }}>Services</h4>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 <a href="#appointment" style={{ color: "inherit", textDecoration: "none" }}>Appointments</a>
-                <a href="#" style={{ color: "inherit", textDecoration: "none" }}>Lab Reports</a>
-                <a href="#" style={{ color: "inherit", textDecoration: "none" }}>Emergency</a>
+                <a href="/login" style={{ color: "inherit", textDecoration: "none" }}>Lab Reports</a>
+                <a href="/login" style={{ color: "inherit", textDecoration: "none" }}>Emergency</a>
               </div>
             </div>
             <div>
@@ -423,8 +423,8 @@ export default function HomePage() {
           <div style={{ borderTop: "1px solid #1f2937", paddingTop: 24, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <p>© 2026 SSV Hospital & Research Center · All rights reserved</p>
             <div style={{ display: "flex", gap: 20 }}>
-              <a href="#" style={{ color: "inherit", textDecoration: "none" }}>Privacy</a>
-              <a href="#" style={{ color: "inherit", textDecoration: "none" }}>Terms</a>
+              <a href="#contact" style={{ color: "inherit", textDecoration: "none" }}>Privacy Policy</a>
+              <a href="#contact" style={{ color: "inherit", textDecoration: "none" }}>Terms of Service</a>
             </div>
           </div>
         </div>

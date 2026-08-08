@@ -3,24 +3,9 @@
 import React, { useState } from "react"
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
+import { usePatients } from "@/lib/patient-context"
 
 const ACCENT = "#14b8a6"
-
-const statsData = [
-  { title: "Total Visits", value: "245", color: ACCENT, bg: "rgba(20,184,166,0.1)" },
-  { title: "Today", value: "18", color: "#3b82f6", bg: "rgba(59,130,246,0.1)" },
-  { title: "In Progress", value: "5", color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
-  { title: "Completed", value: "12", color: "#10b981", bg: "rgba(16,185,129,0.1)" },
-]
-
-const visitsData = [
-  { visitNo: "VIS2026001", patient: "Rajesh Kumar", doctor: "Dr. Priya Sharma", department: "Cardiology", symptoms: "Chest pain, shortness of breath", diagnosis: "Angina Pectoris", date: "2026-08-07", status: "Completed" },
-  { visitNo: "VIS2026002", patient: "Anita Patel", doctor: "Dr. Amit Singh", department: "Orthopedics", symptoms: "Knee pain, swelling", diagnosis: "Osteoarthritis", date: "2026-08-07", status: "In Progress" },
-  { visitNo: "VIS2026003", patient: "Suresh Reddy", doctor: "Dr. Neha Gupta", department: "Neurology", symptoms: "Recurrent headaches, dizziness", diagnosis: "Migraine", date: "2026-08-07", status: "Scheduled" },
-  { visitNo: "VIS2026004", patient: "Priya Verma", doctor: "Dr. Rahul Joshi", department: "Dermatology", symptoms: "Skin rash, itching", diagnosis: "Eczema", date: "2026-08-06", status: "Completed" },
-  { visitNo: "VIS2026005", patient: "Mohammed Ali", doctor: "Dr. Sanjay Mehta", department: "General Medicine", symptoms: "Fever, cough, body ache", diagnosis: "Viral Fever", date: "2026-08-06", status: "Completed" },
-  { visitNo: "VIS2026006", patient: "Deepika Singh", doctor: "Dr. Anita Kulkarni", department: "Pediatrics", symptoms: "Fever, sore throat", diagnosis: "Pharyngitis", date: "2026-08-05", status: "Completed" },
-]
 
 const statusStyles: Record<string, { bg: string; color: string }> = {
   Completed: { bg: "rgba(16,185,129,0.1)", color: "#10b981" },
@@ -30,8 +15,30 @@ const statusStyles: Record<string, { bg: string; color: string }> = {
 
 export default function OPDVisitsPage() {
   const [search, setSearch] = useState("")
+  const { patients } = usePatients()
 
-  const filtered = visitsData.filter(
+  const opdVisits = patients.flatMap((p) =>
+    p.visits.filter((v) => v.type === "OPD").map((v, i) => ({
+      visitNo: `VIS${v.date.replace(/-/g, "")}${String(i + 1).padStart(3, "0")}`,
+      patient: `${p.firstName} ${p.lastName}`,
+      doctor: v.doctor,
+      department: v.department,
+      symptoms: v.symptoms,
+      diagnosis: v.diagnosis,
+      date: v.date,
+      status: v.status,
+    }))
+  )
+
+  const today = new Date().toISOString().slice(0, 10)
+  const statsData = [
+    { title: "Total Visits", value: String(opdVisits.length), color: ACCENT, bg: "rgba(20,184,166,0.1)" },
+    { title: "Today", value: String(opdVisits.filter((v) => v.date === today).length), color: "#3b82f6", bg: "rgba(59,130,246,0.1)" },
+    { title: "In Progress", value: String(opdVisits.filter((v) => v.status === "In Progress").length), color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
+    { title: "Completed", value: String(opdVisits.filter((v) => v.status === "Completed").length), color: "#10b981", bg: "rgba(16,185,129,0.1)" },
+  ]
+
+  const filtered = opdVisits.filter(
     (v) =>
       v.patient.toLowerCase().includes(search.toLowerCase()) ||
       v.visitNo.toLowerCase().includes(search.toLowerCase()) ||

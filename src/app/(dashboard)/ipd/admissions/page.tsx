@@ -4,26 +4,20 @@ import React, { useState } from "react"
 import Link from "next/link"
 import { Search, Plus, Eye, Edit } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
+import { usePatients } from "@/lib/patient-context"
 
 const accent = "#14b8a6"
 const accentLight = "#ccfbf1"
 const accentDark = "#0d9488"
 
-const statsData = [
-  { title: "Total", value: 89, bg: "#f0fdfa" },
-  { title: "Active", value: 45, bg: "#ecfdf5" },
-  { title: "Discharged", value: 38, bg: "#eff6ff" },
-  { title: "Transferred", value: 6, bg: "#fefce8" },
-]
-
-const admissions = [
-  { no: "ADM2026001", patient: "Rajesh Kumar", umr: "UMR2026001", doctor: "Dr. Priya Sharma", ward: "ICU", bed: "ICU-03", date: "2026-08-05", diagnosis: "Acute Myocardial Infarction", discharge: "-", status: "Admitted" },
-  { no: "ADM2026002", patient: "Anita Patel", umr: "UMR2026002", doctor: "Dr. Amit Singh", ward: "Private", bed: "PW-12", date: "2026-08-04", diagnosis: "Fracture Left Femur", discharge: "-", status: "In Treatment" },
-  { no: "ADM2026003", patient: "Suresh Reddy", umr: "UMR2026003", doctor: "Dr. Neha Gupta", ward: "General", bed: "GW-25", date: "2026-08-03", diagnosis: "Stroke", discharge: "-", status: "In Treatment" },
-  { no: "ADM2026004", patient: "Priya Verma", umr: "UMR2026004", doctor: "Dr. Rahul Joshi", ward: "Semi-Private", bed: "SP-08", date: "2026-08-02", diagnosis: "Severe Burns", discharge: "2026-08-06", status: "Discharged" },
-  { no: "ADM2026005", patient: "Mohammed Ali", umr: "UMR2026005", doctor: "Dr. Sanjay Mehta", ward: "General", bed: "GW-30", date: "2026-08-01", diagnosis: "Pneumonia", discharge: "-", status: "Admitted" },
-  { no: "ADM2026006", patient: "Lakshmi Iyer", umr: "UMR2026006", doctor: "Dr. Kavitha Nair", ward: "Maternity", bed: "MT-05", date: "2026-07-30", diagnosis: "Normal Delivery", discharge: "2026-08-02", status: "Discharged" },
-]
+function getIPDAdmissionStatus(visitStatus: string) {
+  switch (visitStatus) {
+    case "In Progress": return "In Treatment"
+    case "Completed": return "Discharged"
+    case "Cancelled": return "Transferred"
+    default: return "Admitted"
+  }
+}
 
 function statusStyle(s: string) {
   switch (s) {
@@ -37,6 +31,29 @@ function statusStyle(s: string) {
 
 export default function IPDAdmissionsPage() {
   const [search, setSearch] = useState("")
+  const { patients } = usePatients()
+
+  const admissions = patients.flatMap((p) =>
+    p.visits.filter((v) => v.type === "IPD").map((v, i) => ({
+      no: `ADM${v.date.replace(/-/g, "")}${String(i + 1).padStart(3, "0")}`,
+      patient: `${p.firstName} ${p.lastName}`,
+      umr: p.uniqueNumber,
+      doctor: v.doctor,
+      ward: "-",
+      bed: "-",
+      date: v.date,
+      diagnosis: v.diagnosis,
+      discharge: v.status === "Completed" ? v.date : "-",
+      status: getIPDAdmissionStatus(v.status),
+    }))
+  )
+
+  const statsData = [
+    { title: "Total", value: admissions.length, bg: "#f0fdfa" },
+    { title: "Active", value: admissions.filter((a) => a.status === "Admitted" || a.status === "In Treatment").length, bg: "#ecfdf5" },
+    { title: "Discharged", value: admissions.filter((a) => a.status === "Discharged").length, bg: "#eff6ff" },
+    { title: "Transferred", value: admissions.filter((a) => a.status === "Transferred").length, bg: "#fefce8" },
+  ]
 
   const filtered = admissions.filter(
     (a) =>
