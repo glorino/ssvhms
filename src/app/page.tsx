@@ -9,9 +9,9 @@ import {
 
 const navLinks = [
   { label: "Home", href: "/" },
-  { label: "Annual Calendar", href: "#" },
-  { label: "Appointment", href: "#appointment" },
-  { label: "Events", href: "#" },
+  { label: "Departments", href: "#departments" },
+  { label: "Doctors", href: "#doctors" },
+  { label: "Contact", href: "#contact" },
 ]
 
 const quickActions = [
@@ -41,10 +41,10 @@ const steps = [
 ]
 
 const doctors = [
-  { name: "Dr. Sonia Bush", spec: "Neurology", exp: "6 yrs", qual: "MS" },
-  { name: "Dr. Sansa Gomez", spec: "Gynecology", exp: "6 yrs", qual: "MS" },
-  { name: "Dr. Amit Singh", spec: "Pediatrics", exp: "7 yrs", qual: "MS" },
-  { name: "Dr. Reyan Jain", spec: "Cardiology", exp: "5 yrs", qual: "MS" },
+  { name: "Dr. Sonia Bush", spec: "Neurology", exp: "6 yrs", qual: "MS", image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop&crop=face" },
+  { name: "Dr. Sansa Gomez", spec: "Gynecology", exp: "6 yrs", qual: "MS", image: "https://images.unsplash.com/photo-1594824476967-48c8b964ac31?w=400&h=400&fit=crop&crop=face" },
+  { name: "Dr. Amit Singh", spec: "Pediatrics", exp: "7 yrs", qual: "MS", image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop&crop=face" },
+  { name: "Dr. Reyan Jain", spec: "Cardiology", exp: "5 yrs", qual: "MS", image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&h=400&fit=crop&crop=face" },
 ]
 
 const roles = [
@@ -289,7 +289,7 @@ export default function HomePage() {
       </section>
 
       {/* Doctors */}
-      <section style={s.section}>
+      <section id="doctors" style={s.section}>
         <div style={s.container}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 40 }}>
             <div>
@@ -303,11 +303,11 @@ export default function HomePage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
             {doctors.map((doc) => (
               <Link key={doc.name} href="/login" style={{ background: "#fff", borderRadius: 12, border: "1px solid #f3f4f6", overflow: "hidden", display: "block", textDecoration: "none" }}>
-                <div style={{ height: 192, background: "linear-gradient(135deg, #f9fafb, #e5e7eb)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-                  <Stethoscope size={64} color="#d1d5db" />
-                  <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.6))", padding: "32px 16px 12px" }}>
+                <div style={{ height: 220, background: "linear-gradient(135deg, #f0fdfa, #e0f2fe)", position: "relative", overflow: "hidden" }}>
+                  <img src={doc.image} alt={doc.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.7))", padding: "40px 16px 12px" }}>
                     <h3 style={{ fontWeight: 700, color: "#fff", fontSize: 14 }}>{doc.name}</h3>
-                    <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 12 }}>{doc.spec}</span>
+                    <span style={{ color: "rgba(255,255,255,0.8)", fontSize: 12 }}>{doc.spec}</span>
                   </div>
                 </div>
                 <div style={{ padding: 16 }}>
@@ -359,7 +359,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA */}
-      <section style={{ padding: "56px 0" }}>
+      <section id="contact" style={{ padding: "56px 0" }}>
         <div style={s.container}>
           <div style={{
             background: "#14b8a6", borderRadius: 16, padding: "48px 40px",
