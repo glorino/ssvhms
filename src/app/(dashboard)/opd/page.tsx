@@ -86,7 +86,7 @@ export default function OPDPage() {
               <p style={{ opacity: 0.9, margin: "6px 0 0 0", fontSize: "14px" }}>Manage outpatient visits and consultations</p>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <button style={{
+              <button onClick={() => alert("Exporting OPD data...")} style={{
                 display: "inline-flex", alignItems: "center", gap: "6px",
                 padding: "9px 18px", borderRadius: "10px", border: "1.5px solid rgba(255,255,255,0.3)",
                 background: "rgba(255,255,255,0.15)", color: "white", fontSize: "13px", fontWeight: 600,

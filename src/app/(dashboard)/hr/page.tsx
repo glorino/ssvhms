@@ -94,7 +94,7 @@ export default function HRPage() {
             <p style={{ color: "rgba(255,255,255,0.85)", fontSize: "14px" }}>Manage staff, attendance, leaves, and payroll</p>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <button style={{
+            <button onClick={() => alert("Exporting HR data...")} style={{
               display: "inline-flex", alignItems: "center", gap: "6px",
               padding: "9px 18px", borderRadius: "10px", border: "1.5px solid rgba(255,255,255,0.3)",
               background: "rgba(255,255,255,0.15)", color: "#fff", fontSize: "13px", fontWeight: 600,
@@ -214,7 +214,7 @@ export default function HRPage() {
                       onBlur={e => e.currentTarget.style.borderColor = "#e2e8f0"}
                     />
                   </div>
-                  <button style={{
+                  <button onClick={() => alert("Filter options coming soon")} style={{
                     display: "inline-flex", alignItems: "center", gap: "6px",
                     padding: "9px 16px", borderRadius: "10px", border: "1.5px solid #e2e8f0",
                     background: "#fff", color: "#475569", fontSize: "13px", fontWeight: 600,
@@ -303,7 +303,7 @@ export default function HRPage() {
                         </td>
                         <td style={{ padding: "14px 16px", textAlign: "right" }}>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "4px" }}>
-                            <button style={{
+                            <button onClick={() => alert("View staff: " + s.name)} style={{
                               width: "32px", height: "32px", borderRadius: "8px", border: "none",
                               background: "transparent", cursor: "pointer",
                               display: "flex", alignItems: "center", justifyContent: "center",
@@ -314,7 +314,7 @@ export default function HRPage() {
                             >
                               <Eye size={16} />
                             </button>
-                            <button style={{
+                            <button onClick={() => alert("Edit staff: " + s.name)} style={{
                               width: "32px", height: "32px", borderRadius: "8px", border: "none",
                               background: "transparent", cursor: "pointer",
                               display: "flex", alignItems: "center", justifyContent: "center",
@@ -356,7 +356,7 @@ export default function HRPage() {
             <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
                 <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b" }}>Today&apos;s Attendance</h2>
-                <button style={{
+                <button onClick={() => alert("Attendance marked successfully!")} style={{
                   display: "inline-flex", alignItems: "center", gap: "6px",
                   padding: "9px 20px", borderRadius: "10px", border: "none",
                   background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
@@ -532,7 +532,7 @@ export default function HRPage() {
                         </td>
                         <td style={{ padding: "14px 16px", textAlign: "right" }}>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "4px" }}>
-                            <button style={{
+                            <button onClick={() => alert("View leave: " + leave.name)} style={{
                               width: "32px", height: "32px", borderRadius: "8px", border: "none",
                               background: "transparent", cursor: "pointer",
                               display: "flex", alignItems: "center", justifyContent: "center",
@@ -544,7 +544,7 @@ export default function HRPage() {
                               <Eye size={16} />
                             </button>
                             {leave.status === "Pending" && (
-                              <button style={{
+                              <button onClick={() => alert("Leave approved!")} style={{
                                 width: "32px", height: "32px", borderRadius: "8px", border: "none",
                                 background: "transparent", cursor: "pointer",
                                 display: "flex", alignItems: "center", justifyContent: "center",
@@ -582,7 +582,7 @@ export default function HRPage() {
             <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
                 <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b" }}>Payroll - July 2026</h2>
-                <button style={{
+                <button onClick={() => alert("Payroll processed successfully!")} style={{
                   display: "inline-flex", alignItems: "center", gap: "6px",
                   padding: "9px 20px", borderRadius: "10px", border: "none",
                   background: "linear-gradient(135deg, #8b5cf6, #a855f7)",

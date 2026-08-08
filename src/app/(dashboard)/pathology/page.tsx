@@ -81,7 +81,7 @@ export default function PathologyPage() {
             <p style={{ color: "#64748b", fontSize: "14px" }}>Manage pathology lab tests and results</p>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <button style={{
+            <button onClick={() => alert("Exporting pathology data...")} style={{
               display: "inline-flex", alignItems: "center", gap: "6px",
               padding: "8px 16px", borderRadius: "10px", border: "1.5px solid #e2e8f0",
               background: "#fff", color: "#475569", fontSize: "13px", fontWeight: 600,
@@ -245,7 +245,7 @@ export default function PathologyPage() {
                       </td>
                       <td style={{ padding: "14px 16px", textAlign: "right" }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "4px" }}>
-                          <button style={{
+                          <button onClick={() => alert("View test: " + test.testName)} style={{
                             width: "32px", height: "32px", borderRadius: "8px", border: "none",
                             background: "transparent", cursor: "pointer",
                             display: "flex", alignItems: "center", justifyContent: "center",
@@ -256,7 +256,7 @@ export default function PathologyPage() {
                           >
                             <Eye size={16} />
                           </button>
-                          <button style={{
+                          <button onClick={() => alert("Edit test: " + test.testName)} style={{
                             width: "32px", height: "32px", borderRadius: "8px", border: "none",
                             background: "transparent", cursor: "pointer",
                             display: "flex", alignItems: "center", justifyContent: "center",

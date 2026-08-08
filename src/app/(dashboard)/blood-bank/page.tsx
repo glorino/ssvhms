@@ -86,7 +86,7 @@ export default function BloodBankPage() {
               <p style={{ opacity: 0.9, margin: "6px 0 0 0", fontSize: "14px" }}>Manage blood donations, issues, and inventory</p>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <button style={{
+              <button onClick={() => alert("Exporting blood bank data...")} style={{
                 display: "inline-flex", alignItems: "center", gap: "6px",
                 padding: "9px 18px", borderRadius: "10px", border: "1.5px solid rgba(255,255,255,0.3)",
                 background: "rgba(255,255,255,0.15)", color: "white", fontSize: "13px", fontWeight: 600,
@@ -322,7 +322,7 @@ export default function BloodBankPage() {
                         </td>
                         <td style={{ padding: "14px 16px", textAlign: "right" }}>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "4px" }}>
-                            <button style={{
+                            <button onClick={() => alert("View donation: " + donation.donorName)} style={{
                               width: "32px", height: "32px", borderRadius: "8px", border: "none",
                               background: "transparent", cursor: "pointer",
                               display: "flex", alignItems: "center", justifyContent: "center",
@@ -333,7 +333,7 @@ export default function BloodBankPage() {
                             >
                               <Eye size={16} />
                             </button>
-                            <button style={{
+                            <button onClick={() => alert("Edit donation: " + donation.donorName)} style={{
                               width: "32px", height: "32px", borderRadius: "8px", border: "none",
                               background: "transparent", cursor: "pointer",
                               display: "flex", alignItems: "center", justifyContent: "center",
@@ -465,7 +465,7 @@ export default function BloodBankPage() {
                           </span>
                         </td>
                         <td style={{ padding: "14px 16px", textAlign: "right" }}>
-                          <button style={{
+                          <button onClick={() => alert("View issue: " + issue.issueNumber)} style={{
                             width: "32px", height: "32px", borderRadius: "8px", border: "none",
                             background: "transparent", cursor: "pointer",
                             display: "inline-flex", alignItems: "center", justifyContent: "center",

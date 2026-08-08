@@ -48,6 +48,7 @@ export default function PaymentsPage() {
           <p style={{ color: "#64748b", margin: "4px 0 0", fontSize: "14px" }}>Track all patient payments and receipts</p>
         </div>
         <button
+          onClick={() => alert("Exporting payments...")}
           style={{
             padding: "8px 16px",
             border: "1px solid #e2e8f0",

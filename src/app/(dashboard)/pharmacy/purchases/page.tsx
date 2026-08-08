@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { ShoppingCart, TrendingUp, Clock, Truck, Plus } from "lucide-react"
 
@@ -37,14 +38,16 @@ export default function PurchasesPage() {
             <h1 style={{ fontSize: 26, fontWeight: 700, color: "#0f172a", marginBottom: 4 }}>Purchase History</h1>
             <p style={{ color: "#64748b", fontSize: 14 }}>Track pharmaceutical purchases and supplier payments</p>
           </div>
-          <button style={{
-            display: "flex", alignItems: "center", gap: 8, padding: "10px 18px",
-            borderRadius: 10, border: "none", background: "linear-gradient(135deg, #0f766e, #14b8a6)",
-            fontSize: 13, fontWeight: 600, color: "#fff", cursor: "pointer",
-            boxShadow: "0 4px 14px rgba(20,184,166,0.3)",
-          }}>
-            <Plus size={16} /> New Purchase
-          </button>
+          <Link href="/pharmacy/purchases/new">
+            <button style={{
+              display: "flex", alignItems: "center", gap: 8, padding: "10px 18px",
+              borderRadius: 10, border: "none", background: "linear-gradient(135deg, #0f766e, #14b8a6)",
+              fontSize: 13, fontWeight: 600, color: "#fff", cursor: "pointer",
+              boxShadow: "0 4px 14px rgba(20,184,166,0.3)",
+            }}>
+              <Plus size={16} /> New Purchase
+            </button>
+          </Link>
         </div>
 
         {/* Stats */}

@@ -55,6 +55,7 @@ export default function AllBillsPage() {
         </div>
         <div style={{ display: "flex", gap: "8px" }}>
           <button
+            onClick={() => alert("Exporting bills...")}
             style={{
               padding: "8px 16px",
               border: "1px solid #e2e8f0",
@@ -250,6 +251,7 @@ export default function AllBillsPage() {
                           <Eye size={14} />
                         </button>
                         <button
+                          onClick={() => alert("Printing bill...")}
                           style={{
                             width: "30px",
                             height: "30px",

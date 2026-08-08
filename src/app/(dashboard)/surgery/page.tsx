@@ -74,7 +74,7 @@ export default function SurgeryPage() {
             <p style={{ color: "rgba(255,255,255,0.85)", fontSize: "14px" }}>Manage surgical procedures and operating theaters</p>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <button style={{
+            <button onClick={() => alert("Exporting surgery data...")} style={{
               display: "inline-flex", alignItems: "center", gap: "6px",
               padding: "9px 18px", borderRadius: "10px", border: "1.5px solid rgba(255,255,255,0.3)",
               background: "rgba(255,255,255,0.15)", color: "#fff", fontSize: "13px", fontWeight: 600,
@@ -261,7 +261,7 @@ export default function SurgeryPage() {
                       </td>
                       <td style={{ padding: "14px 16px", textAlign: "right" }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "4px" }}>
-                          <button style={{
+                          <button onClick={() => alert("View surgery: " + surgery.surgeryName)} style={{
                             width: "32px", height: "32px", borderRadius: "8px", border: "none",
                             background: "transparent", cursor: "pointer",
                             display: "flex", alignItems: "center", justifyContent: "center",
@@ -272,7 +272,7 @@ export default function SurgeryPage() {
                           >
                             <Eye size={16} />
                           </button>
-                          <button style={{
+                          <button onClick={() => alert("Edit surgery: " + surgery.surgeryName)} style={{
                             width: "32px", height: "32px", borderRadius: "8px", border: "none",
                             background: "transparent", cursor: "pointer",
                             display: "flex", alignItems: "center", justifyContent: "center",

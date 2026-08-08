@@ -48,7 +48,7 @@ export default function RadiologyPage() {
             <p className="text-slate-500">Manage radiology scans and imaging tests</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50"><Download className="mr-2 h-4 w-4" />Export</Button>
+            <Button onClick={() => alert("Exporting radiology data...")} variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50"><Download className="mr-2 h-4 w-4" />Export</Button>
             <Link href="/radiology/new">
               <Button size="sm" className="bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 shadow-lg shadow-pink-500/30">
                 <Plus className="mr-2 h-4 w-4" />New Scan
@@ -133,8 +133,8 @@ export default function RadiologyPage() {
                       </TableCell>
                       <td className="text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-blue-50 hover:text-blue-600"><Eye className="h-4 w-4" /></Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-pink-50 hover:text-pink-600"><Edit className="h-4 w-4" /></Button>
+                          <Button onClick={() => alert("View scan: " + scan.testName)} variant="ghost" size="icon" className="h-8 w-8 hover:bg-blue-50 hover:text-blue-600"><Eye className="h-4 w-4" /></Button>
+                          <Button onClick={() => alert("Edit scan: " + scan.testName)} variant="ghost" size="icon" className="h-8 w-8 hover:bg-pink-50 hover:text-pink-600"><Edit className="h-4 w-4" /></Button>
                         </div>
                       </td>
                     </motion.tr>

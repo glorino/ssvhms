@@ -81,7 +81,7 @@ export default function BillingPage() {
             <p style={{ color: "#64748b", fontSize: "14px" }}>Manage bills, payments, and invoices</p>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <button style={{
+            <button onClick={() => alert("Exporting billing data...")} style={{
               display: "inline-flex", alignItems: "center", gap: "6px",
               padding: "8px 16px", borderRadius: "10px", border: "1.5px solid #e2e8f0",
               background: "#fff", color: "#475569", fontSize: "13px", fontWeight: 600,
@@ -261,7 +261,7 @@ export default function BillingPage() {
                           >
                             <Eye size={16} />
                           </button>
-                          <button style={{
+                          <button onClick={() => alert("Printing bill...")} style={{
                             width: "32px", height: "32px", borderRadius: "8px", border: "none", background: "transparent",
                             cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                             color: "#64748b", transition: "all 0.2s",

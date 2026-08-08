@@ -637,6 +637,7 @@ export default function AppointmentsPage() {
                           <div style={{ display: "flex", justifyContent: "flex-end", gap: "6px" }}>
                             <button
                               title="View"
+                              onClick={() => alert("View appointment: " + apt.patient)}
                               style={{
                                 width: "34px",
                                 height: "34px",
@@ -665,6 +666,7 @@ export default function AppointmentsPage() {
                             </button>
                             <button
                               title="Edit"
+                              onClick={() => alert("Edit appointment: " + apt.patient)}
                               style={{
                                 width: "34px",
                                 height: "34px",

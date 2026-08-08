@@ -69,7 +69,7 @@ export default function PharmacyPage() {
             <p style={{ color: "#64748b", margin: "4px 0 0 0" }}>Manage medicine inventory, purchases, and sales</p>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <button style={{ display: "flex", alignItems: "center", padding: "8px 16px", borderRadius: "12px", border: "1px solid #e2e8f0", background: "white", color: "#475569", cursor: "pointer", fontSize: "14px", fontWeight: "500", transition: "all 0.2s" }}>
+            <button onClick={() => alert("Exporting pharmacy data...")} style={{ display: "flex", alignItems: "center", padding: "8px 16px", borderRadius: "12px", border: "1px solid #e2e8f0", background: "white", color: "#475569", cursor: "pointer", fontSize: "14px", fontWeight: "500", transition: "all 0.2s" }}>
               <Download style={{ width: "16px", height: "16px", marginRight: "8px" }} />
               Export
             </button>
@@ -201,13 +201,13 @@ export default function PharmacyPage() {
                           </td>
                           <td style={{ padding: "14px 16px", textAlign: "right" }}>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "4px" }}>
-                              <button style={{ width: "32px", height: "32px", borderRadius: "8px", border: "none", background: "transparent", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
+                              <button onClick={() => alert("View: " + med.name)} style={{ width: "32px", height: "32px", borderRadius: "8px", border: "none", background: "transparent", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
                                 onMouseEnter={(e) => { e.currentTarget.style.background = "#eff6ff"; e.currentTarget.style.color = "#3b82f6" }}
                                 onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b" }}
                               >
                                 <Eye style={{ width: "16px", height: "16px" }} />
                               </button>
-                              <button style={{ width: "32px", height: "32px", borderRadius: "8px", border: "none", background: "transparent", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
+                              <button onClick={() => alert("Edit: " + med.name)} style={{ width: "32px", height: "32px", borderRadius: "8px", border: "none", background: "transparent", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
                                 onMouseEnter={(e) => { e.currentTarget.style.background = "#f0fdfa"; e.currentTarget.style.color = "#14b8a6" }}
                                 onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b" }}
                               >
