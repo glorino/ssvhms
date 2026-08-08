@@ -2,19 +2,46 @@
 
 import React, { useState } from "react"
 import Link from "next/link"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { Plus, Search, Download, Eye, Edit, FlaskConical, CheckCircle, Clock, AlertCircle, Microscope } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { AnimatedPage, StaggerContainer, StaggerItem } from "@/components/animated-wrapper"
 import { usePatients } from "@/lib/patient-context"
+
+const statusStyles: Record<string, { bg: string; color: string; border: string }> = {
+  Completed: { bg: "#dcfce7", color: "#166534", border: "#bbf7d0" },
+  "In Progress": { bg: "#fff7ed", color: "#9a3412", border: "#fed7aa" },
+  Pending: { bg: "#fef2f2", color: "#991b1b", border: "#fecaca" },
+}
+
+const resultStyles: Record<string, { color: string; fontWeight: string }> = {
+  Abnormal: { color: "#ef4444", fontWeight: "700" },
+  Normal: { color: "#22c55e", fontWeight: "600" },
+}
+
+const statGradients = [
+  "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+  "linear-gradient(135deg, #22c55e, #16a34a)",
+  "linear-gradient(135deg, #f97316, #ea580c)",
+  "linear-gradient(135deg, #ef4444, #dc2626)",
+]
+
+const statShadows = [
+  "0 8px 24px rgba(139,92,246,0.35)",
+  "0 8px 24px rgba(34,197,94,0.35)",
+  "0 8px 24px rgba(249,115,22,0.35)",
+  "0 8px 24px rgba(239,68,68,0.35)",
+]
 
 export default function PathologyPage() {
   const { patients } = usePatients()
-  const tests = patients.flatMap(p => p.labResults.map(lr => ({ ...lr, patient: `${p.firstName} ${p.lastName}`, umr: p.uniqueNumber, testNumber: lr.id, doctor: lr.orderedBy })))
+  const tests = patients.flatMap(p =>
+    p.labResults.map(lr => ({
+      ...lr,
+      patient: `${p.firstName} ${p.lastName}`,
+      umr: p.uniqueNumber,
+      testNumber: lr.id,
+      doctor: lr.orderedBy,
+    }))
+  )
 
   const totalTests = tests.length
   const completedTests = tests.filter(t => t.status === "Completed").length
@@ -22,128 +49,240 @@ export default function PathologyPage() {
   const pendingTests = tests.filter(t => t.status === "Pending").length
 
   const statsData = [
-    { title: "Total Tests", value: totalTests.toString(), icon: FlaskConical, gradient: "from-indigo-500 to-purple-600", shadow: "shadow-indigo-500/30" },
-    { title: "Completed", value: completedTests.toString(), icon: CheckCircle, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/30" },
-    { title: "In Progress", value: inProgressTests.toString(), icon: Clock, gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30" },
-    { title: "Pending", value: pendingTests.toString(), icon: AlertCircle, gradient: "from-rose-500 to-pink-600", shadow: "shadow-rose-500/30" },
+    { title: "Total Tests", value: totalTests.toString(), icon: FlaskConical },
+    { title: "Completed", value: completedTests.toString(), icon: CheckCircle },
+    { title: "In Progress", value: inProgressTests.toString(), icon: Clock },
+    { title: "Pending", value: pendingTests.toString(), icon: AlertCircle },
   ]
 
   const [searchTerm, setSearchTerm] = useState("")
 
   const filteredTests = tests.filter(
-    (test) =>
+    test =>
       test.patient.toLowerCase().includes(searchTerm.toLowerCase()) ||
       test.testNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       test.testName.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   return (
-    <AnimatedPage>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ padding: "24px 0" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
           <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Pathology</h1>
-            <p className="text-slate-500">Manage pathology lab tests and results</p>
+            <h1 style={{
+              fontSize: "26px", fontWeight: 800,
+              background: "linear-gradient(135deg, #8b5cf6, #6d28d9)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+              marginBottom: "4px",
+            }}>
+              Pathology
+            </h1>
+            <p style={{ color: "#64748b", fontSize: "14px" }}>Manage pathology lab tests and results</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50"><Download className="mr-2 h-4 w-4" />Export</Button>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <button style={{
+              display: "inline-flex", alignItems: "center", gap: "6px",
+              padding: "8px 16px", borderRadius: "10px", border: "1.5px solid #e2e8f0",
+              background: "#fff", color: "#475569", fontSize: "13px", fontWeight: 600,
+              cursor: "pointer", transition: "all 0.2s",
+            }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = "#cbd5e1" }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.borderColor = "#e2e8f0" }}
+            >
+              <Download size={15} /> Export
+            </button>
             <Link href="/pathology/new">
-              <Button size="sm" className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/30">
-                <Plus className="mr-2 h-4 w-4" />New Test
-              </Button>
+              <button style={{
+                display: "inline-flex", alignItems: "center", gap: "6px",
+                padding: "8px 18px", borderRadius: "10px", border: "none",
+                background: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+                color: "#fff", fontSize: "13px", fontWeight: 600,
+                cursor: "pointer", boxShadow: "0 4px 16px rgba(139,92,246,0.4)",
+                transition: "all 0.2s",
+              }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 6px 24px rgba(139,92,246,0.5)"; e.currentTarget.style.transform = "translateY(-1px)" }}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(139,92,246,0.4)"; e.currentTarget.style.transform = "translateY(0)" }}
+              >
+                <Plus size={15} /> New Test
+              </button>
             </Link>
           </div>
         </div>
 
-        <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-          {statsData.map((stat) => (
-            <StaggerItem key={stat.title}>
-              <motion.div whileHover={{ scale: 1.02, y: -2 }} transition={{ type: "spring", stiffness: 300 }}>
-                <Card className={`overflow-hidden shadow-lg ${stat.shadow} hover:shadow-xl transition-shadow duration-300`}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-2xl font-bold">{stat.value}</div>
-                        <p className="text-xs text-slate-500">{stat.title}</p>
-                      </div>
-                      <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg`}>
-                        <stat.icon className="h-6 w-6 text-white" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-          <Card className="shadow-lg border-0">
-            <CardHeader>
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <CardTitle className="text-lg font-semibold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">Lab Tests</CardTitle>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 text-slate-400 -translate-y-1/2" />
-                  <Input type="search" placeholder="Search tests..." className="pl-10 w-64 border-slate-200 focus:border-indigo-500 focus:ring-indigo-500" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        {/* Stat Cards */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "18px" }}>
+          {statsData.map((stat, i) => (
+            <motion.div
+              key={stat.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08, type: "spring", stiffness: 300 }}
+              whileHover={{ scale: 1.03, y: -3 }}
+              style={{
+                background: "#fff", borderRadius: "16px", padding: "20px",
+                boxShadow: statShadows[i], border: "1px solid rgba(0,0,0,0.04)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div>
+                  <div style={{ fontSize: "26px", fontWeight: 800, color: "#1e293b" }}>{stat.value}</div>
+                  <p style={{ fontSize: "12px", color: "#94a3b8", marginTop: "2px", fontWeight: 500 }}>{stat.title}</p>
+                </div>
+                <div style={{
+                  width: "48px", height: "48px", borderRadius: "14px",
+                  background: statGradients[i],
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: statShadows[i],
+                }}>
+                  <stat.icon size={24} color="#fff" />
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div style={{ overflowX: "auto" }}>
-                <Table>
-                <TableHeader>
-                  <TableRow className="border-slate-100">
-                    <TableHead className="font-semibold text-slate-700">Test No.</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Patient</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Doctor</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Test Name</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Category</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Date</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Result</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Status</TableHead>
-                    <TableHead className="text-right font-semibold text-slate-700">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Table Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          style={{
+            background: "#fff", borderRadius: "16px",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+            border: "1px solid rgba(0,0,0,0.04)", overflow: "hidden",
+          }}
+        >
+          <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+              <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b" }}>Lab Tests</h2>
+              <div style={{ position: "relative" }}>
+                <Search size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                <input
+                  type="search"
+                  placeholder="Search tests..."
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  style={{
+                    paddingLeft: "36px", paddingRight: "14px", paddingTop: "9px", paddingBottom: "9px",
+                    width: "260px", borderRadius: "10px",
+                    border: "1.5px solid #e2e8f0", fontSize: "13px", color: "#334155",
+                    outline: "none", transition: "border-color 0.2s",
+                  }}
+                  onFocus={e => e.currentTarget.style.borderColor = "#8b5cf6"}
+                  onBlur={e => e.currentTarget.style.borderColor = "#e2e8f0"}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+              <thead>
+                <tr style={{ borderBottom: "2px solid #f1f5f9" }}>
+                  {["Test No.", "Patient", "Doctor", "Test Name", "Category", "Date", "Result", "Status", "Actions"].map(h => (
+                    <th key={h} style={{
+                      padding: "12px 16px",
+                      textAlign: h === "Actions" ? "right" : "left",
+                      fontWeight: 700, color: "#64748b", fontSize: "11px",
+                      textTransform: "uppercase", letterSpacing: "0.05em",
+                    }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <AnimatePresence>
                   {filteredTests.map((test, index) => (
                     <motion.tr
                       key={test.id}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="border-slate-100 hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-purple-50/50 transition-colors duration-200"
+                      transition={{ delay: index * 0.04 }}
+                      style={{ borderBottom: "1px solid #f8fafc", transition: "background 0.2s" }}
+                      onMouseEnter={e => e.currentTarget.style.background = "linear-gradient(90deg, rgba(139,92,246,0.04), rgba(139,92,246,0.02))"}
+                      onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                     >
-                      <TableCell className="font-medium text-slate-700">{test.testNumber}</TableCell>
-                      <TableCell>
-                        <div><p className="font-medium text-slate-800">{test.patient}</p><p className="text-xs text-slate-500">{test.umr}</p></div>
-                      </TableCell>
-                      <TableCell className="text-slate-600">{test.doctor}</TableCell>
-                      <TableCell className="font-medium text-slate-700">{test.testName}</TableCell>
-                      <TableCell><Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200">{test.category}</Badge></TableCell>
-                      <TableCell className="text-slate-600">{test.date}</TableCell>
-                      <TableCell className={test.result === "Abnormal" ? "text-rose-600 font-bold" : test.result === "Normal" ? "text-emerald-600 font-medium" : "text-slate-400"}>{test.result}</TableCell>
-                      <TableCell>
-                        <Badge variant={test.status === "Completed" ? "success" : test.status === "In Progress" ? "warning" : "destructive"} className={
-                          test.status === "Completed" ? "bg-emerald-100 text-emerald-700 border-emerald-200" :
-                          test.status === "In Progress" ? "bg-amber-100 text-amber-700 border-amber-200" :
-                          "bg-red-100 text-red-700 border-red-200"
-                        }>{test.status}</Badge>
-                      </TableCell>
-                      <td className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-blue-50 hover:text-blue-600"><Eye className="h-4 w-4" /></Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-indigo-50 hover:text-indigo-600"><Edit className="h-4 w-4" /></Button>
+                      <td style={{ padding: "14px 16px", fontWeight: 600, color: "#334155" }}>{test.testNumber}</td>
+                      <td style={{ padding: "14px 16px" }}>
+                        <div style={{ fontWeight: 600, color: "#1e293b" }}>{test.patient}</div>
+                        <div style={{ fontSize: "11px", color: "#94a3b8" }}>{test.umr}</div>
+                      </td>
+                      <td style={{ padding: "14px 16px", color: "#64748b" }}>{test.doctor}</td>
+                      <td style={{ padding: "14px 16px", fontWeight: 600, color: "#1e293b" }}>{test.testName}</td>
+                      <td style={{ padding: "14px 16px" }}>
+                        <span style={{
+                          display: "inline-block", padding: "3px 10px", borderRadius: "6px",
+                          background: "#f8fafc", border: "1px solid #e2e8f0",
+                          fontSize: "12px", color: "#64748b", fontWeight: 500,
+                        }}>
+                          {test.category}
+                        </span>
+                      </td>
+                      <td style={{ padding: "14px 16px", color: "#64748b" }}>{test.date}</td>
+                      <td style={{ padding: "14px 16px" }}>
+                        <span style={{
+                          color: resultStyles[test.result]?.color || "#94a3b8",
+                          fontWeight: resultStyles[test.result]?.fontWeight || "400",
+                        }}>
+                          {test.result}
+                        </span>
+                      </td>
+                      <td style={{ padding: "14px 16px" }}>
+                        {(() => {
+                          const s = statusStyles[test.status] || statusStyles.Pending
+                          return (
+                            <span style={{
+                              display: "inline-block", padding: "4px 12px", borderRadius: "20px",
+                              background: s.bg, color: s.color, border: `1px solid ${s.border}`,
+                              fontSize: "12px", fontWeight: 600,
+                            }}>
+                              {test.status}
+                            </span>
+                          )
+                        })()}
+                      </td>
+                      <td style={{ padding: "14px 16px", textAlign: "right" }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "4px" }}>
+                          <button style={{
+                            width: "32px", height: "32px", borderRadius: "8px", border: "none",
+                            background: "transparent", cursor: "pointer",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            color: "#64748b", transition: "all 0.2s",
+                          }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "#eff6ff"; e.currentTarget.style.color = "#3b82f6" }}
+                            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b" }}
+                          >
+                            <Eye size={16} />
+                          </button>
+                          <button style={{
+                            width: "32px", height: "32px", borderRadius: "8px", border: "none",
+                            background: "transparent", cursor: "pointer",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            color: "#64748b", transition: "all 0.2s",
+                          }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "#f5f3ff"; e.currentTarget.style.color = "#8b5cf6" }}
+                            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b" }}
+                          >
+                            <Edit size={16} />
+                          </button>
                         </div>
                       </td>
                     </motion.tr>
                   ))}
-                </TableBody>
-              </Table>
-              </div>
-            </CardContent>
-          </Card>
+                </AnimatePresence>
+              </tbody>
+            </table>
+          </div>
+
+          {filteredTests.length === 0 && (
+            <div style={{ padding: "48px 24px", textAlign: "center", color: "#94a3b8", fontSize: "14px" }}>
+              No tests found matching your search.
+            </div>
+          )}
         </motion.div>
       </div>
-    </AnimatedPage>
+    </motion.div>
   )
 }

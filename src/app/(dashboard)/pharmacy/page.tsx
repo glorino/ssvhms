@@ -4,12 +4,6 @@ import React, { useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { Plus, Search, Download, Eye, Edit, Pill, Package, AlertTriangle, TrendingUp, ShoppingCart } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AnimatedPage, StaggerContainer, StaggerItem } from "@/components/animated-wrapper"
 
 const medicines = [
@@ -34,238 +28,303 @@ const sales = [
 ]
 
 const statsData = [
-  { title: "Total Medicines", value: "6", icon: Pill, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/30" },
-  { title: "Total Stock Units", value: "1,285", icon: Package, gradient: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/30" },
-  { title: "Low Stock Alert", value: "2", icon: AlertTriangle, gradient: "from-rose-500 to-pink-600", shadow: "shadow-rose-500/30" },
-  { title: "Today Sales", value: "₦1,580", icon: TrendingUp, gradient: "from-violet-500 to-purple-600", shadow: "shadow-violet-500/30" },
+  { title: "Total Medicines", value: "6", icon: Pill, gradient: "linear-gradient(135deg, #14b8a6, #22c55e)", shadow: "0 8px 32px rgba(20,184,166,0.30)" },
+  { title: "Total Stock Units", value: "1,285", icon: Package, gradient: "linear-gradient(135deg, #3b82f6, #8b5cf6)", shadow: "0 8px 32px rgba(59,130,246,0.30)" },
+  { title: "Low Stock Alert", value: "2", icon: AlertTriangle, gradient: "linear-gradient(135deg, #ef4444, #ec4899)", shadow: "0 8px 32px rgba(239,68,68,0.30)" },
+  { title: "Today Sales", value: "₦1,580", icon: TrendingUp, gradient: "linear-gradient(135deg, #8b5cf6, #a855f7)", shadow: "0 8px 32px rgba(139,92,246,0.30)" },
 ]
 
 export default function PharmacyPage() {
   const [searchTerm, setSearchTerm] = useState("")
+  const [activeTab, setActiveTab] = useState("medicines")
 
   const filteredMedicines = medicines.filter(
     (med) => med.name.toLowerCase().includes(searchTerm.toLowerCase()) || med.generic.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  const getStockLevel = (stock: number, minStock: number) => {
+    const ratio = stock / minStock
+    if (ratio >= 3) return { color: "#22c55e", background: "linear-gradient(135deg, #dcfce7, #d1fae5)", label: "High" }
+    if (ratio >= 1) return { color: "#f97316", background: "linear-gradient(135deg, #fff7ed, #ffedd5)", label: "Medium" }
+    return { color: "#ef4444", background: "linear-gradient(135deg, #fef2f2, #fee2e2)", label: "Low" }
+  }
+
+  const getPaymentBadge = (status: string) => {
+    switch (status) {
+      case "Paid":
+        return { background: "linear-gradient(135deg, #dcfce7, #d1fae5)", color: "#166534", border: "1px solid #bbf7d0" }
+      default:
+        return { background: "linear-gradient(135deg, #fef3c7, #fde68a)", color: "#92400e", border: "1px solid #fcd34d" }
+    }
+  }
+
   return (
     <AnimatedPage>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div style={{ padding: "24px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
           <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Pharmacy</h1>
-            <p className="text-slate-500">Manage medicine inventory, purchases, and sales</p>
+            <h1 style={{ fontSize: "28px", fontWeight: "bold", background: "linear-gradient(135deg, #14b8a6, #22c55e)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", margin: 0 }}>
+              Pharmacy
+            </h1>
+            <p style={{ color: "#64748b", margin: "4px 0 0 0" }}>Manage medicine inventory, purchases, and sales</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50"><Download className="mr-2 h-4 w-4" />Export</Button>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <button style={{ display: "flex", alignItems: "center", padding: "8px 16px", borderRadius: "12px", border: "1px solid #e2e8f0", background: "white", color: "#475569", cursor: "pointer", fontSize: "14px", fontWeight: "500", transition: "all 0.2s" }}>
+              <Download style={{ width: "16px", height: "16px", marginRight: "8px" }} />
+              Export
+            </button>
             <Link href="/pharmacy/medicines/new">
-              <Button size="sm" className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-lg shadow-emerald-500/30">
-                <Plus className="mr-2 h-4 w-4" />Add Medicine
-              </Button>
+              <button style={{ display: "flex", alignItems: "center", padding: "8px 16px", borderRadius: "12px", border: "none", background: "linear-gradient(135deg, #14b8a6, #22c55e)", color: "white", cursor: "pointer", fontSize: "14px", fontWeight: "500", boxShadow: "0 8px 32px rgba(20,184,166,0.30)", transition: "all 0.2s" }}>
+                <Plus style={{ width: "16px", height: "16px", marginRight: "8px" }} />
+                Add Medicine
+              </button>
             </Link>
           </div>
         </div>
 
-        <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+        <StaggerContainer style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "20px", marginBottom: "24px" }}>
           {statsData.map((stat) => (
             <StaggerItem key={stat.title}>
               <motion.div whileHover={{ scale: 1.02, y: -2 }} transition={{ type: "spring", stiffness: 300 }}>
-                <Card className={`overflow-hidden shadow-lg ${stat.shadow} hover:shadow-xl transition-shadow duration-300`}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-2xl font-bold">{stat.value}</div>
-                        <p className="text-xs text-slate-500">{stat.title}</p>
-                      </div>
-                      <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg`}>
-                        <stat.icon className="h-6 w-6 text-white" />
-                      </div>
+                <div style={{ background: "white", borderRadius: "16px", padding: "20px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", border: "1px solid rgba(255,255,255,0.8)", position: "relative", overflow: "hidden" }}>
+                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "4px", background: stat.gradient }} />
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div>
+                      <div style={{ fontSize: "32px", fontWeight: "bold", color: "#1e293b" }}>{stat.value}</div>
+                      <p style={{ fontSize: "14px", color: "#64748b", margin: "4px 0 0 0" }}>{stat.title}</p>
                     </div>
-                  </CardContent>
-                </Card>
+                    <div style={{ width: "48px", height: "48px", borderRadius: "12px", background: stat.gradient, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: stat.shadow }}>
+                      <stat.icon style={{ width: "24px", height: "24px", color: "white" }} />
+                    </div>
+                  </div>
+                </div>
               </motion.div>
             </StaggerItem>
           ))}
         </StaggerContainer>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-          <Tabs defaultValue="medicines">
-            <TabsList className="bg-white shadow-md rounded-xl p-1">
-              <TabsTrigger value="medicines" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-teal-600 data-[state=active]:text-white rounded-lg">Medicines</TabsTrigger>
-              <TabsTrigger value="purchases" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white rounded-lg">Purchases</TabsTrigger>
-              <TabsTrigger value="sales" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-500 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-lg">Sales</TabsTrigger>
-            </TabsList>
+          <div style={{ display: "flex", gap: "8px", marginBottom: "16px", background: "white", padding: "8px", borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", border: "1px solid rgba(255,255,255,0.8)" }}>
+            {[
+              { key: "medicines", label: "Medicines", gradient: "linear-gradient(135deg, #14b8a6, #22c55e)" },
+              { key: "purchases", label: "Purchases", gradient: "linear-gradient(135deg, #3b82f6, #8b5cf6)" },
+              { key: "sales", label: "Sales", gradient: "linear-gradient(135deg, #8b5cf6, #a855f7)" },
+            ].map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                style={{
+                  padding: "10px 24px",
+                  borderRadius: "12px",
+                  border: "none",
+                  background: activeTab === tab.key ? tab.gradient : "transparent",
+                  color: activeTab === tab.key ? "white" : "#64748b",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  transition: "all 0.2s",
+                  flex: 1,
+                  textAlign: "center",
+                }}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
-            <TabsContent value="medicines">
-              <Card className="shadow-lg border-0 mt-4">
-                <CardHeader>
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <CardTitle className="text-lg font-semibold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">Medicine Inventory</CardTitle>
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 h-4 w-4 text-slate-400 -translate-y-1/2" />
-                      <Input type="search" placeholder="Search medicines..." className="pl-10 w-64 border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div style={{ overflowX: "auto" }}>
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-slate-100">
-                        <TableHead className="font-semibold text-slate-700">Medicine</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Generic</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Category</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Batch</TableHead>
-                        <TableHead className="text-right font-semibold text-slate-700">Stock</TableHead>
-                        <TableHead className="text-right font-semibold text-slate-700">Price</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Expiry</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
-                        <TableHead className="text-right font-semibold text-slate-700">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredMedicines.map((med, index) => (
+          {activeTab === "medicines" && (
+            <div style={{ background: "white", borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", border: "1px solid rgba(255,255,255,0.8)", overflow: "hidden" }}>
+              <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
+                <h2 style={{ fontSize: "18px", fontWeight: "600", background: "linear-gradient(135deg, #1e293b, #475569)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", margin: 0 }}>Medicine Inventory</h2>
+                <div style={{ position: "relative" }}>
+                  <Search style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", width: "16px", height: "16px", color: "#94a3b8" }} />
+                  <input
+                    type="search"
+                    placeholder="Search medicines..."
+                    style={{ paddingLeft: "36px", width: "256px", padding: "10px 12px 10px 36px", borderRadius: "12px", border: "1px solid #e2e8f0", outline: "none", fontSize: "14px", transition: "all 0.2s" }}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div style={{ padding: "0 24px 24px 24px", overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Medicine</th>
+                      <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Generic</th>
+                      <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Category</th>
+                      <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Batch</th>
+                      <th style={{ padding: "12px 16px", textAlign: "right", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Stock</th>
+                      <th style={{ padding: "12px 16px", textAlign: "right", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Price</th>
+                      <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Expiry</th>
+                      <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Status</th>
+                      <th style={{ padding: "12px 16px", textAlign: "right", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredMedicines.map((med, index) => {
+                      const stockLevel = getStockLevel(med.stock, med.minStock)
+                      return (
                         <motion.tr
                           key={med.id}
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          className="border-slate-100 hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-teal-50/50 transition-colors duration-200"
+                          style={{ borderBottom: "1px solid #f1f5f9", transition: "all 0.2s" }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = "linear-gradient(90deg, rgba(20,184,166,0.05), rgba(34,197,94,0.05))"}
+                          onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
                         >
-                          <TableCell>
+                          <td style={{ padding: "14px 16px" }}>
                             <div>
-                              <p className="font-medium text-slate-800">{med.name}</p>
-                              <p className="text-xs text-slate-500">{med.manufacturer}</p>
+                              <p style={{ fontSize: "14px", fontWeight: "600", color: "#1e293b", margin: 0 }}>{med.name}</p>
+                              <p style={{ fontSize: "12px", color: "#94a3b8", margin: "2px 0 0 0" }}>{med.manufacturer}</p>
                             </div>
-                          </TableCell>
-                          <TableCell className="text-slate-600">{med.generic}</TableCell>
-                          <TableCell><Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200">{med.category}</Badge></TableCell>
-                          <TableCell className="text-slate-600">{med.batchNo}</TableCell>
-                          <td className="text-right"><span className={med.stock < med.minStock ? "text-rose-600 font-bold" : "text-slate-700 font-medium"}>{med.stock}</span></td>
-                          <td className="text-right font-medium text-slate-700">₦{med.sellingPrice}</td>
-                          <TableCell className="text-slate-600">{med.expiryDate}</TableCell>
-                          <TableCell>
-                            <Badge variant={med.status === "In Stock" ? "success" : "destructive"} className={med.status === "In Stock" ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-red-100 text-red-700 border-red-200"}>
+                          </td>
+                          <td style={{ padding: "14px 16px", fontSize: "14px", color: "#64748b" }}>{med.generic}</td>
+                          <td style={{ padding: "14px 16px" }}>
+                            <span style={{ padding: "4px 10px", borderRadius: "12px", background: "#f8fafc", border: "1px solid #e2e8f0", fontSize: "12px", color: "#64748b", fontWeight: "500" }}>{med.category}</span>
+                          </td>
+                          <td style={{ padding: "14px 16px", fontSize: "14px", color: "#64748b" }}>{med.batchNo}</td>
+                          <td style={{ padding: "14px 16px", textAlign: "right" }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "8px" }}>
+                              <span style={{ padding: "2px 8px", borderRadius: "8px", background: stockLevel.background, color: stockLevel.color, fontSize: "12px", fontWeight: "600" }}>{stockLevel.label}</span>
+                              <span style={{ fontSize: "14px", fontWeight: "600", color: med.stock < med.minStock ? "#ef4444" : "#334155" }}>{med.stock}</span>
+                            </div>
+                          </td>
+                          <td style={{ padding: "14px 16px", textAlign: "right", fontSize: "14px", fontWeight: "500", color: "#334155" }}>₦{med.sellingPrice}</td>
+                          <td style={{ padding: "14px 16px", fontSize: "14px", color: "#64748b" }}>{med.expiryDate}</td>
+                          <td style={{ padding: "14px 16px" }}>
+                            <span style={{ ...getPaymentBadge(med.status === "In Stock" ? "Paid" : "Partial"), padding: "4px 12px", borderRadius: "20px", fontSize: "12px", fontWeight: "600" }}>
                               {med.status}
-                            </Badge>
-                          </TableCell>
-                          <td className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-blue-50 hover:text-blue-600"><Eye className="h-4 w-4" /></Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-emerald-50 hover:text-emerald-600"><Edit className="h-4 w-4" /></Button>
+                            </span>
+                          </td>
+                          <td style={{ padding: "14px 16px", textAlign: "right" }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "4px" }}>
+                              <button style={{ width: "32px", height: "32px", borderRadius: "8px", border: "none", background: "transparent", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = "#eff6ff"; e.currentTarget.style.color = "#3b82f6" }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b" }}
+                              >
+                                <Eye style={{ width: "16px", height: "16px" }} />
+                              </button>
+                              <button style={{ width: "32px", height: "32px", borderRadius: "8px", border: "none", background: "transparent", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = "#f0fdfa"; e.currentTarget.style.color = "#14b8a6" }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b" }}
+                              >
+                                <Edit style={{ width: "16px", height: "16px" }} />
+                              </button>
                             </div>
                           </td>
                         </motion.tr>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
-            <TabsContent value="purchases">
-              <Card className="shadow-lg border-0 mt-4">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-semibold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">Purchase History</CardTitle>
-                    <Link href="/pharmacy/purchases/new">
-                      <Button size="sm" className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-lg shadow-blue-500/30">
-                        <ShoppingCart className="mr-2 h-4 w-4" />New Purchase
-                      </Button>
-                    </Link>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div style={{ overflowX: "auto" }}>
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-slate-100">
-                        <TableHead className="font-semibold text-slate-700">Purchase No.</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Supplier</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Invoice</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Date</TableHead>
-                        <TableHead className="text-right font-semibold text-slate-700">Amount</TableHead>
-                        <TableHead className="text-right font-semibold text-slate-700">Paid</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {purchases.map((pur, index) => (
-                        <motion.tr
-                          key={pur.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="border-slate-100 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 transition-colors duration-200"
-                        >
-                          <TableCell className="font-medium text-slate-700">{pur.purchaseNo}</TableCell>
-                          <TableCell className="text-slate-600">{pur.supplier}</TableCell>
-                          <TableCell className="text-slate-600">{pur.invoiceNo}</TableCell>
-                          <TableCell className="text-slate-600">{pur.date}</TableCell>
-                          <td className="text-right font-medium text-slate-700">₦{pur.totalAmount.toLocaleString()}</td>
-                          <td className="text-right font-medium text-slate-700">₦{pur.paidAmount.toLocaleString()}</td>
-                          <TableCell>
-                            <Badge variant={pur.status === "Paid" ? "success" : "warning"} className={pur.status === "Paid" ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-amber-100 text-amber-700 border-amber-200"}>
-                              {pur.status}
-                            </Badge>
-                          </TableCell>
-                        </motion.tr>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+          {activeTab === "purchases" && (
+            <div style={{ background: "white", borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", border: "1px solid rgba(255,255,255,0.8)", overflow: "hidden" }}>
+              <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <h2 style={{ fontSize: "18px", fontWeight: "600", background: "linear-gradient(135deg, #1e293b, #475569)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", margin: 0 }}>Purchase History</h2>
+                <Link href="/pharmacy/purchases/new">
+                  <button style={{ display: "flex", alignItems: "center", padding: "8px 16px", borderRadius: "12px", border: "none", background: "linear-gradient(135deg, #3b82f6, #8b5cf6)", color: "white", cursor: "pointer", fontSize: "14px", fontWeight: "500", boxShadow: "0 8px 32px rgba(59,130,246,0.30)", transition: "all 0.2s" }}>
+                    <ShoppingCart style={{ width: "16px", height: "16px", marginRight: "8px" }} />
+                    New Purchase
+                  </button>
+                </Link>
+              </div>
+              <div style={{ padding: "0 24px 24px 24px", overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Purchase No.</th>
+                      <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Supplier</th>
+                      <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Invoice</th>
+                      <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Date</th>
+                      <th style={{ padding: "12px 16px", textAlign: "right", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Amount</th>
+                      <th style={{ padding: "12px 16px", textAlign: "right", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Paid</th>
+                      <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {purchases.map((pur, index) => (
+                      <motion.tr
+                        key={pur.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        style={{ borderBottom: "1px solid #f1f5f9", transition: "all 0.2s" }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = "linear-gradient(90deg, rgba(59,130,246,0.05), rgba(139,92,246,0.05))"}
+                        onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+                      >
+                        <td style={{ padding: "14px 16px", fontSize: "14px", fontWeight: "500", color: "#334155" }}>{pur.purchaseNo}</td>
+                        <td style={{ padding: "14px 16px", fontSize: "14px", color: "#64748b" }}>{pur.supplier}</td>
+                        <td style={{ padding: "14px 16px", fontSize: "14px", color: "#64748b" }}>{pur.invoiceNo}</td>
+                        <td style={{ padding: "14px 16px", fontSize: "14px", color: "#64748b" }}>{pur.date}</td>
+                        <td style={{ padding: "14px 16px", textAlign: "right", fontSize: "14px", fontWeight: "500", color: "#334155" }}>₦{pur.totalAmount.toLocaleString()}</td>
+                        <td style={{ padding: "14px 16px", textAlign: "right", fontSize: "14px", fontWeight: "500", color: "#334155" }}>₦{pur.paidAmount.toLocaleString()}</td>
+                        <td style={{ padding: "14px 16px" }}>
+                          <span style={{ ...getPaymentBadge(pur.status), padding: "4px 12px", borderRadius: "20px", fontSize: "12px", fontWeight: "600" }}>
+                            {pur.status}
+                          </span>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
-            <TabsContent value="sales">
-              <Card className="shadow-lg border-0 mt-4">
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">Sales History</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div style={{ overflowX: "auto" }}>
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-slate-100">
-                        <TableHead className="font-semibold text-slate-700">Sale No.</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Patient</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Items</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Date</TableHead>
-                        <TableHead className="text-right font-semibold text-slate-700">Amount</TableHead>
-                        <TableHead className="text-right font-semibold text-slate-700">Paid</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {sales.map((sale, index) => (
-                        <motion.tr
-                          key={sale.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="border-slate-100 hover:bg-gradient-to-r hover:from-violet-50/50 hover:to-purple-50/50 transition-colors duration-200"
-                        >
-                          <TableCell className="font-medium text-slate-700">{sale.saleNo}</TableCell>
-                          <TableCell className="text-slate-600">{sale.patient}</TableCell>
-                          <TableCell className="text-slate-600">{sale.items}</TableCell>
-                          <TableCell className="text-slate-600">{sale.date}</TableCell>
-                          <td className="text-right font-medium text-slate-700">₦{sale.totalAmount.toLocaleString()}</td>
-                          <td className="text-right font-medium text-slate-700">₦{sale.paidAmount.toLocaleString()}</td>
-                          <TableCell>
-                            <Badge variant={sale.status === "Paid" ? "success" : "warning"} className={sale.status === "Paid" ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-amber-100 text-amber-700 border-amber-200"}>
-                              {sale.status}
-                            </Badge>
-                          </TableCell>
-                        </motion.tr>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+          {activeTab === "sales" && (
+            <div style={{ background: "white", borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", border: "1px solid rgba(255,255,255,0.8)", overflow: "hidden" }}>
+              <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9" }}>
+                <h2 style={{ fontSize: "18px", fontWeight: "600", background: "linear-gradient(135deg, #1e293b, #475569)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", margin: 0 }}>Sales History</h2>
+              </div>
+              <div style={{ padding: "0 24px 24px 24px", overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Sale No.</th>
+                      <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Patient</th>
+                      <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Items</th>
+                      <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Date</th>
+                      <th style={{ padding: "12px 16px", textAlign: "right", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Amount</th>
+                      <th style={{ padding: "12px 16px", textAlign: "right", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Paid</th>
+                      <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sales.map((sale, index) => (
+                      <motion.tr
+                        key={sale.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        style={{ borderBottom: "1px solid #f1f5f9", transition: "all 0.2s" }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = "linear-gradient(90deg, rgba(139,92,246,0.05), rgba(168,85,247,0.05))"}
+                        onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+                      >
+                        <td style={{ padding: "14px 16px", fontSize: "14px", fontWeight: "500", color: "#334155" }}>{sale.saleNo}</td>
+                        <td style={{ padding: "14px 16px", fontSize: "14px", color: "#64748b" }}>{sale.patient}</td>
+                        <td style={{ padding: "14px 16px", fontSize: "14px", color: "#64748b" }}>{sale.items}</td>
+                        <td style={{ padding: "14px 16px", fontSize: "14px", color: "#64748b" }}>{sale.date}</td>
+                        <td style={{ padding: "14px 16px", textAlign: "right", fontSize: "14px", fontWeight: "500", color: "#334155" }}>₦{sale.totalAmount.toLocaleString()}</td>
+                        <td style={{ padding: "14px 16px", textAlign: "right", fontSize: "14px", fontWeight: "500", color: "#334155" }}>₦{sale.paidAmount.toLocaleString()}</td>
+                        <td style={{ padding: "14px 16px" }}>
+                          <span style={{ ...getPaymentBadge(sale.status), padding: "4px 12px", borderRadius: "20px", fontSize: "12px", fontWeight: "600" }}>
+                            {sale.status}
+                          </span>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </motion.div>
       </div>
     </AnimatedPage>

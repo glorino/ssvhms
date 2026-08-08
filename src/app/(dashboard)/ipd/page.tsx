@@ -15,28 +15,16 @@ import {
   CheckCircle,
   Building2,
 } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import { AnimatedPage, StaggerContainer, StaggerItem } from "@/components/animated-wrapper"
 import { usePatients } from "@/lib/patient-context"
 
 const bedStatus = [
-  { ward: "ICU", total: 10, occupied: 9, vacant: 1, reserved: 0, gradient: "from-rose-500 to-pink-600" },
-  { ward: "General Ward", total: 40, occupied: 32, vacant: 6, reserved: 2, gradient: "from-blue-500 to-indigo-600" },
-  { ward: "Private", total: 20, occupied: 15, vacant: 4, reserved: 1, gradient: "from-violet-500 to-purple-600" },
-  { ward: "Semi-Private", total: 30, occupied: 22, vacant: 7, reserved: 1, gradient: "from-cyan-500 to-blue-600" },
-  { ward: "Emergency", total: 10, occupied: 7, vacant: 3, reserved: 0, gradient: "from-amber-500 to-orange-600" },
-  { ward: "Maternity", total: 15, occupied: 11, vacant: 3, reserved: 1, gradient: "from-emerald-500 to-teal-600" },
+  { ward: "ICU", total: 10, occupied: 9, vacant: 1, reserved: 0, gradient: "linear-gradient(135deg, #ef4444, #ec4899)" },
+  { ward: "General Ward", total: 40, occupied: 32, vacant: 6, reserved: 2, gradient: "linear-gradient(135deg, #3b82f6, #8b5cf6)" },
+  { ward: "Private", total: 20, occupied: 15, vacant: 4, reserved: 1, gradient: "linear-gradient(135deg, #8b5cf6, #a855f7)" },
+  { ward: "Semi-Private", total: 30, occupied: 22, vacant: 7, reserved: 1, gradient: "linear-gradient(135deg, #14b8a6, #3b82f6)" },
+  { ward: "Emergency", total: 10, occupied: 7, vacant: 3, reserved: 0, gradient: "linear-gradient(135deg, #f97316, #ef4444)" },
+  { ward: "Maternity", total: 15, occupied: 11, vacant: 3, reserved: 1, gradient: "linear-gradient(135deg, #22c55e, #14b8a6)" },
 ]
 
 function getIPDStatus(visitStatus: string) {
@@ -54,10 +42,10 @@ const totalVacant = bedStatus.reduce((acc, ward) => acc + ward.vacant, 0)
 const totalReserved = bedStatus.reduce((acc, ward) => acc + ward.reserved, 0)
 
 const statsData = [
-  { title: "Total Beds", value: totalBeds, icon: BedDouble, gradient: "from-slate-500 to-slate-600", shadow: "shadow-slate-500/30" },
-  { title: "Occupied", value: totalOccupied, icon: AlertCircle, gradient: "from-rose-500 to-pink-600", shadow: "shadow-rose-500/30" },
-  { title: "Vacant", value: totalVacant, icon: CheckCircle, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/30" },
-  { title: "Reserved", value: totalReserved, icon: Clock, gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30" },
+  { title: "Total Beds", value: totalBeds, icon: BedDouble, gradient: "linear-gradient(135deg, #14b8a6, #3b82f6)", shadow: "0 8px 32px rgba(20,184,166,0.30)" },
+  { title: "Occupied", value: totalOccupied, icon: AlertCircle, gradient: "linear-gradient(135deg, #ef4444, #ec4899)", shadow: "0 8px 32px rgba(239,68,68,0.30)" },
+  { title: "Vacant", value: totalVacant, icon: CheckCircle, gradient: "linear-gradient(135deg, #22c55e, #14b8a6)", shadow: "0 8px 32px rgba(34,197,94,0.30)" },
+  { title: "Reserved", value: totalReserved, icon: Clock, gradient: "linear-gradient(135deg, #f97316, #ef4444)", shadow: "0 8px 32px rgba(249,115,22,0.30)" },
 ]
 
 export default function IPDPage() {
@@ -86,57 +74,69 @@ export default function IPDPage() {
       admission.admissionNumber.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  const getAdmissionBadge = (status: string) => {
+    switch (status) {
+      case "Admitted":
+        return { background: "linear-gradient(135deg, #dbeafe, #bfdbfe)", color: "#1e40af", border: "1px solid #93c5fd" }
+      case "In Treatment":
+        return { background: "linear-gradient(135deg, #fef3c7, #fde68a)", color: "#92400e", border: "1px solid #fcd34d" }
+      default:
+        return { background: "linear-gradient(135deg, #dcfce7, #d1fae5)", color: "#166534", border: "1px solid #bbf7d0" }
+    }
+  }
+
   return (
     <AnimatedPage>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div style={{ padding: "24px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
           <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">IPD (In Patient Department)</h1>
-            <p className="text-slate-500">Manage inpatient admissions and bed management</p>
+            <h1 style={{ fontSize: "28px", fontWeight: "bold", background: "linear-gradient(135deg, #ef4444, #ec4899)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", margin: 0 }}>
+              IPD (In Patient Department)
+            </h1>
+            <p style={{ color: "#64748b", margin: "4px 0 0 0" }}>Manage inpatient admissions and bed management</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50">
-              <Download className="mr-2 h-4 w-4" />
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <button style={{ display: "flex", alignItems: "center", padding: "8px 16px", borderRadius: "12px", border: "1px solid #e2e8f0", background: "white", color: "#475569", cursor: "pointer", fontSize: "14px", fontWeight: "500", transition: "all 0.2s" }}>
+              <Download style={{ width: "16px", height: "16px", marginRight: "8px" }} />
               Export
-            </Button>
+            </button>
             <Link href="/ipd/new">
-              <Button size="sm" className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 shadow-lg shadow-rose-500/30">
-                <Plus className="mr-2 h-4 w-4" />
+              <button style={{ display: "flex", alignItems: "center", padding: "8px 16px", borderRadius: "12px", border: "none", background: "linear-gradient(135deg, #ef4444, #ec4899)", color: "white", cursor: "pointer", fontSize: "14px", fontWeight: "500", boxShadow: "0 8px 32px rgba(239,68,68,0.30)", transition: "all 0.2s" }}>
+                <Plus style={{ width: "16px", height: "16px", marginRight: "8px" }} />
                 New Admission
-              </Button>
+              </button>
             </Link>
           </div>
         </div>
 
-        <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+        <StaggerContainer style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "20px", marginBottom: "24px" }}>
           {statsData.map((stat) => (
             <StaggerItem key={stat.title}>
               <motion.div whileHover={{ scale: 1.02, y: -2 }} transition={{ type: "spring", stiffness: 300 }}>
-                <Card className={`overflow-hidden shadow-lg ${stat.shadow} hover:shadow-xl transition-shadow duration-300`}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-2xl font-bold">{stat.value}</div>
-                        <p className="text-xs text-slate-500">{stat.title}</p>
-                      </div>
-                      <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg`}>
-                        <stat.icon className="h-6 w-6 text-white" />
-                      </div>
+                <div style={{ background: "white", borderRadius: "16px", padding: "20px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", border: "1px solid rgba(255,255,255,0.8)", position: "relative", overflow: "hidden" }}>
+                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "4px", background: stat.gradient }} />
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div>
+                      <div style={{ fontSize: "32px", fontWeight: "bold", color: "#1e293b" }}>{stat.value}</div>
+                      <p style={{ fontSize: "14px", color: "#64748b", margin: "4px 0 0 0" }}>{stat.title}</p>
                     </div>
-                  </CardContent>
-                </Card>
+                    <div style={{ width: "48px", height: "48px", borderRadius: "12px", background: stat.gradient, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: stat.shadow }}>
+                      <stat.icon style={{ width: "24px", height: "24px", color: "white" }} />
+                    </div>
+                  </div>
+                </div>
               </motion.div>
             </StaggerItem>
           ))}
         </StaggerContainer>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-          <Card className="shadow-lg border-0">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">Bed Status by Ward</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div style={{ background: "white", borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", border: "1px solid rgba(255,255,255,0.8)", overflow: "hidden" }}>
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9" }}>
+              <h2 style={{ fontSize: "18px", fontWeight: "600", background: "linear-gradient(135deg, #1e293b, #475569)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", margin: 0 }}>Bed Status by Ward</h2>
+            </div>
+            <div style={{ padding: "24px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "20px" }}>
                 {bedStatus.map((ward, index) => (
                   <motion.div
                     key={ward.ward}
@@ -145,35 +145,35 @@ export default function IPDPage() {
                     transition={{ delay: index * 0.1 }}
                     whileHover={{ scale: 1.03, y: -3 }}
                   >
-                    <div className="rounded-xl border-0 p-4 bg-white shadow-md hover:shadow-xl transition-all duration-300">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <div className={`h-8 w-8 rounded-lg bg-gradient-to-br ${ward.gradient} flex items-center justify-center`}>
-                            <Building2 className="h-4 w-4 text-white" />
+                    <div style={{ background: "white", borderRadius: "16px", padding: "20px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", border: "1px solid #f1f5f9", transition: "all 0.3s" }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                          <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: ward.gradient, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Building2 style={{ width: "18px", height: "18px", color: "white" }} />
                           </div>
-                          <h3 className="font-bold text-slate-800">{ward.ward}</h3>
+                          <h3 style={{ fontSize: "16px", fontWeight: "bold", color: "#1e293b", margin: 0 }}>{ward.ward}</h3>
                         </div>
-                        <Badge variant="outline" className="bg-slate-50">{ward.total} beds</Badge>
+                        <span style={{ padding: "4px 10px", borderRadius: "12px", background: "#f8fafc", border: "1px solid #e2e8f0", fontSize: "12px", color: "#64748b", fontWeight: "500" }}>{ward.total} beds</span>
                       </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-slate-500">Occupied</span>
-                          <span className="font-bold text-rose-600">{ward.occupied}</span>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "14px" }}>
+                          <span style={{ color: "#64748b" }}>Occupied</span>
+                          <span style={{ fontWeight: "bold", color: "#ef4444" }}>{ward.occupied}</span>
                         </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-slate-500">Vacant</span>
-                          <span className="font-bold text-emerald-600">{ward.vacant}</span>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "14px" }}>
+                          <span style={{ color: "#64748b" }}>Vacant</span>
+                          <span style={{ fontWeight: "bold", color: "#22c55e" }}>{ward.vacant}</span>
                         </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-slate-500">Reserved</span>
-                          <span className="font-bold text-amber-600">{ward.reserved}</span>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "14px" }}>
+                          <span style={{ color: "#64748b" }}>Reserved</span>
+                          <span style={{ fontWeight: "bold", color: "#f97316" }}>{ward.reserved}</span>
                         </div>
-                        <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                        <div style={{ width: "100%", height: "8px", background: "#f1f5f9", borderRadius: "4px", overflow: "hidden", marginTop: "4px" }}>
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${(ward.occupied / ward.total) * 100}%` }}
                             transition={{ duration: 1, delay: index * 0.1 }}
-                            className="h-full bg-gradient-to-r from-rose-500 to-pink-600 rounded-full"
+                            style={{ height: "100%", background: "linear-gradient(135deg, #ef4444, #ec4899)", borderRadius: "4px" }}
                           />
                         </div>
                       </div>
@@ -181,96 +181,93 @@ export default function IPDPage() {
                   </motion.div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-          <Card className="shadow-lg border-0">
-            <CardHeader>
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <CardTitle className="text-lg font-semibold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">Current Admissions</CardTitle>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 text-slate-400 -translate-y-1/2" />
-                  <Input
-                    type="search"
-                    placeholder="Search admissions..."
-                    className="pl-10 w-64 border-slate-200 focus:border-rose-500 focus:ring-rose-500"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} style={{ marginTop: "24px" }}>
+          <div style={{ background: "white", borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", border: "1px solid rgba(255,255,255,0.8)", overflow: "hidden" }}>
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
+              <h2 style={{ fontSize: "18px", fontWeight: "600", background: "linear-gradient(135deg, #1e293b, #475569)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", margin: 0 }}>Current Admissions</h2>
+              <div style={{ position: "relative" }}>
+                <Search style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", width: "16px", height: "16px", color: "#94a3b8" }} />
+                <input
+                  type="search"
+                  placeholder="Search admissions..."
+                  style={{ paddingLeft: "36px", width: "256px", padding: "10px 12px 10px 36px", borderRadius: "12px", border: "1px solid #e2e8f0", outline: "none", fontSize: "14px", transition: "all 0.2s" }}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
               </div>
-            </CardHeader>
-            <CardContent>
-              <div style={{ overflowX: "auto" }}>
-                <Table>
-                <TableHeader>
-                  <TableRow className="border-slate-100">
-                    <TableHead className="font-semibold text-slate-700">Admission No.</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Patient</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Doctor</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Ward/Bed</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Admission Date</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Diagnosis</TableHead>
-                    <TableHead className="font-semibold text-slate-700">Status</TableHead>
-                    <TableHead className="text-right font-semibold text-slate-700">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+            </div>
+            <div style={{ padding: "0 24px 24px 24px", overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr>
+                    <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Admission No.</th>
+                    <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Patient</th>
+                    <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Doctor</th>
+                    <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Ward/Bed</th>
+                    <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Admission Date</th>
+                    <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Diagnosis</th>
+                    <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Status</th>
+                    <th style={{ padding: "12px 16px", textAlign: "right", fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em", borderBottom: "2px solid #f1f5f9" }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
                   {filteredAdmissions.map((admission, index) => (
                     <motion.tr
                       key={admission.id}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="border-slate-100 hover:bg-gradient-to-r hover:from-rose-50/50 hover:to-pink-50/50 transition-colors duration-200"
+                      style={{ borderBottom: "1px solid #f1f5f9", transition: "all 0.2s" }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = "linear-gradient(90deg, rgba(239,68,68,0.05), rgba(236,72,153,0.05))"}
+                      onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
                     >
-                      <TableCell className="font-medium text-slate-700">{admission.admissionNumber}</TableCell>
-                      <TableCell>
+                      <td style={{ padding: "14px 16px", fontSize: "14px", fontWeight: "500", color: "#334155" }}>{admission.admissionNumber}</td>
+                      <td style={{ padding: "14px 16px" }}>
                         <div>
-                          <p className="font-medium text-slate-800">{admission.patient}</p>
-                          <p className="text-xs text-slate-500">{admission.umr}</p>
+                          <p style={{ fontSize: "14px", fontWeight: "600", color: "#1e293b", margin: 0 }}>{admission.patient}</p>
+                          <p style={{ fontSize: "12px", color: "#94a3b8", margin: "2px 0 0 0" }}>{admission.umr}</p>
                         </div>
-                      </TableCell>
-                      <TableCell className="text-slate-600">{admission.doctor}</TableCell>
-                      <TableCell>
+                      </td>
+                      <td style={{ padding: "14px 16px", fontSize: "14px", color: "#64748b" }}>{admission.doctor}</td>
+                      <td style={{ padding: "14px 16px" }}>
                         <div>
-                          <p className="font-medium text-slate-800">{admission.ward}</p>
-                          <p className="text-xs text-slate-500">{admission.bed}</p>
+                          <p style={{ fontSize: "14px", fontWeight: "500", color: "#334155", margin: 0 }}>{admission.ward}</p>
+                          <p style={{ fontSize: "12px", color: "#94a3b8", margin: "2px 0 0 0" }}>{admission.bed}</p>
                         </div>
-                      </TableCell>
-                      <TableCell className="text-slate-600">{admission.admissionDate}</TableCell>
-                      <TableCell className="max-w-[200px] truncate text-slate-600">{admission.diagnosis}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={admission.status === "Admitted" ? "info" : admission.status === "In Treatment" ? "warning" : "success"}
-                          className={
-                            admission.status === "Admitted" ? "bg-blue-100 text-blue-700 border-blue-200" :
-                            admission.status === "In Treatment" ? "bg-amber-100 text-amber-700 border-amber-200" :
-                            "bg-emerald-100 text-emerald-700 border-emerald-200"
-                          }
-                        >
+                      </td>
+                      <td style={{ padding: "14px 16px", fontSize: "14px", color: "#64748b" }}>{admission.admissionDate}</td>
+                      <td style={{ padding: "14px 16px", fontSize: "14px", color: "#64748b", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{admission.diagnosis}</td>
+                      <td style={{ padding: "14px 16px" }}>
+                        <span style={{ ...getAdmissionBadge(admission.status), padding: "4px 12px", borderRadius: "20px", fontSize: "12px", fontWeight: "600" }}>
                           {admission.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-blue-50 hover:text-blue-600">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-rose-50 hover:text-rose-600">
-                            <Edit className="h-4 w-4" />
-                          </Button>
+                        </span>
+                      </td>
+                      <td style={{ padding: "14px 16px", textAlign: "right" }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "4px" }}>
+                          <button style={{ width: "32px", height: "32px", borderRadius: "8px", border: "none", background: "transparent", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = "#eff6ff"; e.currentTarget.style.color = "#3b82f6" }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b" }}
+                          >
+                            <Eye style={{ width: "16px", height: "16px" }} />
+                          </button>
+                          <button style={{ width: "32px", height: "32px", borderRadius: "8px", border: "none", background: "transparent", color: "#64748b", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = "#fef2f2"; e.currentTarget.style.color = "#ef4444" }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b" }}
+                          >
+                            <Edit style={{ width: "16px", height: "16px" }} />
+                          </button>
                         </div>
-                      </TableCell>
+                      </td>
                     </motion.tr>
                   ))}
-                </TableBody>
-              </Table>
-              </div>
-            </CardContent>
-          </Card>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </motion.div>
       </div>
     </AnimatedPage>
