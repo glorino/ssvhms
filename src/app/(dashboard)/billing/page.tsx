@@ -48,9 +48,9 @@ export default function BillingPage() {
   const totalPending = bills.reduce((acc, bill) => acc + Number(bill.dueAmount), 0)
 
   const statsData = [
-    { title: "Total Revenue", value: `\u20A6${totalRevenue.toLocaleString()}`, icon: IndianRupee },
-    { title: "Collected", value: `\u20A6${totalCollected.toLocaleString()}`, icon: CheckCircle },
-    { title: "Pending", value: `\u20A6${totalPending.toLocaleString()}`, icon: AlertCircle },
+    { title: "Total Revenue", value: `₦${totalRevenue.toLocaleString()}`, icon: IndianRupee },
+    { title: "Collected", value: `₦${totalCollected.toLocaleString()}`, icon: CheckCircle },
+    { title: "Pending", value: `₦${totalPending.toLocaleString()}`, icon: AlertCircle },
     { title: "Total Bills", value: bills.length.toString(), icon: FileText },
   ]
 
@@ -227,13 +227,13 @@ export default function BillingPage() {
                       </td>
                       <td style={{ padding: "14px 16px", color: "#64748b" }}>{bill.billDate}</td>
                       <td style={{ padding: "14px 16px", textAlign: "right", fontWeight: 600, color: "#1e293b" }}>
-                        {"\u20A6"}{Number(bill.totalAmount).toLocaleString()}
+                        {"₦"}{Number(bill.totalAmount).toLocaleString()}
                       </td>
                       <td style={{ padding: "14px 16px", textAlign: "right", fontWeight: 600, color: "#16a34a" }}>
-                        {"\u20A6"}{Number(bill.paidAmount).toLocaleString()}
+                        {"₦"}{Number(bill.paidAmount).toLocaleString()}
                       </td>
                       <td style={{ padding: "14px 16px", textAlign: "right", fontWeight: 600, color: "#ef4444" }}>
-                        {"\u20A6"}{Number(bill.dueAmount).toLocaleString()}
+                        {"₦"}{Number(bill.dueAmount).toLocaleString()}
                       </td>
                       <td style={{ padding: "14px 16px" }}>
                         {(() => {
@@ -251,7 +251,7 @@ export default function BillingPage() {
                       </td>
                       <td style={{ padding: "14px 16px", textAlign: "right" }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "4px" }}>
-                          <button style={{
+                          <button onClick={() => alert(`Bill: ${bill.billNumber}\nPatient: ${bill.patient}\nAmount: ₦${Number(bill.totalAmount).toLocaleString()}\nPaid: ₦${Number(bill.paidAmount).toLocaleString()}\nDue: ₦${Number(bill.dueAmount).toLocaleString()}\nStatus: ${bill.paymentStatus}`)} style={{
                             width: "32px", height: "32px", borderRadius: "8px", border: "none", background: "transparent",
                             cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                             color: "#64748b", transition: "all 0.2s",

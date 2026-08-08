@@ -14,10 +14,10 @@ const sales = [
 ]
 
 const stats = [
-  { title: "Total Sales", value: "\u20A68,750,000", icon: TrendingUp, color: "#14b8a6", bg: "#f0fdfa" },
-  { title: "Today", value: "\u20A645,000", icon: Clock, color: "#3b82f6", bg: "#eff6ff" },
-  { title: "This Week", value: "\u20A6320,000", icon: Calendar, color: "#8b5cf6", bg: "#f5f3ff" },
-  { title: "This Month", value: "\u20A61,580,000", icon: BarChart3, color: "#f59e0b", bg: "#fffbeb" },
+  { title: "Total Sales", value: "₦8,750,000", icon: TrendingUp, color: "#14b8a6", bg: "#f0fdfa" },
+  { title: "Today", value: "₦45,000", icon: Clock, color: "#3b82f6", bg: "#eff6ff" },
+  { title: "This Week", value: "₦320,000", icon: Calendar, color: "#8b5cf6", bg: "#f5f3ff" },
+  { title: "This Month", value: "₦1,580,000", icon: BarChart3, color: "#f59e0b", bg: "#fffbeb" },
 ]
 
 const statusStyles: Record<string, { bg: string; color: string }> = {
@@ -83,7 +83,7 @@ export default function SalesPage() {
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ background: "#f8fafc" }}>
-                  {["Sale No", "Patient", "Items", "Total (\u20A6)", "Paid (\u20A6)", "Date", "Status"].map((h) => (
+                  {["Sale No", "Patient", "Items", "Total (₦)", "Paid (₦)", "Date", "Status"].map((h) => (
                     <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
@@ -102,8 +102,8 @@ export default function SalesPage() {
                       <td style={{ padding: "14px 16px", fontSize: 13, fontWeight: 600, color: "#0f172a", fontFamily: "monospace" }}>{sale.saleNo}</td>
                       <td style={{ padding: "14px 16px", fontSize: 13, color: "#475569" }}>{sale.patient}</td>
                       <td style={{ padding: "14px 16px", fontSize: 13, color: "#475569", textAlign: "center" }}>{sale.items}</td>
-                      <td style={{ padding: "14px 16px", fontSize: 13, fontWeight: 600, color: "#0f172a" }}>\u20A6{sale.total.toLocaleString()}</td>
-                      <td style={{ padding: "14px 16px", fontSize: 13, color: "#475569" }}>\u20A6{sale.paid.toLocaleString()}</td>
+                      <td style={{ padding: "14px 16px", fontSize: 13, fontWeight: 600, color: "#0f172a" }}>₦{sale.total.toLocaleString()}</td>
+                      <td style={{ padding: "14px 16px", fontSize: 13, color: "#475569" }}>₦{sale.paid.toLocaleString()}</td>
                       <td style={{ padding: "14px 16px", fontSize: 13, color: "#475569" }}>{sale.date}</td>
                       <td style={{ padding: "14px 16px" }}>
                         <span style={{

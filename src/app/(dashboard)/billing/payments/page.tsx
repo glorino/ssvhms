@@ -199,6 +199,7 @@ export default function PaymentsPage() {
                     </td>
                     <td style={{ padding: "14px", textAlign: "right" }}>
                       <button
+                        onClick={() => alert(`Payment: ${pay.id}\nPatient: ${pay.patient}\nBill: ${pay.billNo}\nAmount: ${formatNaira(pay.amount)}\nMethod: ${pay.method}\nDate: ${pay.date}\nReceipt: ${pay.receipt}`)}
                         style={{
                           width: "30px",
                           height: "30px",

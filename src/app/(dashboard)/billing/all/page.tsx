@@ -232,6 +232,7 @@ export default function AllBillsPage() {
                     <td style={{ padding: "14px", textAlign: "right" }}>
                       <div style={{ display: "flex", gap: "4px", justifyContent: "flex-end" }}>
                         <button
+                          onClick={() => alert(`Bill: ${bill.billNo}\nPatient: ${bill.patient}\nAmount: ${formatNaira(bill.amount)}\nPaid: ${formatNaira(bill.paid)}\nDue: ${formatNaira(bill.due)}\nStatus: ${bill.status}`)}
                           style={{
                             width: "30px",
                             height: "30px",

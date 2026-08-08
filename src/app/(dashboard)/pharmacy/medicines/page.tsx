@@ -19,7 +19,7 @@ const stats = [
   { title: "Total Items", value: "156", icon: Package, color: "#14b8a6", bg: "#f0fdfa" },
   { title: "Low Stock", value: "12", icon: AlertTriangle, color: "#f59e0b", bg: "#fffbeb" },
   { title: "Expiring Soon", value: "8", icon: AlertTriangle, color: "#ef4444", bg: "#fef2f2" },
-  { title: "Total Value", value: "\u20A64,250,000", icon: TrendingUp, color: "#8b5cf6", bg: "#f5f3ff" },
+  { title: "Total Value", value: "₦4,250,000", icon: TrendingUp, color: "#8b5cf6", bg: "#f5f3ff" },
 ]
 
 const statusStyles: Record<string, { bg: string; color: string }> = {
@@ -129,7 +129,7 @@ export default function MedicinesPage() {
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ background: "#f8fafc" }}>
-                  {["Drug Name", "Category", "Batch No", "Stock Qty", "Unit Price (\u20A6)", "Expiry Date", "Supplier", "Status", "Actions"].map((h) => (
+                  {["Drug Name", "Category", "Batch No", "Stock Qty", "Unit Price (₦)", "Expiry Date", "Supplier", "Status", "Actions"].map((h) => (
                     <th key={h} style={{ textAlign: "left", padding: "12px 16px", fontSize: 12, fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5, whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
@@ -154,7 +154,7 @@ export default function MedicinesPage() {
                       </td>
                       <td style={{ padding: "14px 16px", fontSize: 13, color: "#475569", fontFamily: "monospace" }}>{drug.batchNo}</td>
                       <td style={{ padding: "14px 16px", fontSize: 13, fontWeight: 600, color: drug.stockQty < 30 ? "#dc2626" : "#0f172a" }}>{drug.stockQty}</td>
-                      <td style={{ padding: "14px 16px", fontSize: 13, color: "#475569" }}>\u20A6{drug.unitPrice.toLocaleString()}</td>
+                      <td style={{ padding: "14px 16px", fontSize: 13, color: "#475569" }}>₦{drug.unitPrice.toLocaleString()}</td>
                       <td style={{ padding: "14px 16px", fontSize: 13, color: "#475569" }}>{drug.expiryDate}</td>
                       <td style={{ padding: "14px 16px", fontSize: 13, color: "#475569" }}>{drug.supplier}</td>
                       <td style={{ padding: "14px 16px" }}>
@@ -165,12 +165,12 @@ export default function MedicinesPage() {
                       </td>
                       <td style={{ padding: "14px 16px" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                          <button style={{
+                          <button onClick={() => alert(`Drug: ${drug.name}\nCategory: ${drug.category}\nBatch: ${drug.batchNo}\nStock: ${drug.stockQty}\nPrice: ₦${drug.unitPrice.toLocaleString()}\nExpiry: ${drug.expiryDate}\nSupplier: ${drug.supplier}\nStatus: ${drug.status}`)} style={{
                             width: 32, height: 32, borderRadius: 8, border: "none",
                             background: "#f0f9ff", color: "#0369a1", cursor: "pointer",
                             display: "flex", alignItems: "center", justifyContent: "center",
                           }}><Eye size={14} /></button>
-                          <button style={{
+                          <button onClick={() => alert(`Edit drug: ${drug.name}`)} style={{
                             width: 32, height: 32, borderRadius: 8, border: "none",
                             background: "#f0fdf4", color: "#16a34a", cursor: "pointer",
                             display: "flex", alignItems: "center", justifyContent: "center",
