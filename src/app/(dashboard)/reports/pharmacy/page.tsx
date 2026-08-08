@@ -28,7 +28,7 @@ const pharmacyData = [
   { month: "June 2026", medicinesSold: 2050, revenue: 1290000, expenses: 790000, profit: 500000, status: "Profitable" },
   { month: "May 2026", medicinesSold: 1920, revenue: 1210000, expenses: 910000, profit: 300000, status: "Low Margin" },
   { month: "April 2026", medicinesSold: 2210, revenue: 1350000, expenses: 870000, profit: 480000, status: "Profitable" },
-  { month: "March 2026", medicinesSold: 2050, revenue: 1070000, prices: 960000, profit: 110000, status: "Low Margin" },
+  { month: "March 2026", medicinesSold: 2050, revenue: 1070000, expenses: 960000, profit: 110000, status: "Low Margin" },
 ]
 
 export default function PharmacyReportPage() {
