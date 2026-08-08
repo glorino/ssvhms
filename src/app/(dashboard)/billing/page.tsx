@@ -92,7 +92,8 @@ export default function BillingPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <Table>
+              <div style={{ overflowX: "auto" }}>
+                <Table>
                 <TableHeader>
                   <TableRow className="border-slate-100">
                     <TableHead className="font-semibold text-slate-700">Bill No.</TableHead>
@@ -143,6 +144,7 @@ export default function BillingPage() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
             </CardContent>
           </Card>
         </motion.div>

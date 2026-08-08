@@ -122,7 +122,8 @@ export default function OPDPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <Table>
+              <div style={{ overflowX: "auto" }}>
+                <Table>
                 <TableHeader>
                   <TableRow className="border-slate-100">
                     <TableHead className="font-semibold text-slate-700">Visit No.</TableHead>
@@ -183,6 +184,7 @@ export default function OPDPage() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
             </CardContent>
           </Card>
         </motion.div>

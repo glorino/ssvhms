@@ -219,6 +219,7 @@ export default function HRPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <div style={{ overflowX: "auto" }}>
                   <Table>
                     <TableHeader>
                       <TableRow className="border-slate-100">
@@ -291,6 +292,7 @@ export default function HRPage() {
                       ))}
                     </TableBody>
                   </Table>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -318,6 +320,7 @@ export default function HRPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <div style={{ overflowX: "auto" }}>
                   <Table>
                     <TableHeader>
                       <TableRow className="border-slate-100">
@@ -363,6 +366,7 @@ export default function HRPage() {
                       ))}
                     </TableBody>
                   </Table>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -392,6 +396,7 @@ export default function HRPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <div style={{ overflowX: "auto" }}>
                   <Table>
                     <TableHeader>
                       <TableRow className="border-slate-100">
@@ -466,6 +471,7 @@ export default function HRPage() {
                       ))}
                     </TableBody>
                   </Table>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -493,6 +499,7 @@ export default function HRPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <div style={{ overflowX: "auto" }}>
                   <Table>
                     <TableHeader>
                       <TableRow className="border-slate-100">
@@ -546,6 +553,7 @@ export default function HRPage() {
                       ))}
                     </TableBody>
                   </Table>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>

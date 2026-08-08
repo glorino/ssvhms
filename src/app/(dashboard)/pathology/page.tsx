@@ -91,7 +91,8 @@ export default function PathologyPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <Table>
+              <div style={{ overflowX: "auto" }}>
+                <Table>
                 <TableHeader>
                   <TableRow className="border-slate-100">
                     <TableHead className="font-semibold text-slate-700">Test No.</TableHead>
@@ -140,6 +141,7 @@ export default function PathologyPage() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
             </CardContent>
           </Card>
         </motion.div>

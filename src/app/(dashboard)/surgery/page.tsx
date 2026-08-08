@@ -97,7 +97,8 @@ export default function SurgeryPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <Table>
+              <div style={{ overflowX: "auto" }}>
+                <Table>
                 <TableHeader>
                   <TableRow className="border-slate-100">
                     <TableHead className="font-semibold text-slate-700">Surgery No.</TableHead>
@@ -149,6 +150,7 @@ export default function SurgeryPage() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
             </CardContent>
           </Card>
         </motion.div>

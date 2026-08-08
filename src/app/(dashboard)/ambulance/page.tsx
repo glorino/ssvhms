@@ -109,6 +109,7 @@ export default function AmbulancePage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <div style={{ overflowX: "auto" }}>
                   <Table>
                     <TableHeader>
                       <TableRow className="border-slate-100">
@@ -154,6 +155,7 @@ export default function AmbulancePage() {
                       ))}
                     </TableBody>
                   </Table>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -171,6 +173,7 @@ export default function AmbulancePage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <div style={{ overflowX: "auto" }}>
                   <Table>
                     <TableHeader>
                       <TableRow className="border-slate-100">
@@ -211,6 +214,7 @@ export default function AmbulancePage() {
                       ))}
                     </TableBody>
                   </Table>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>

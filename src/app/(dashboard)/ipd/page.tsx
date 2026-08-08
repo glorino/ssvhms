@@ -184,7 +184,8 @@ export default function IPDPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <Table>
+              <div style={{ overflowX: "auto" }}>
+                <Table>
                 <TableHeader>
                   <TableRow className="border-slate-100">
                     <TableHead className="font-semibold text-slate-700">Admission No.</TableHead>
@@ -248,6 +249,7 @@ export default function IPDPage() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
             </CardContent>
           </Card>
         </motion.div>

@@ -16,6 +16,7 @@ export function AnimatedPage({ children, className }: AnimatedPageProps) {
       exit={{ opacity: 0, y: 20 }}
       transition={{ duration: 0.3 }}
       className={className}
+      style={{ overflowX: "hidden" }}
     >
       {children}
     </motion.div>

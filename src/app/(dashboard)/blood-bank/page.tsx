@@ -146,6 +146,7 @@ export default function BloodBankPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <div style={{ overflowX: "auto" }}>
                   <Table>
                     <TableHeader>
                       <TableRow className="border-slate-100">
@@ -189,6 +190,7 @@ export default function BloodBankPage() {
                       ))}
                     </TableBody>
                   </Table>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -206,6 +208,7 @@ export default function BloodBankPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <div style={{ overflowX: "auto" }}>
                   <Table>
                     <TableHeader>
                       <TableRow className="border-slate-100">
@@ -248,6 +251,7 @@ export default function BloodBankPage() {
                       ))}
                     </TableBody>
                   </Table>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>

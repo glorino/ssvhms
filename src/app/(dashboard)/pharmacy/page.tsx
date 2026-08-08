@@ -107,6 +107,7 @@ export default function PharmacyPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <div style={{ overflowX: "auto" }}>
                   <Table>
                     <TableHeader>
                       <TableRow className="border-slate-100">
@@ -157,6 +158,7 @@ export default function PharmacyPage() {
                       ))}
                     </TableBody>
                   </Table>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -174,6 +176,7 @@ export default function PharmacyPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <div style={{ overflowX: "auto" }}>
                   <Table>
                     <TableHeader>
                       <TableRow className="border-slate-100">
@@ -210,6 +213,7 @@ export default function PharmacyPage() {
                       ))}
                     </TableBody>
                   </Table>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -220,6 +224,7 @@ export default function PharmacyPage() {
                   <CardTitle className="text-lg font-semibold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">Sales History</CardTitle>
                 </CardHeader>
                 <CardContent>
+                  <div style={{ overflowX: "auto" }}>
                   <Table>
                     <TableHeader>
                       <TableRow className="border-slate-100">
@@ -256,6 +261,7 @@ export default function PharmacyPage() {
                       ))}
                     </TableBody>
                   </Table>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>

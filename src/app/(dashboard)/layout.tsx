@@ -16,7 +16,7 @@ export default function DashboardLayout({
   return (
     <div style={{ minHeight: "100vh", background: "#f8fafc" }}>
       <Sidebar userRole={role} />
-      <div style={{ marginLeft: 280, transition: "margin-left 0.3s", minHeight: "100vh", overflow: "hidden" }}>
+      <div style={{ marginLeft: 280, transition: "margin-left 0.3s", minHeight: "100vh", overflow: "hidden", minWidth: 0 }}>
         <Header />
         <main style={{ padding: 24 }}>{children}</main>
       </div>

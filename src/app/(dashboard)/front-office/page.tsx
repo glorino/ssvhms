@@ -206,6 +206,7 @@ export default function FrontOfficePage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <div style={{ overflowX: "auto" }}>
                   <Table>
                     <TableHeader>
                       <TableRow className="border-slate-100">
@@ -257,6 +258,7 @@ export default function FrontOfficePage() {
                       ))}
                     </TableBody>
                   </Table>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -286,6 +288,7 @@ export default function FrontOfficePage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <div style={{ overflowX: "auto" }}>
                   <Table>
                     <TableHeader>
                       <TableRow className="border-slate-100">
@@ -331,6 +334,7 @@ export default function FrontOfficePage() {
                       ))}
                     </TableBody>
                   </Table>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -360,6 +364,7 @@ export default function FrontOfficePage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <div style={{ overflowX: "auto" }}>
                   <Table>
                     <TableHeader>
                       <TableRow className="border-slate-100">
@@ -416,6 +421,7 @@ export default function FrontOfficePage() {
                       ))}
                     </TableBody>
                   </Table>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
