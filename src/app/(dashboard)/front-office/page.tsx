@@ -2,69 +2,14 @@
 
 import React, { useState } from "react"
 import Link from "next/link"
-import { motion } from "framer-motion"
-import {
-  Plus,
-  Search,
-  Filter,
-  Download,
-  Eye,
-  Edit,
-  Users,
-  Phone,
-  Mail,
-  Clock,
-  CheckCircle,
-  AlertCircle,
-} from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  AnimatedPage,
-  StaggerContainer,
-  StaggerItem,
-} from "@/components/animated-wrapper"
+import { motion, AnimatePresence } from "framer-motion"
+import { Plus, Search, Download, Eye, Edit, Users, Phone, Mail, CheckCircle } from "lucide-react"
 
 const stats = [
-  {
-    title: "Total Visitors",
-    value: "128",
-    icon: Users,
-    gradient: "from-teal-500 to-cyan-600",
-    shadow: "shadow-teal-500/30",
-  },
-  {
-    title: "Currently In",
-    value: "4",
-    icon: CheckCircle,
-    gradient: "from-emerald-500 to-green-600",
-    shadow: "shadow-emerald-500/30",
-  },
-  {
-    title: "Calls Today",
-    value: "5",
-    icon: Phone,
-    gradient: "from-amber-500 to-orange-600",
-    shadow: "shadow-amber-500/30",
-  },
-  {
-    title: "Postal Items",
-    value: "5",
-    icon: Mail,
-    gradient: "from-purple-500 to-violet-600",
-    shadow: "shadow-purple-500/30",
-  },
+  { title: "Visitors Today", value: "128", icon: Users, gradient: "linear-gradient(135deg, #14b8a6, #06b6d4)", shadow: "0 8px 24px rgba(20,184,166,0.35)" },
+  { title: "Currently In", value: "4", icon: CheckCircle, gradient: "linear-gradient(135deg, #22c55e, #16a34a)", shadow: "0 8px 24px rgba(34,197,94,0.35)" },
+  { title: "Calls Today", value: "5", icon: Phone, gradient: "linear-gradient(135deg, #f59e0b, #d97706)", shadow: "0 8px 24px rgba(245,158,11,0.35)" },
+  { title: "Postal Items", value: "5", icon: Mail, gradient: "linear-gradient(135deg, #8b5cf6, #a855f7)", shadow: "0 8px 24px rgba(139,92,246,0.35)" },
 ]
 
 const visitors = [
@@ -92,342 +37,454 @@ const postal = [
   { id: "PST005", trackingNumber: "IND2026005", type: "Incoming", sender: "Blood Bank Assoc", recipient: "Blood Bank", description: "Certification Docs", receivedDate: "2026-08-05", receivedBy: "Rahul", status: "Delivered" },
 ]
 
+const statusStyles: Record<string, { bg: string; color: string; border: string }> = {
+  In: { bg: "#dcfce7", color: "#166534", border: "#bbf7d0" },
+  Out: { bg: "#f1f5f9", color: "#64748b", border: "#e2e8f0" },
+  Resolved: { bg: "#dcfce7", color: "#166534", border: "#bbf7d0" },
+  Escalated: { bg: "#fef2f2", color: "#991b1b", border: "#fecaca" },
+  Delivered: { bg: "#dcfce7", color: "#166534", border: "#bbf7d0" },
+  Dispatched: { bg: "#dbeafe", color: "#1e40af", border: "#bfdbfe" },
+  Incoming: { bg: "#dbeafe", color: "#1e40af", border: "#bfdbfe" },
+  Outgoing: { bg: "#fff7ed", color: "#9a3412", border: "#fed7aa" },
+}
+
+const tabs = ["Visitors", "Phone Calls", "Postal"] as const
+
 export default function FrontOfficePage() {
   const [searchTerm, setSearchTerm] = useState("")
+  const [activeTab, setActiveTab] = useState<"Visitors" | "Phone Calls" | "Postal">("Visitors")
 
   const filteredVisitors = visitors.filter(
-    (visitor) => visitor.visitorName.toLowerCase().includes(searchTerm.toLowerCase()) || visitor.patientName.toLowerCase().includes(searchTerm.toLowerCase())
+    v => v.visitorName.toLowerCase().includes(searchTerm.toLowerCase()) || v.patientName.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   const filteredCalls = phoneCalls.filter(
-    (call) => call.callerName.toLowerCase().includes(searchTerm.toLowerCase()) || call.department.toLowerCase().includes(searchTerm.toLowerCase())
+    c => c.callerName.toLowerCase().includes(searchTerm.toLowerCase()) || c.department.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   const filteredPostal = postal.filter(
-    (post) => post.trackingNumber.toLowerCase().includes(searchTerm.toLowerCase()) || post.sender.toLowerCase().includes(searchTerm.toLowerCase())
+    p => p.trackingNumber.toLowerCase().includes(searchTerm.toLowerCase()) || p.sender.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const currentVisitors = visitors.filter((v) => v.status === "In").length
-  const resolvedCalls = phoneCalls.filter((c) => c.status === "Resolved").length
-
   return (
-    <AnimatedPage>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ minHeight: "100vh", background: "#f8fafc" }}>
+      {/* Gradient Banner */}
+      <div style={{
+        background: "linear-gradient(135deg, #14b8a6, #06b6d4)",
+        padding: "32px 40px 28px",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        <div style={{
+          position: "absolute", top: "-40%", right: "-5%", width: "300px", height: "300px",
+          borderRadius: "50%", background: "rgba(255,255,255,0.08)",
+        }} />
+        <div style={{
+          position: "absolute", bottom: "-30%", left: "10%", width: "200px", height: "200px",
+          borderRadius: "50%", background: "rgba(255,255,255,0.06)",
+        }} />
+        <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
           <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+            <h1 style={{ fontSize: "28px", fontWeight: 800, color: "#fff", marginBottom: "6px" }}>
               Front Office
             </h1>
-            <p className="text-slate-500">Manage visitors, phone calls, and postal services</p>
+            <p style={{ color: "rgba(255,255,255,0.85)", fontSize: "14px" }}>Manage visitors, phone calls, and postal services</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50">
-              <Download className="mr-2 h-4 w-4" />
-              Export
-            </Button>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <button style={{
+              display: "inline-flex", alignItems: "center", gap: "6px",
+              padding: "9px 18px", borderRadius: "10px", border: "1.5px solid rgba(255,255,255,0.3)",
+              background: "rgba(255,255,255,0.15)", color: "#fff", fontSize: "13px", fontWeight: 600,
+              cursor: "pointer", backdropFilter: "blur(8px)", transition: "all 0.2s",
+            }}
+              onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.25)" }}
+              onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.15)" }}
+            >
+              <Download size={15} /> Export
+            </button>
             <Link href="/front-office/visitor/new">
-              <Button
-                size="sm"
-                className="bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 shadow-lg shadow-teal-500/30"
+              <button style={{
+                display: "inline-flex", alignItems: "center", gap: "6px",
+                padding: "9px 20px", borderRadius: "10px", border: "none",
+                background: "#fff", color: "#14b8a6", fontSize: "13px", fontWeight: 700,
+                cursor: "pointer", boxShadow: "0 4px 16px rgba(0,0,0,0.15)", transition: "all 0.2s",
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 24px rgba(0,0,0,0.2)" }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.15)" }}
               >
-                <Plus className="mr-2 h-4 w-4" />
-                Register Visitor
-              </Button>
+                <Plus size={15} /> Register Visitor
+              </button>
             </Link>
           </div>
         </div>
-
-        <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-          {stats.map((stat) => (
-            <StaggerItem key={stat.title}>
-              <motion.div whileHover={{ scale: 1.02, y: -2 }} transition={{ type: "spring", stiffness: 300 }}>
-                <Card className={`overflow-hidden shadow-lg ${stat.shadow} hover:shadow-xl transition-shadow duration-300`}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-2xl font-bold">{stat.value}</div>
-                        <p className="text-xs text-slate-500">{stat.title}</p>
-                      </div>
-                      <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg`}>
-                        <stat.icon className="h-6 w-6 text-white" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-
-        <Tabs defaultValue="visitors">
-          <TabsList className="bg-white border border-slate-200 p-1 shadow-sm">
-            <TabsTrigger
-              value="visitors"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white data-[state=active]:shadow-md"
-            >
-              Visitors
-            </TabsTrigger>
-            <TabsTrigger
-              value="calls"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white data-[state=active]:shadow-md"
-            >
-              Phone Calls
-            </TabsTrigger>
-            <TabsTrigger
-              value="postal"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white data-[state=active]:shadow-md"
-            >
-              Postal
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="visitors">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Card className="shadow-lg border-0">
-                <CardHeader>
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <CardTitle className="text-lg font-semibold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
-                      Visitor Log
-                    </CardTitle>
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 h-4 w-4 text-slate-400 -translate-y-1/2" />
-                      <Input
-                        type="search"
-                        placeholder="Search visitors..."
-                        className="pl-10 w-64 border-slate-200 focus:border-teal-500 focus:ring-teal-500"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div style={{ overflowX: "auto" }}>
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-slate-100">
-                        <TableHead className="font-semibold text-slate-700">Visitor</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Contact</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Patient</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Relation</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Purpose</TableHead>
-                        <TableHead className="font-semibold text-slate-700">In Time</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Out Time</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Floor</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredVisitors.map((visitor, index) => (
-                        <motion.tr
-                          key={visitor.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="border-slate-100 hover:bg-gradient-to-r hover:from-teal-50/50 hover:to-cyan-50/50 transition-colors duration-200"
-                        >
-                          <TableCell className="font-medium text-slate-700">{visitor.visitorName}</TableCell>
-                          <TableCell className="text-slate-600">{visitor.contact}</TableCell>
-                          <TableCell className="text-slate-600">{visitor.patientName}</TableCell>
-                          <TableCell className="text-slate-600">{visitor.relation}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200">
-                              {visitor.purpose}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-slate-600">{visitor.inTime}</TableCell>
-                          <TableCell className="text-slate-600">{visitor.outTime}</TableCell>
-                          <TableCell className="text-slate-600">{visitor.floor}</TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={visitor.status === "In" ? "success" : "secondary"}
-                              className={
-                                visitor.status === "In"
-                                  ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                                  : "bg-slate-100 text-slate-600 border-slate-200"
-                              }
-                            >
-                              {visitor.status}
-                            </Badge>
-                          </TableCell>
-                        </motion.tr>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </TabsContent>
-
-          <TabsContent value="calls">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Card className="shadow-lg border-0">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-semibold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
-                      Phone Call Log
-                    </CardTitle>
-                    <Link href="/front-office/call/new">
-                      <Button
-                        size="sm"
-                        className="bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 shadow-lg shadow-teal-500/30"
-                      >
-                        <Phone className="mr-2 h-4 w-4" />
-                        Log Call
-                      </Button>
-                    </Link>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div style={{ overflowX: "auto" }}>
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-slate-100">
-                        <TableHead className="font-semibold text-slate-700">Caller</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Contact</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Department</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Call Time</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Duration</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Purpose</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Handled By</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredCalls.map((call, index) => (
-                        <motion.tr
-                          key={call.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="border-slate-100 hover:bg-gradient-to-r hover:from-teal-50/50 hover:to-cyan-50/50 transition-colors duration-200"
-                        >
-                          <TableCell className="font-medium text-slate-700">{call.callerName}</TableCell>
-                          <TableCell className="text-slate-600">{call.contact}</TableCell>
-                          <TableCell className="text-slate-600">{call.department}</TableCell>
-                          <TableCell className="text-slate-600">{call.callTime}</TableCell>
-                          <TableCell className="text-slate-600">{call.duration}</TableCell>
-                          <TableCell className="text-slate-600">{call.purpose}</TableCell>
-                          <TableCell className="text-slate-600">{call.handledBy}</TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={call.status === "Resolved" ? "success" : "destructive"}
-                              className={
-                                call.status === "Resolved"
-                                  ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                                  : "bg-red-100 text-red-700 border-red-200"
-                              }
-                            >
-                              {call.status}
-                            </Badge>
-                          </TableCell>
-                        </motion.tr>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </TabsContent>
-
-          <TabsContent value="postal">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Card className="shadow-lg border-0">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-semibold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
-                      Postal Register
-                    </CardTitle>
-                    <Link href="/front-office/postal/new">
-                      <Button
-                        size="sm"
-                        className="bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 shadow-lg shadow-teal-500/30"
-                      >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Postal
-                      </Button>
-                    </Link>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div style={{ overflowX: "auto" }}>
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-slate-100">
-                        <TableHead className="font-semibold text-slate-700">Tracking No.</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Type</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Sender</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Recipient</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Description</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Date</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Received By</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredPostal.map((post, index) => (
-                        <motion.tr
-                          key={post.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="border-slate-100 hover:bg-gradient-to-r hover:from-teal-50/50 hover:to-cyan-50/50 transition-colors duration-200"
-                        >
-                          <TableCell className="font-medium text-slate-700">{post.trackingNumber}</TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={post.type === "Incoming" ? "info" : "outline"}
-                              className={
-                                post.type === "Incoming"
-                                  ? "bg-blue-100 text-blue-700 border-blue-200"
-                                  : "bg-orange-100 text-orange-700 border-orange-200"
-                              }
-                            >
-                              {post.type}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-slate-600">{post.sender}</TableCell>
-                          <TableCell className="text-slate-600">{post.recipient}</TableCell>
-                          <TableCell className="text-slate-600">{post.description}</TableCell>
-                          <TableCell className="text-slate-600">{post.receivedDate}</TableCell>
-                          <TableCell className="text-slate-600">{post.receivedBy}</TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={post.status === "Delivered" ? "success" : "info"}
-                              className={
-                                post.status === "Delivered"
-                                  ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                                  : "bg-blue-100 text-blue-700 border-blue-200"
-                              }
-                            >
-                              {post.status}
-                            </Badge>
-                          </TableCell>
-                        </motion.tr>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </TabsContent>
-        </Tabs>
       </div>
-    </AnimatedPage>
+
+      <div style={{ padding: "24px 40px" }}>
+        {/* Filter Bar */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px",
+          background: "#fff", padding: "8px", borderRadius: "12px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.06)", border: "1px solid rgba(0,0,0,0.04)",
+          width: "fit-content",
+        }}>
+          {tabs.map(t => (
+            <button
+              key={t}
+              onClick={() => setActiveTab(t)}
+              style={{
+                padding: "7px 18px", borderRadius: "8px", border: "none", fontSize: "13px",
+                fontWeight: 600, cursor: "pointer", transition: "all 0.25s",
+                background: activeTab === t ? "linear-gradient(135deg, #14b8a6, #06b6d4)" : "transparent",
+                color: activeTab === t ? "#fff" : "#64748b",
+                boxShadow: activeTab === t ? "0 4px 12px rgba(20,184,166,0.3)" : "none",
+              }}
+              onMouseEnter={e => { if (activeTab !== t) e.currentTarget.style.background = "#f0fdfa" }}
+              onMouseLeave={e => { if (activeTab !== t) e.currentTarget.style.background = "transparent" }}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+
+        {/* Stat Cards */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "24px" }}>
+          {stats.map((stat, i) => (
+            <motion.div
+              key={stat.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08, type: "spring" as const, stiffness: 300 }}
+              whileHover={{ scale: 1.03, y: -4 }}
+              style={{
+                background: "#fff", borderRadius: "16px", padding: "20px",
+                boxShadow: stat.shadow, border: "1px solid rgba(0,0,0,0.04)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div>
+                  <div style={{ fontSize: "26px", fontWeight: 800, color: "#1e293b" }}>{stat.value}</div>
+                  <p style={{ fontSize: "12px", color: "#94a3b8", marginTop: "4px", fontWeight: 500 }}>{stat.title}</p>
+                </div>
+                <div style={{
+                  width: "48px", height: "48px", borderRadius: "14px",
+                  background: stat.gradient,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: stat.shadow,
+                }}>
+                  <stat.icon size={24} color="#fff" />
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Visitors Table */}
+        {activeTab === "Visitors" && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            style={{
+              background: "#fff", borderRadius: "16px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+              border: "1px solid rgba(0,0,0,0.04)", overflow: "hidden",
+            }}
+          >
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+                <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b" }}>Visitor Log</h2>
+                <div style={{ position: "relative" }}>
+                  <Search size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                  <input
+                    type="search"
+                    placeholder="Search visitors..."
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                    style={{
+                      paddingLeft: "36px", paddingRight: "14px", paddingTop: "9px", paddingBottom: "9px",
+                      width: "260px", borderRadius: "10px",
+                      border: "1.5px solid #e2e8f0", fontSize: "13px", color: "#334155",
+                      outline: "none", transition: "border-color 0.2s",
+                    }}
+                    onFocus={e => e.currentTarget.style.borderColor = "#14b8a6"}
+                    onBlur={e => e.currentTarget.style.borderColor = "#e2e8f0"}
+                  />
+                </div>
+              </div>
+            </div>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                <thead>
+                  <tr style={{ borderBottom: "2px solid #f1f5f9" }}>
+                    {["Visitor", "Contact", "Patient", "Relation", "Purpose", "In Time", "Out Time", "Floor", "Status"].map(h => (
+                      <th key={h} style={{
+                        padding: "12px 16px", textAlign: "left",
+                        fontWeight: 700, color: "#64748b", fontSize: "11px",
+                        textTransform: "uppercase" as const, letterSpacing: "0.05em",
+                      }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <AnimatePresence>
+                    {filteredVisitors.map((visitor, index) => (
+                      <motion.tr
+                        key={visitor.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ delay: index * 0.05 }}
+                        style={{ borderBottom: "1px solid #f8fafc", transition: "background 0.2s" }}
+                        onMouseEnter={e => e.currentTarget.style.background = "linear-gradient(90deg, rgba(20,184,166,0.04), rgba(6,182,212,0.02))"}
+                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                      >
+                        <td style={{ padding: "14px 16px", fontWeight: 600, color: "#1e293b" }}>{visitor.visitorName}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{visitor.contact}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{visitor.patientName}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{visitor.relation}</td>
+                        <td style={{ padding: "14px 16px" }}>
+                          <span style={{
+                            display: "inline-block", padding: "3px 10px", borderRadius: "6px",
+                            background: "#f0fdfa", border: "1px solid #99f6e4",
+                            fontSize: "12px", color: "#0f766e", fontWeight: 500,
+                          }}>
+                            {visitor.purpose}
+                          </span>
+                        </td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{visitor.inTime}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{visitor.outTime}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{visitor.floor}</td>
+                        <td style={{ padding: "14px 16px" }}>
+                          {(() => {
+                            const s = statusStyles[visitor.status] || statusStyles.In
+                            return (
+                              <span style={{
+                                display: "inline-block", padding: "4px 12px", borderRadius: "20px",
+                                background: s.bg, color: s.color, border: `1px solid ${s.border}`,
+                                fontSize: "12px", fontWeight: 600,
+                              }}>
+                                {visitor.status}
+                              </span>
+                            )
+                          })()}
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </tbody>
+              </table>
+            </div>
+            {filteredVisitors.length === 0 && (
+              <div style={{ padding: "48px 24px", textAlign: "center", color: "#94a3b8", fontSize: "14px" }}>
+                No visitors found matching your search.
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* Phone Calls Table */}
+        {activeTab === "Phone Calls" && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            style={{
+              background: "#fff", borderRadius: "16px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+              border: "1px solid rgba(0,0,0,0.04)", overflow: "hidden",
+            }}
+          >
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+                <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b" }}>Phone Call Log</h2>
+                <Link href="/front-office/call/new">
+                  <button style={{
+                    display: "inline-flex", alignItems: "center", gap: "6px",
+                    padding: "9px 20px", borderRadius: "10px", border: "none",
+                    background: "linear-gradient(135deg, #14b8a6, #06b6d4)",
+                    color: "#fff", fontSize: "13px", fontWeight: 600,
+                    cursor: "pointer", boxShadow: "0 4px 16px rgba(20,184,166,0.4)", transition: "all 0.2s",
+                  }}
+                    onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 6px 24px rgba(20,184,166,0.5)"; e.currentTarget.style.transform = "translateY(-1px)" }}
+                    onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(20,184,166,0.4)"; e.currentTarget.style.transform = "translateY(0)" }}
+                  >
+                    <Phone size={15} /> Log Call
+                  </button>
+                </Link>
+              </div>
+            </div>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                <thead>
+                  <tr style={{ borderBottom: "2px solid #f1f5f9" }}>
+                    {["Caller", "Contact", "Department", "Call Time", "Duration", "Purpose", "Handled By", "Status"].map(h => (
+                      <th key={h} style={{
+                        padding: "12px 16px", textAlign: "left",
+                        fontWeight: 700, color: "#64748b", fontSize: "11px",
+                        textTransform: "uppercase" as const, letterSpacing: "0.05em",
+                      }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <AnimatePresence>
+                    {filteredCalls.map((call, index) => (
+                      <motion.tr
+                        key={call.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ delay: index * 0.05 }}
+                        style={{ borderBottom: "1px solid #f8fafc", transition: "background 0.2s" }}
+                        onMouseEnter={e => e.currentTarget.style.background = "linear-gradient(90deg, rgba(20,184,166,0.04), rgba(6,182,212,0.02))"}
+                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                      >
+                        <td style={{ padding: "14px 16px", fontWeight: 600, color: "#1e293b" }}>{call.callerName}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{call.contact}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{call.department}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{call.callTime}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{call.duration}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{call.purpose}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{call.handledBy}</td>
+                        <td style={{ padding: "14px 16px" }}>
+                          {(() => {
+                            const s = statusStyles[call.status] || statusStyles.Resolved
+                            return (
+                              <span style={{
+                                display: "inline-block", padding: "4px 12px", borderRadius: "20px",
+                                background: s.bg, color: s.color, border: `1px solid ${s.border}`,
+                                fontSize: "12px", fontWeight: 600,
+                              }}>
+                                {call.status}
+                              </span>
+                            )
+                          })()}
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </tbody>
+              </table>
+            </div>
+            {filteredCalls.length === 0 && (
+              <div style={{ padding: "48px 24px", textAlign: "center", color: "#94a3b8", fontSize: "14px" }}>
+                No calls found matching your search.
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* Postal Table */}
+        {activeTab === "Postal" && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            style={{
+              background: "#fff", borderRadius: "16px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+              border: "1px solid rgba(0,0,0,0.04)", overflow: "hidden",
+            }}
+          >
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+                <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b" }}>Postal Register</h2>
+                <Link href="/front-office/postal/new">
+                  <button style={{
+                    display: "inline-flex", alignItems: "center", gap: "6px",
+                    padding: "9px 20px", borderRadius: "10px", border: "none",
+                    background: "linear-gradient(135deg, #14b8a6, #06b6d4)",
+                    color: "#fff", fontSize: "13px", fontWeight: 600,
+                    cursor: "pointer", boxShadow: "0 4px 16px rgba(20,184,166,0.4)", transition: "all 0.2s",
+                  }}
+                    onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 6px 24px rgba(20,184,166,0.5)"; e.currentTarget.style.transform = "translateY(-1px)" }}
+                    onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(20,184,166,0.4)"; e.currentTarget.style.transform = "translateY(0)" }}
+                  >
+                    <Plus size={15} /> Add Postal
+                  </button>
+                </Link>
+              </div>
+            </div>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                <thead>
+                  <tr style={{ borderBottom: "2px solid #f1f5f9" }}>
+                    {["Tracking No.", "Type", "Sender", "Recipient", "Description", "Date", "Received By", "Status"].map(h => (
+                      <th key={h} style={{
+                        padding: "12px 16px", textAlign: "left",
+                        fontWeight: 700, color: "#64748b", fontSize: "11px",
+                        textTransform: "uppercase" as const, letterSpacing: "0.05em",
+                      }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <AnimatePresence>
+                    {filteredPostal.map((post, index) => (
+                      <motion.tr
+                        key={post.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ delay: index * 0.05 }}
+                        style={{ borderBottom: "1px solid #f8fafc", transition: "background 0.2s" }}
+                        onMouseEnter={e => e.currentTarget.style.background = "linear-gradient(90deg, rgba(20,184,166,0.04), rgba(6,182,212,0.02))"}
+                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                      >
+                        <td style={{ padding: "14px 16px", fontWeight: 600, color: "#334155" }}>{post.trackingNumber}</td>
+                        <td style={{ padding: "14px 16px" }}>
+                          {(() => {
+                            const s = statusStyles[post.type] || statusStyles.Incoming
+                            return (
+                              <span style={{
+                                display: "inline-block", padding: "4px 12px", borderRadius: "20px",
+                                background: s.bg, color: s.color, border: `1px solid ${s.border}`,
+                                fontSize: "12px", fontWeight: 600,
+                              }}>
+                                {post.type}
+                              </span>
+                            )
+                          })()}
+                        </td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{post.sender}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{post.recipient}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{post.description}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{post.receivedDate}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{post.receivedBy}</td>
+                        <td style={{ padding: "14px 16px" }}>
+                          {(() => {
+                            const s = statusStyles[post.status] || statusStyles.Delivered
+                            return (
+                              <span style={{
+                                display: "inline-block", padding: "4px 12px", borderRadius: "20px",
+                                background: s.bg, color: s.color, border: `1px solid ${s.border}`,
+                                fontSize: "12px", fontWeight: 600,
+                              }}>
+                                {post.status}
+                              </span>
+                            )
+                          })()}
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </tbody>
+              </table>
+            </div>
+            {filteredPostal.length === 0 && (
+              <div style={{ padding: "48px 24px", textAlign: "center", color: "#94a3b8", fontSize: "14px" }}>
+                No postal items found matching your search.
+              </div>
+            )}
+          </motion.div>
+        )}
+      </div>
+    </motion.div>
   )
 }

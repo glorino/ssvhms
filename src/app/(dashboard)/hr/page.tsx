@@ -2,68 +2,14 @@
 
 import React, { useState } from "react"
 import Link from "next/link"
-import { motion } from "framer-motion"
-import {
-  Plus,
-  Search,
-  Filter,
-  Download,
-  Eye,
-  Edit,
-  Users,
-  CheckCircle,
-  Clock,
-  AlertCircle,
-  Banknote,
-} from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  AnimatedPage,
-  StaggerContainer,
-  StaggerItem,
-} from "@/components/animated-wrapper"
+import { motion, AnimatePresence } from "framer-motion"
+import { Plus, Search, Download, Eye, Edit, Users, CheckCircle, Clock, AlertCircle, Banknote, Filter } from "lucide-react"
 
 const stats = [
-  {
-    title: "Total Staff",
-    value: "6",
-    icon: Users,
-    gradient: "from-indigo-500 to-purple-600",
-    shadow: "shadow-indigo-500/30",
-  },
-  {
-    title: "Active",
-    value: "5",
-    icon: CheckCircle,
-    gradient: "from-emerald-500 to-green-600",
-    shadow: "shadow-emerald-500/30",
-  },
-  {
-    title: "Pending Leaves",
-    value: "2",
-    icon: Clock,
-    gradient: "from-amber-500 to-orange-600",
-    shadow: "shadow-amber-500/30",
-  },
-  {
-    title: "Monthly Payroll",
-    value: "₦3,63,000",
-    icon: Banknote,
-    gradient: "from-purple-500 to-violet-600",
-    shadow: "shadow-purple-500/30",
-  },
+  { title: "Total Staff", value: "6", icon: Users, gradient: "linear-gradient(135deg, #8b5cf6, #a855f7)", shadow: "0 8px 24px rgba(139,92,246,0.35)" },
+  { title: "Present Today", value: "4", icon: CheckCircle, gradient: "linear-gradient(135deg, #22c55e, #16a34a)", shadow: "0 8px 24px rgba(34,197,94,0.35)" },
+  { title: "On Leave", value: "2", icon: Clock, gradient: "linear-gradient(135deg, #f59e0b, #d97706)", shadow: "0 8px 24px rgba(245,158,11,0.35)" },
+  { title: "Monthly Payroll", value: "₦3,63,000", icon: Banknote, gradient: "linear-gradient(135deg, #8b5cf6, #a855f7)", shadow: "0 8px 24px rgba(139,92,246,0.35)" },
 ]
 
 const staff = [
@@ -99,467 +45,629 @@ const payroll = [
   { id: "PAY005", employeeId: "EMP2026005", name: "Sanjay Mehta", month: "July 2026", basic: 22000, allowances: 13000, deductions: 4000, netPay: 31000, status: "Paid" },
 ]
 
+const statusStyles: Record<string, { bg: string; color: string; border: string }> = {
+  Active: { bg: "#dcfce7", color: "#166534", border: "#bbf7d0" },
+  "On Leave": { bg: "#fef3c7", color: "#92400e", border: "#fde68a" },
+  Present: { bg: "#dcfce7", color: "#166534", border: "#bbf7d0" },
+  Absent: { bg: "#fef2f2", color: "#991b1b", border: "#fecaca" },
+  Approved: { bg: "#dcfce7", color: "#166534", border: "#bbf7d0" },
+  Pending: { bg: "#fef3c7", color: "#92400e", border: "#fde68a" },
+  Paid: { bg: "#dcfce7", color: "#166534", border: "#bbf7d0" },
+}
+
+const tabs = ["Staff", "Attendance", "Leaves", "Payroll"] as const
+
+function getInitials(name: string) {
+  return name.split(" ").map(n => n[0]).join("")
+}
+
 export default function HRPage() {
   const [searchTerm, setSearchTerm] = useState("")
+  const [activeTab, setActiveTab] = useState<"Staff" | "Attendance" | "Leaves" | "Payroll">("Staff")
 
   const filteredStaff = staff.filter(
-    (s) => s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.employeeId.toLowerCase().includes(searchTerm.toLowerCase())
+    s => s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.employeeId.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const activeCount = staff.filter((s) => s.status === "Active").length
-  const onLeaveCount = staff.filter((s) => s.status === "On Leave").length
-  const pendingLeaves = leaves.filter((l) => l.status === "Pending").length
-  const totalPayroll = payroll.reduce((acc, p) => acc + p.netPay, 0)
-
   return (
-    <AnimatedPage>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ minHeight: "100vh", background: "#f8fafc" }}>
+      {/* Gradient Banner */}
+      <div style={{
+        background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
+        padding: "32px 40px 28px",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        <div style={{
+          position: "absolute", top: "-40%", right: "-5%", width: "300px", height: "300px",
+          borderRadius: "50%", background: "rgba(255,255,255,0.08)",
+        }} />
+        <div style={{
+          position: "absolute", bottom: "-30%", left: "10%", width: "200px", height: "200px",
+          borderRadius: "50%", background: "rgba(255,255,255,0.06)",
+        }} />
+        <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
           <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 style={{ fontSize: "28px", fontWeight: 800, color: "#fff", marginBottom: "6px" }}>
               Human Resources
             </h1>
-            <p className="text-slate-500">Manage staff, attendance, leaves, and payroll</p>
+            <p style={{ color: "rgba(255,255,255,0.85)", fontSize: "14px" }}>Manage staff, attendance, leaves, and payroll</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50">
-              <Download className="mr-2 h-4 w-4" />
-              Export
-            </Button>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <button style={{
+              display: "inline-flex", alignItems: "center", gap: "6px",
+              padding: "9px 18px", borderRadius: "10px", border: "1.5px solid rgba(255,255,255,0.3)",
+              background: "rgba(255,255,255,0.15)", color: "#fff", fontSize: "13px", fontWeight: 600,
+              cursor: "pointer", backdropFilter: "blur(8px)", transition: "all 0.2s",
+            }}
+              onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.25)" }}
+              onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.15)" }}
+            >
+              <Download size={15} /> Export
+            </button>
             <Link href="/hr/staff/new">
-              <Button
-                size="sm"
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/30"
+              <button style={{
+                display: "inline-flex", alignItems: "center", gap: "6px",
+                padding: "9px 20px", borderRadius: "10px", border: "none",
+                background: "#fff", color: "#8b5cf6", fontSize: "13px", fontWeight: 700,
+                cursor: "pointer", boxShadow: "0 4px 16px rgba(0,0,0,0.15)", transition: "all 0.2s",
+              }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 24px rgba(0,0,0,0.2)" }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.15)" }}
               >
-                <Plus className="mr-2 h-4 w-4" />
-                Add Staff
-              </Button>
+                <Plus size={15} /> Add Staff
+              </button>
             </Link>
           </div>
         </div>
-
-        <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-          {stats.map((stat) => (
-            <StaggerItem key={stat.title}>
-              <motion.div whileHover={{ scale: 1.02, y: -2 }} transition={{ type: "spring", stiffness: 300 }}>
-                <Card className={`overflow-hidden shadow-lg ${stat.shadow} hover:shadow-xl transition-shadow duration-300`}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-2xl font-bold">{stat.value}</div>
-                        <p className="text-xs text-slate-500">{stat.title}</p>
-                      </div>
-                      <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg`}>
-                        <stat.icon className="h-6 w-6 text-white" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-
-        <Tabs defaultValue="staff">
-          <TabsList className="bg-white border border-slate-200 p-1 shadow-sm">
-            <TabsTrigger
-              value="staff"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-md"
-            >
-              Staff
-            </TabsTrigger>
-            <TabsTrigger
-              value="attendance"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-md"
-            >
-              Attendance
-            </TabsTrigger>
-            <TabsTrigger
-              value="leaves"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-md"
-            >
-              Leaves
-            </TabsTrigger>
-            <TabsTrigger
-              value="payroll"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-md"
-            >
-              Payroll
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="staff">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Card className="shadow-lg border-0">
-                <CardHeader>
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <CardTitle className="text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                      Staff Directory
-                    </CardTitle>
-                    <div className="flex items-center gap-2">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 text-slate-400 -translate-y-1/2" />
-                        <Input
-                          type="search"
-                          placeholder="Search staff..."
-                          className="pl-10 w-64 border-slate-200 focus:border-indigo-500 focus:ring-indigo-500"
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                      </div>
-                      <Button variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50">
-                        <Filter className="mr-2 h-4 w-4" />
-                        Filter
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div style={{ overflowX: "auto" }}>
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-slate-100">
-                        <TableHead className="font-semibold text-slate-700">Employee ID</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Name</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Department</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Designation</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Joining Date</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Contact</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Salary</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
-                        <TableHead className="text-right font-semibold text-slate-700">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredStaff.map((s, index) => (
-                        <motion.tr
-                          key={s.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="border-slate-100 hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-purple-50/50 transition-colors duration-200"
-                        >
-                          <TableCell className="font-medium text-slate-700">{s.employeeId}</TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-3">
-                              <div className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
-                                <span className="text-xs font-bold text-white">
-                                  {s.name.split(" ").map((n) => n[0]).join("")}
-                                </span>
-                              </div>
-                              <div>
-                                <p className="font-medium text-slate-800">{s.name}</p>
-                                <p className="text-xs text-slate-500">{s.email}</p>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-slate-600">{s.department}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">
-                              {s.designation}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-slate-600">{s.joiningDate}</TableCell>
-                          <TableCell className="text-slate-600">{s.contact}</TableCell>
-                          <TableCell className="text-slate-700 font-medium">₦{s.salary.toLocaleString()}</TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={s.status === "Active" ? "success" : "warning"}
-                              className={
-                                s.status === "Active"
-                                  ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                                  : "bg-amber-100 text-amber-700 border-amber-200"
-                              }
-                            >
-                              {s.status}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-indigo-50 hover:text-indigo-600">
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-amber-50 hover:text-amber-600">
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </motion.tr>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </TabsContent>
-
-          <TabsContent value="attendance">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Card className="shadow-lg border-0">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                      Today&apos;s Attendance
-                    </CardTitle>
-                    <Button
-                      size="sm"
-                      className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/30"
-                    >
-                      <Clock className="mr-2 h-4 w-4" />
-                      Mark Attendance
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div style={{ overflowX: "auto" }}>
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-slate-100">
-                        <TableHead className="font-semibold text-slate-700">Employee ID</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Name</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Date</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Clock In</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Clock Out</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Hours</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {attendance.map((att, index) => (
-                        <motion.tr
-                          key={att.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="border-slate-100 hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-purple-50/50 transition-colors duration-200"
-                        >
-                          <TableCell className="font-medium text-slate-700">{att.employeeId}</TableCell>
-                          <TableCell className="text-slate-600">{att.name}</TableCell>
-                          <TableCell className="text-slate-600">{att.date}</TableCell>
-                          <TableCell className="text-slate-600">{att.clockIn}</TableCell>
-                          <TableCell className="text-slate-600">{att.clockOut}</TableCell>
-                          <TableCell className="text-slate-600">{att.hours}</TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={att.status === "Present" ? "success" : att.status === "On Leave" ? "warning" : "destructive"}
-                              className={
-                                att.status === "Present"
-                                  ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                                  : att.status === "On Leave"
-                                    ? "bg-amber-100 text-amber-700 border-amber-200"
-                                    : "bg-red-100 text-red-700 border-red-200"
-                              }
-                            >
-                              {att.status}
-                            </Badge>
-                          </TableCell>
-                        </motion.tr>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </TabsContent>
-
-          <TabsContent value="leaves">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Card className="shadow-lg border-0">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                      Leave Requests
-                    </CardTitle>
-                    <Link href="/hr/leave/new">
-                      <Button
-                        size="sm"
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/30"
-                      >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Apply Leave
-                      </Button>
-                    </Link>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div style={{ overflowX: "auto" }}>
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-slate-100">
-                        <TableHead className="font-semibold text-slate-700">Employee</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Leave Type</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Start Date</TableHead>
-                        <TableHead className="font-semibold text-slate-700">End Date</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Days</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Reason</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
-                        <TableHead className="text-right font-semibold text-slate-700">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {leaves.map((leave, index) => (
-                        <motion.tr
-                          key={leave.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="border-slate-100 hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-purple-50/50 transition-colors duration-200"
-                        >
-                          <TableCell>
-                            <div className="flex items-center gap-3">
-                              <div className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
-                                <span className="text-xs font-bold text-white">
-                                  {leave.name.split(" ").map((n) => n[0]).join("")}
-                                </span>
-                              </div>
-                              <div>
-                                <p className="font-medium text-slate-800">{leave.name}</p>
-                                <p className="text-xs text-slate-500">{leave.employeeId}</p>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
-                              {leave.leaveType}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-slate-600">{leave.startDate}</TableCell>
-                          <TableCell className="text-slate-600">{leave.endDate}</TableCell>
-                          <TableCell className="text-slate-700 font-medium">{leave.days}</TableCell>
-                          <TableCell className="max-w-[200px] truncate text-slate-600">{leave.reason}</TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={leave.status === "Approved" ? "success" : leave.status === "Pending" ? "warning" : "destructive"}
-                              className={
-                                leave.status === "Approved"
-                                  ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                                  : leave.status === "Pending"
-                                    ? "bg-amber-100 text-amber-700 border-amber-200"
-                                    : "bg-red-100 text-red-700 border-red-200"
-                              }
-                            >
-                              {leave.status}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-indigo-50 hover:text-indigo-600">
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              {leave.status === "Pending" && (
-                                <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-emerald-50 hover:text-emerald-600">
-                                  <CheckCircle className="h-4 w-4" />
-                                </Button>
-                              )}
-                            </div>
-                          </TableCell>
-                        </motion.tr>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </TabsContent>
-
-          <TabsContent value="payroll">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Card className="shadow-lg border-0">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                      Payroll - July 2026
-                    </CardTitle>
-                    <Button
-                      size="sm"
-                      className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg shadow-indigo-500/30"
-                    >
-                      <Banknote className="mr-2 h-4 w-4" />
-                      Process Payroll
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div style={{ overflowX: "auto" }}>
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-slate-100">
-                        <TableHead className="font-semibold text-slate-700">Employee</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Basic</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Allowances</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Deductions</TableHead>
-                        <TableHead className="text-right font-semibold text-slate-700">Net Pay</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {payroll.map((pay, index) => (
-                        <motion.tr
-                          key={pay.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="border-slate-100 hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-purple-50/50 transition-colors duration-200"
-                        >
-                          <TableCell>
-                            <div className="flex items-center gap-3">
-                              <div className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md">
-                                <span className="text-xs font-bold text-white">
-                                  {pay.name.split(" ").map((n) => n[0]).join("")}
-                                </span>
-                              </div>
-                              <div>
-                                <p className="font-medium text-slate-800">{pay.name}</p>
-                                <p className="text-xs text-slate-500">{pay.employeeId}</p>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-slate-700">₦{pay.basic.toLocaleString()}</TableCell>
-                          <TableCell className="text-slate-700">₦{pay.allowances.toLocaleString()}</TableCell>
-                          <TableCell className="text-red-600 font-medium">₦{pay.deductions.toLocaleString()}</TableCell>
-                          <TableCell className="text-right font-bold text-slate-900">₦{pay.netPay.toLocaleString()}</TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={pay.status === "Paid" ? "success" : "warning"}
-                              className={
-                                pay.status === "Paid"
-                                  ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                                  : "bg-amber-100 text-amber-700 border-amber-200"
-                              }
-                            >
-                              {pay.status}
-                            </Badge>
-                          </TableCell>
-                        </motion.tr>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </TabsContent>
-        </Tabs>
       </div>
-    </AnimatedPage>
+
+      <div style={{ padding: "24px 40px" }}>
+        {/* Filter Bar */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px",
+          background: "#fff", padding: "8px", borderRadius: "12px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.06)", border: "1px solid rgba(0,0,0,0.04)",
+          width: "fit-content",
+        }}>
+          {tabs.map(t => (
+            <button
+              key={t}
+              onClick={() => setActiveTab(t)}
+              style={{
+                padding: "7px 18px", borderRadius: "8px", border: "none", fontSize: "13px",
+                fontWeight: 600, cursor: "pointer", transition: "all 0.25s",
+                background: activeTab === t ? "linear-gradient(135deg, #8b5cf6, #a855f7)" : "transparent",
+                color: activeTab === t ? "#fff" : "#64748b",
+                boxShadow: activeTab === t ? "0 4px 12px rgba(139,92,246,0.3)" : "none",
+              }}
+              onMouseEnter={e => { if (activeTab !== t) e.currentTarget.style.background = "#f5f3ff" }}
+              onMouseLeave={e => { if (activeTab !== t) e.currentTarget.style.background = "transparent" }}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+
+        {/* Stat Cards */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "24px" }}>
+          {stats.map((stat, i) => (
+            <motion.div
+              key={stat.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08, type: "spring" as const, stiffness: 300 }}
+              whileHover={{ scale: 1.03, y: -4 }}
+              style={{
+                background: "#fff", borderRadius: "16px", padding: "20px",
+                boxShadow: stat.shadow, border: "1px solid rgba(0,0,0,0.04)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div>
+                  <div style={{ fontSize: "26px", fontWeight: 800, color: "#1e293b" }}>{stat.value}</div>
+                  <p style={{ fontSize: "12px", color: "#94a3b8", marginTop: "4px", fontWeight: 500 }}>{stat.title}</p>
+                </div>
+                <div style={{
+                  width: "48px", height: "48px", borderRadius: "14px",
+                  background: stat.gradient,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: stat.shadow,
+                }}>
+                  <stat.icon size={24} color="#fff" />
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Staff Table */}
+        {activeTab === "Staff" && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            style={{
+              background: "#fff", borderRadius: "16px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+              border: "1px solid rgba(0,0,0,0.04)", overflow: "hidden",
+            }}
+          >
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+                <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b" }}>Staff Directory</h2>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div style={{ position: "relative" }}>
+                    <Search size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                    <input
+                      type="search"
+                      placeholder="Search staff..."
+                      value={searchTerm}
+                      onChange={e => setSearchTerm(e.target.value)}
+                      style={{
+                        paddingLeft: "36px", paddingRight: "14px", paddingTop: "9px", paddingBottom: "9px",
+                        width: "260px", borderRadius: "10px",
+                        border: "1.5px solid #e2e8f0", fontSize: "13px", color: "#334155",
+                        outline: "none", transition: "border-color 0.2s",
+                      }}
+                      onFocus={e => e.currentTarget.style.borderColor = "#8b5cf6"}
+                      onBlur={e => e.currentTarget.style.borderColor = "#e2e8f0"}
+                    />
+                  </div>
+                  <button style={{
+                    display: "inline-flex", alignItems: "center", gap: "6px",
+                    padding: "9px 16px", borderRadius: "10px", border: "1.5px solid #e2e8f0",
+                    background: "#fff", color: "#475569", fontSize: "13px", fontWeight: 600,
+                    cursor: "pointer", transition: "all 0.2s",
+                  }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = "#cbd5e1" }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.borderColor = "#e2e8f0" }}
+                  >
+                    <Filter size={14} /> Filter
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                <thead>
+                  <tr style={{ borderBottom: "2px solid #f1f5f9" }}>
+                    {["Employee ID", "Name", "Department", "Designation", "Joining Date", "Contact", "Salary", "Status", "Actions"].map(h => (
+                      <th key={h} style={{
+                        padding: "12px 16px",
+                        textAlign: h === "Actions" ? "right" : "left",
+                        fontWeight: 700, color: "#64748b", fontSize: "11px",
+                        textTransform: "uppercase" as const, letterSpacing: "0.05em",
+                      }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <AnimatePresence>
+                    {filteredStaff.map((s, index) => (
+                      <motion.tr
+                        key={s.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ delay: index * 0.05 }}
+                        style={{ borderBottom: "1px solid #f8fafc", transition: "background 0.2s" }}
+                        onMouseEnter={e => e.currentTarget.style.background = "linear-gradient(90deg, rgba(139,92,246,0.04), rgba(168,85,247,0.02))"}
+                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                      >
+                        <td style={{ padding: "14px 16px", fontWeight: 600, color: "#334155" }}>{s.employeeId}</td>
+                        <td style={{ padding: "14px 16px" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                            <div style={{
+                              width: "36px", height: "36px", borderRadius: "50%",
+                              background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              boxShadow: "0 4px 12px rgba(139,92,246,0.3)",
+                            }}>
+                              <span style={{ fontSize: "12px", fontWeight: 700, color: "#fff" }}>{getInitials(s.name)}</span>
+                            </div>
+                            <div>
+                              <div style={{ fontWeight: 600, color: "#1e293b" }}>{s.name}</div>
+                              <div style={{ fontSize: "11px", color: "#94a3b8" }}>{s.email}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{s.department}</td>
+                        <td style={{ padding: "14px 16px" }}>
+                          <span style={{
+                            display: "inline-block", padding: "3px 10px", borderRadius: "6px",
+                            background: "#f5f3ff", border: "1px solid #ddd6fe",
+                            fontSize: "12px", color: "#7c3aed", fontWeight: 500,
+                          }}>
+                            {s.designation}
+                          </span>
+                        </td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{s.joiningDate}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{s.contact}</td>
+                        <td style={{ padding: "14px 16px", color: "#334155", fontWeight: 600 }}>₦{s.salary.toLocaleString()}</td>
+                        <td style={{ padding: "14px 16px" }}>
+                          {(() => {
+                            const s2 = statusStyles[s.status] || statusStyles.Active
+                            return (
+                              <span style={{
+                                display: "inline-block", padding: "4px 12px", borderRadius: "20px",
+                                background: s2.bg, color: s2.color, border: `1px solid ${s2.border}`,
+                                fontSize: "12px", fontWeight: 600,
+                              }}>
+                                {s.status}
+                              </span>
+                            )
+                          })()}
+                        </td>
+                        <td style={{ padding: "14px 16px", textAlign: "right" }}>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "4px" }}>
+                            <button style={{
+                              width: "32px", height: "32px", borderRadius: "8px", border: "none",
+                              background: "transparent", cursor: "pointer",
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              color: "#64748b", transition: "all 0.2s",
+                            }}
+                              onMouseEnter={e => { e.currentTarget.style.background = "#f5f3ff"; e.currentTarget.style.color = "#8b5cf6" }}
+                              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b" }}
+                            >
+                              <Eye size={16} />
+                            </button>
+                            <button style={{
+                              width: "32px", height: "32px", borderRadius: "8px", border: "none",
+                              background: "transparent", cursor: "pointer",
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              color: "#64748b", transition: "all 0.2s",
+                            }}
+                              onMouseEnter={e => { e.currentTarget.style.background = "#fef3c7"; e.currentTarget.style.color = "#f59e0b" }}
+                              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b" }}
+                            >
+                              <Edit size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </tbody>
+              </table>
+            </div>
+            {filteredStaff.length === 0 && (
+              <div style={{ padding: "48px 24px", textAlign: "center", color: "#94a3b8", fontSize: "14px" }}>
+                No staff found matching your search.
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* Attendance Table */}
+        {activeTab === "Attendance" && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            style={{
+              background: "#fff", borderRadius: "16px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+              border: "1px solid rgba(0,0,0,0.04)", overflow: "hidden",
+            }}
+          >
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+                <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b" }}>Today&apos;s Attendance</h2>
+                <button style={{
+                  display: "inline-flex", alignItems: "center", gap: "6px",
+                  padding: "9px 20px", borderRadius: "10px", border: "none",
+                  background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
+                  color: "#fff", fontSize: "13px", fontWeight: 600,
+                  cursor: "pointer", boxShadow: "0 4px 16px rgba(139,92,246,0.4)", transition: "all 0.2s",
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 6px 24px rgba(139,92,246,0.5)"; e.currentTarget.style.transform = "translateY(-1px)" }}
+                  onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(139,92,246,0.4)"; e.currentTarget.style.transform = "translateY(0)" }}
+                >
+                  <Clock size={15} /> Mark Attendance
+                </button>
+              </div>
+            </div>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                <thead>
+                  <tr style={{ borderBottom: "2px solid #f1f5f9" }}>
+                    {["Employee ID", "Name", "Date", "Clock In", "Clock Out", "Hours", "Status"].map(h => (
+                      <th key={h} style={{
+                        padding: "12px 16px", textAlign: "left",
+                        fontWeight: 700, color: "#64748b", fontSize: "11px",
+                        textTransform: "uppercase" as const, letterSpacing: "0.05em",
+                      }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <AnimatePresence>
+                    {attendance.map((att, index) => (
+                      <motion.tr
+                        key={att.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ delay: index * 0.05 }}
+                        style={{ borderBottom: "1px solid #f8fafc", transition: "background 0.2s" }}
+                        onMouseEnter={e => e.currentTarget.style.background = "linear-gradient(90deg, rgba(139,92,246,0.04), rgba(168,85,247,0.02))"}
+                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                      >
+                        <td style={{ padding: "14px 16px", fontWeight: 600, color: "#334155" }}>{att.employeeId}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{att.name}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{att.date}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{att.clockIn}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{att.clockOut}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{att.hours}</td>
+                        <td style={{ padding: "14px 16px" }}>
+                          {(() => {
+                            const s = statusStyles[att.status] || statusStyles.Present
+                            return (
+                              <span style={{
+                                display: "inline-block", padding: "4px 12px", borderRadius: "20px",
+                                background: s.bg, color: s.color, border: `1px solid ${s.border}`,
+                                fontSize: "12px", fontWeight: 600,
+                              }}>
+                                {att.status}
+                              </span>
+                            )
+                          })()}
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Leaves Table */}
+        {activeTab === "Leaves" && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            style={{
+              background: "#fff", borderRadius: "16px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+              border: "1px solid rgba(0,0,0,0.04)", overflow: "hidden",
+            }}
+          >
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+                <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b" }}>Leave Requests</h2>
+                <Link href="/hr/leave/new">
+                  <button style={{
+                    display: "inline-flex", alignItems: "center", gap: "6px",
+                    padding: "9px 20px", borderRadius: "10px", border: "none",
+                    background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
+                    color: "#fff", fontSize: "13px", fontWeight: 600,
+                    cursor: "pointer", boxShadow: "0 4px 16px rgba(139,92,246,0.4)", transition: "all 0.2s",
+                  }}
+                    onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 6px 24px rgba(139,92,246,0.5)"; e.currentTarget.style.transform = "translateY(-1px)" }}
+                    onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(139,92,246,0.4)"; e.currentTarget.style.transform = "translateY(0)" }}
+                  >
+                    <Plus size={15} /> Apply Leave
+                  </button>
+                </Link>
+              </div>
+            </div>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                <thead>
+                  <tr style={{ borderBottom: "2px solid #f1f5f9" }}>
+                    {["Employee", "Leave Type", "Start Date", "End Date", "Days", "Reason", "Status", "Actions"].map(h => (
+                      <th key={h} style={{
+                        padding: "12px 16px",
+                        textAlign: h === "Actions" ? "right" : "left",
+                        fontWeight: 700, color: "#64748b", fontSize: "11px",
+                        textTransform: "uppercase" as const, letterSpacing: "0.05em",
+                      }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <AnimatePresence>
+                    {leaves.map((leave, index) => (
+                      <motion.tr
+                        key={leave.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ delay: index * 0.05 }}
+                        style={{ borderBottom: "1px solid #f8fafc", transition: "background 0.2s" }}
+                        onMouseEnter={e => e.currentTarget.style.background = "linear-gradient(90deg, rgba(139,92,246,0.04), rgba(168,85,247,0.02))"}
+                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                      >
+                        <td style={{ padding: "14px 16px" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                            <div style={{
+                              width: "36px", height: "36px", borderRadius: "50%",
+                              background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              boxShadow: "0 4px 12px rgba(139,92,246,0.3)",
+                            }}>
+                              <span style={{ fontSize: "12px", fontWeight: 700, color: "#fff" }}>{getInitials(leave.name)}</span>
+                            </div>
+                            <div>
+                              <div style={{ fontWeight: 600, color: "#1e293b" }}>{leave.name}</div>
+                              <div style={{ fontSize: "11px", color: "#94a3b8" }}>{leave.employeeId}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td style={{ padding: "14px 16px" }}>
+                          <span style={{
+                            display: "inline-block", padding: "3px 10px", borderRadius: "6px",
+                            background: "#f5f3ff", border: "1px solid #ddd6fe",
+                            fontSize: "12px", color: "#7c3aed", fontWeight: 500,
+                          }}>
+                            {leave.leaveType}
+                          </span>
+                        </td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{leave.startDate}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{leave.endDate}</td>
+                        <td style={{ padding: "14px 16px", color: "#334155", fontWeight: 600 }}>{leave.days}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b", maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{leave.reason}</td>
+                        <td style={{ padding: "14px 16px" }}>
+                          {(() => {
+                            const s = statusStyles[leave.status] || statusStyles.Pending
+                            return (
+                              <span style={{
+                                display: "inline-block", padding: "4px 12px", borderRadius: "20px",
+                                background: s.bg, color: s.color, border: `1px solid ${s.border}`,
+                                fontSize: "12px", fontWeight: 600,
+                              }}>
+                                {leave.status}
+                              </span>
+                            )
+                          })()}
+                        </td>
+                        <td style={{ padding: "14px 16px", textAlign: "right" }}>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "4px" }}>
+                            <button style={{
+                              width: "32px", height: "32px", borderRadius: "8px", border: "none",
+                              background: "transparent", cursor: "pointer",
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              color: "#64748b", transition: "all 0.2s",
+                            }}
+                              onMouseEnter={e => { e.currentTarget.style.background = "#f5f3ff"; e.currentTarget.style.color = "#8b5cf6" }}
+                              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b" }}
+                            >
+                              <Eye size={16} />
+                            </button>
+                            {leave.status === "Pending" && (
+                              <button style={{
+                                width: "32px", height: "32px", borderRadius: "8px", border: "none",
+                                background: "transparent", cursor: "pointer",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                color: "#64748b", transition: "all 0.2s",
+                              }}
+                                onMouseEnter={e => { e.currentTarget.style.background = "#dcfce7"; e.currentTarget.style.color = "#22c55e" }}
+                                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b" }}
+                              >
+                                <CheckCircle size={16} />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Payroll Table */}
+        {activeTab === "Payroll" && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            style={{
+              background: "#fff", borderRadius: "16px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+              border: "1px solid rgba(0,0,0,0.04)", overflow: "hidden",
+            }}
+          >
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+                <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b" }}>Payroll - July 2026</h2>
+                <button style={{
+                  display: "inline-flex", alignItems: "center", gap: "6px",
+                  padding: "9px 20px", borderRadius: "10px", border: "none",
+                  background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
+                  color: "#fff", fontSize: "13px", fontWeight: 600,
+                  cursor: "pointer", boxShadow: "0 4px 16px rgba(139,92,246,0.4)", transition: "all 0.2s",
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 6px 24px rgba(139,92,246,0.5)"; e.currentTarget.style.transform = "translateY(-1px)" }}
+                  onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(139,92,246,0.4)"; e.currentTarget.style.transform = "translateY(0)" }}
+                >
+                  <Banknote size={15} /> Process Payroll
+                </button>
+              </div>
+            </div>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                <thead>
+                  <tr style={{ borderBottom: "2px solid #f1f5f9" }}>
+                    {["Employee", "Basic", "Allowances", "Deductions", "Net Pay", "Status"].map(h => (
+                      <th key={h} style={{
+                        padding: "12px 16px",
+                        textAlign: h === "Net Pay" ? "right" : "left",
+                        fontWeight: 700, color: "#64748b", fontSize: "11px",
+                        textTransform: "uppercase" as const, letterSpacing: "0.05em",
+                      }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <AnimatePresence>
+                    {payroll.map((pay, index) => (
+                      <motion.tr
+                        key={pay.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ delay: index * 0.05 }}
+                        style={{ borderBottom: "1px solid #f8fafc", transition: "background 0.2s" }}
+                        onMouseEnter={e => e.currentTarget.style.background = "linear-gradient(90deg, rgba(139,92,246,0.04), rgba(168,85,247,0.02))"}
+                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                      >
+                        <td style={{ padding: "14px 16px" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                            <div style={{
+                              width: "36px", height: "36px", borderRadius: "50%",
+                              background: "linear-gradient(135deg, #8b5cf6, #a855f7)",
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              boxShadow: "0 4px 12px rgba(139,92,246,0.3)",
+                            }}>
+                              <span style={{ fontSize: "12px", fontWeight: 700, color: "#fff" }}>{getInitials(pay.name)}</span>
+                            </div>
+                            <div>
+                              <div style={{ fontWeight: 600, color: "#1e293b" }}>{pay.name}</div>
+                              <div style={{ fontSize: "11px", color: "#94a3b8" }}>{pay.employeeId}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td style={{ padding: "14px 16px", color: "#334155" }}>₦{pay.basic.toLocaleString()}</td>
+                        <td style={{ padding: "14px 16px", color: "#334155" }}>₦{pay.allowances.toLocaleString()}</td>
+                        <td style={{ padding: "14px 16px", color: "#ef4444", fontWeight: 600 }}>₦{pay.deductions.toLocaleString()}</td>
+                        <td style={{ padding: "14px 16px", textAlign: "right", fontWeight: 700, color: "#1e293b" }}>₦{pay.netPay.toLocaleString()}</td>
+                        <td style={{ padding: "14px 16px" }}>
+                          {(() => {
+                            const s = statusStyles[pay.status] || statusStyles.Paid
+                            return (
+                              <span style={{
+                                display: "inline-block", padding: "4px 12px", borderRadius: "20px",
+                                background: s.bg, color: s.color, border: `1px solid ${s.border}`,
+                                fontSize: "12px", fontWeight: 600,
+                              }}>
+                                {pay.status}
+                              </span>
+                            )
+                          })()}
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+        )}
+      </div>
+    </motion.div>
   )
 }

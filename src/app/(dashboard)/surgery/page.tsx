@@ -29,31 +29,18 @@ const completedCount = surgeries.filter(s => s.status === "Completed").length
 const cancelledCount = surgeries.filter(s => s.status === "Cancelled").length
 
 const statsData = [
-  { title: "Total Surgeries", value: "8", icon: Scissors },
-  { title: "Scheduled", value: scheduledCount.toString(), icon: Clock },
-  { title: "In Progress", value: inProgressCount.toString(), icon: AlertCircle },
-  { title: "Completed", value: completedCount.toString(), icon: CheckCircle },
-  { title: "Cancelled", value: cancelledCount.toString(), icon: XCircle },
+  { title: "Total Surgeries", value: "8", icon: Scissors, gradient: "linear-gradient(135deg, #ec4899, #f43f5e)", shadow: "0 8px 24px rgba(236,72,153,0.35)" },
+  { title: "Scheduled", value: scheduledCount.toString(), icon: Clock, gradient: "linear-gradient(135deg, #3b82f6, #2563eb)", shadow: "0 8px 24px rgba(59,130,246,0.35)" },
+  { title: "In Progress", value: inProgressCount.toString(), icon: AlertCircle, gradient: "linear-gradient(135deg, #f97316, #ea580c)", shadow: "0 8px 24px rgba(249,115,22,0.35)" },
+  { title: "Completed", value: completedCount.toString(), icon: CheckCircle, gradient: "linear-gradient(135deg, #22c55e, #16a34a)", shadow: "0 8px 24px rgba(34,197,94,0.35)" },
+  { title: "Cancelled", value: cancelledCount.toString(), icon: XCircle, gradient: "linear-gradient(135deg, #ef4444, #dc2626)", shadow: "0 8px 24px rgba(239,68,68,0.35)" },
 ]
 
-const statGradients = [
-  "linear-gradient(135deg, #14b8a6, #0891b2)",
-  "linear-gradient(135deg, #3b82f6, #2563eb)",
-  "linear-gradient(135deg, #f97316, #ea580c)",
-  "linear-gradient(135deg, #22c55e, #16a34a)",
-  "linear-gradient(135deg, #ef4444, #dc2626)",
-]
-
-const statShadows = [
-  "0 8px 24px rgba(20,184,166,0.35)",
-  "0 8px 24px rgba(59,130,246,0.35)",
-  "0 8px 24px rgba(249,115,22,0.35)",
-  "0 8px 24px rgba(34,197,94,0.35)",
-  "0 8px 24px rgba(239,68,68,0.35)",
-]
+const periods = ["All", "Today", "This Week", "This Month"]
 
 export default function SurgeryPage() {
   const [searchTerm, setSearchTerm] = useState("")
+  const [activePeriod, setActivePeriod] = useState("All")
 
   const filteredSurgeries = surgeries.filter(
     surgery =>
@@ -63,77 +50,111 @@ export default function SurgeryPage() {
   )
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ padding: "24px 0" }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
-        {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ minHeight: "100vh", background: "#f8fafc" }}>
+      {/* Gradient Banner */}
+      <div style={{
+        background: "linear-gradient(135deg, #ec4899, #f43f5e)",
+        padding: "32px 40px 28px",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        <div style={{
+          position: "absolute", top: "-40%", right: "-5%", width: "300px", height: "300px",
+          borderRadius: "50%", background: "rgba(255,255,255,0.08)",
+        }} />
+        <div style={{
+          position: "absolute", bottom: "-30%", left: "10%", width: "200px", height: "200px",
+          borderRadius: "50%", background: "rgba(255,255,255,0.06)",
+        }} />
+        <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
           <div>
-            <h1 style={{
-              fontSize: "26px", fontWeight: 800,
-              background: "linear-gradient(135deg, #14b8a6, #0891b2)",
-              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-              marginBottom: "4px",
-            }}>
+            <h1 style={{ fontSize: "28px", fontWeight: 800, color: "#fff", marginBottom: "6px" }}>
               Surgery Management
             </h1>
-            <p style={{ color: "#64748b", fontSize: "14px" }}>Manage surgical procedures and operating theaters</p>
+            <p style={{ color: "rgba(255,255,255,0.85)", fontSize: "14px" }}>Manage surgical procedures and operating theaters</p>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <button style={{
               display: "inline-flex", alignItems: "center", gap: "6px",
-              padding: "8px 16px", borderRadius: "10px", border: "1.5px solid #e2e8f0",
-              background: "#fff", color: "#475569", fontSize: "13px", fontWeight: 600,
-              cursor: "pointer", transition: "all 0.2s",
+              padding: "9px 18px", borderRadius: "10px", border: "1.5px solid rgba(255,255,255,0.3)",
+              background: "rgba(255,255,255,0.15)", color: "#fff", fontSize: "13px", fontWeight: 600,
+              cursor: "pointer", backdropFilter: "blur(8px)", transition: "all 0.2s",
             }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#f8fafc"; e.currentTarget.style.borderColor = "#cbd5e1" }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.borderColor = "#e2e8f0" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.25)" }}
+              onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.15)" }}
             >
               <Download size={15} /> Export
             </button>
             <Link href="/surgery/new">
               <button style={{
                 display: "inline-flex", alignItems: "center", gap: "6px",
-                padding: "8px 18px", borderRadius: "10px", border: "none",
-                background: "linear-gradient(135deg, #14b8a6, #0891b2)",
-                color: "#fff", fontSize: "13px", fontWeight: 600,
-                cursor: "pointer", boxShadow: "0 4px 16px rgba(20,184,166,0.4)",
-                transition: "all 0.2s",
+                padding: "9px 20px", borderRadius: "10px", border: "none",
+                background: "#fff", color: "#ec4899", fontSize: "13px", fontWeight: 700,
+                cursor: "pointer", boxShadow: "0 4px 16px rgba(0,0,0,0.15)", transition: "all 0.2s",
               }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 6px 24px rgba(20,184,166,0.5)"; e.currentTarget.style.transform = "translateY(-1px)" }}
-                onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 16px rgba(20,184,166,0.4)"; e.currentTarget.style.transform = "translateY(0)" }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 24px rgba(0,0,0,0.2)" }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.15)" }}
               >
                 <Plus size={15} /> Schedule Surgery
               </button>
             </Link>
           </div>
         </div>
+      </div>
+
+      <div style={{ padding: "24px 40px" }}>
+        {/* Filter Bar */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px",
+          background: "#fff", padding: "8px", borderRadius: "12px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.06)", border: "1px solid rgba(0,0,0,0.04)",
+          width: "fit-content",
+        }}>
+          {periods.map(p => (
+            <button
+              key={p}
+              onClick={() => setActivePeriod(p)}
+              style={{
+                padding: "7px 18px", borderRadius: "8px", border: "none", fontSize: "13px",
+                fontWeight: 600, cursor: "pointer", transition: "all 0.25s",
+                background: activePeriod === p ? "linear-gradient(135deg, #ec4899, #f43f5e)" : "transparent",
+                color: activePeriod === p ? "#fff" : "#64748b",
+                boxShadow: activePeriod === p ? "0 4px 12px rgba(236,72,153,0.3)" : "none",
+              }}
+              onMouseEnter={e => { if (activePeriod !== p) e.currentTarget.style.background = "#fdf2f8" }}
+              onMouseLeave={e => { if (activePeriod !== p) e.currentTarget.style.background = "transparent" }}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
 
         {/* Stat Cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: "16px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "16px", marginBottom: "24px" }}>
           {statsData.map((stat, i) => (
             <motion.div
               key={stat.title}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08, type: "spring", stiffness: 300 }}
-              whileHover={{ scale: 1.03, y: -3 }}
+              transition={{ delay: i * 0.08, type: "spring" as const, stiffness: 300 }}
+              whileHover={{ scale: 1.03, y: -4 }}
               style={{
-                background: "#fff", borderRadius: "16px", padding: "18px",
-                boxShadow: statShadows[i], border: "1px solid rgba(0,0,0,0.04)",
+                background: "#fff", borderRadius: "16px", padding: "20px",
+                boxShadow: stat.shadow, border: "1px solid rgba(0,0,0,0.04)",
               }}
             >
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div>
-                  <div style={{ fontSize: "24px", fontWeight: 800, color: "#1e293b" }}>{stat.value}</div>
-                  <p style={{ fontSize: "11px", color: "#94a3b8", marginTop: "2px", fontWeight: 500 }}>{stat.title}</p>
+                  <div style={{ fontSize: "26px", fontWeight: 800, color: "#1e293b" }}>{stat.value}</div>
+                  <p style={{ fontSize: "12px", color: "#94a3b8", marginTop: "4px", fontWeight: 500 }}>{stat.title}</p>
                 </div>
                 <div style={{
-                  width: "44px", height: "44px", borderRadius: "12px",
-                  background: statGradients[i],
+                  width: "48px", height: "48px", borderRadius: "14px",
+                  background: stat.gradient,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  boxShadow: statShadows[i],
+                  boxShadow: stat.shadow,
                 }}>
-                  <stat.icon size={22} color="#fff" />
+                  <stat.icon size={24} color="#fff" />
                 </div>
               </div>
             </motion.div>
@@ -167,7 +188,7 @@ export default function SurgeryPage() {
                     border: "1.5px solid #e2e8f0", fontSize: "13px", color: "#334155",
                     outline: "none", transition: "border-color 0.2s",
                   }}
-                  onFocus={e => e.currentTarget.style.borderColor = "#14b8a6"}
+                  onFocus={e => e.currentTarget.style.borderColor = "#ec4899"}
                   onBlur={e => e.currentTarget.style.borderColor = "#e2e8f0"}
                 />
               </div>
@@ -183,7 +204,7 @@ export default function SurgeryPage() {
                       padding: "12px 16px",
                       textAlign: h === "Actions" ? "right" : "left",
                       fontWeight: 700, color: "#64748b", fontSize: "11px",
-                      textTransform: "uppercase", letterSpacing: "0.05em",
+                      textTransform: "uppercase" as const, letterSpacing: "0.05em",
                     }}>
                       {h}
                     </th>
@@ -197,9 +218,10 @@ export default function SurgeryPage() {
                       key={surgery.id}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
                       transition={{ delay: index * 0.04 }}
                       style={{ borderBottom: "1px solid #f8fafc", transition: "background 0.2s" }}
-                      onMouseEnter={e => e.currentTarget.style.background = "linear-gradient(90deg, rgba(20,184,166,0.04), rgba(20,184,166,0.02))"}
+                      onMouseEnter={e => e.currentTarget.style.background = "linear-gradient(90deg, rgba(236,72,153,0.04), rgba(244,63,94,0.02))"}
                       onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                     >
                       <td style={{ padding: "14px 16px", fontWeight: 600, color: "#334155" }}>{surgery.surgeryNumber}</td>
@@ -212,8 +234,8 @@ export default function SurgeryPage() {
                       <td style={{ padding: "14px 16px" }}>
                         <span style={{
                           display: "inline-block", padding: "3px 10px", borderRadius: "6px",
-                          background: "#f8fafc", border: "1px solid #e2e8f0",
-                          fontSize: "12px", color: "#64748b", fontWeight: 500,
+                          background: "#fdf2f8", border: "1px solid #fbcfe8",
+                          fontSize: "12px", color: "#be185d", fontWeight: 500,
                         }}>
                           {surgery.type}
                         </span>
@@ -245,7 +267,7 @@ export default function SurgeryPage() {
                             display: "flex", alignItems: "center", justifyContent: "center",
                             color: "#64748b", transition: "all 0.2s",
                           }}
-                            onMouseEnter={e => { e.currentTarget.style.background = "#eff6ff"; e.currentTarget.style.color = "#3b82f6" }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "#fce7f3"; e.currentTarget.style.color = "#ec4899" }}
                             onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b" }}
                           >
                             <Eye size={16} />
@@ -256,7 +278,7 @@ export default function SurgeryPage() {
                             display: "flex", alignItems: "center", justifyContent: "center",
                             color: "#64748b", transition: "all 0.2s",
                           }}
-                            onMouseEnter={e => { e.currentTarget.style.background = "#f0fdfa"; e.currentTarget.style.color = "#14b8a6" }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "#fdf2f8"; e.currentTarget.style.color = "#f43f5e" }}
                             onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b" }}
                           >
                             <Edit size={16} />
