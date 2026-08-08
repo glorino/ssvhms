@@ -29,7 +29,7 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 260, damping: 20 } },
+  visible: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 260, damping: 20 } },
 }
 
 export default function AppointmentsPage() {
@@ -441,7 +441,7 @@ export default function AppointmentsPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+          transition={{ delay: 0.3, type: "spring" as const, stiffness: 200 }}
           style={{
             background: "white",
             borderRadius: "18px",
@@ -585,7 +585,7 @@ export default function AppointmentsPage() {
                               {apt.date}
                             </span>
                             <span style={{ color: "#94a3b8", fontSize: "12px" }}>
-                              {apt.time || "N/A"}
+                              {apt.date}
                             </span>
                           </div>
                         </td>

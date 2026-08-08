@@ -106,7 +106,7 @@ export default function PatientsPage() {
 
   const itemVariants = {
     hidden: { opacity: 0, y: 24 },
-    visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 260, damping: 20 } },
+    visible: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 260, damping: 20 } },
   }
 
   return (
@@ -374,7 +374,7 @@ export default function PatientsPage() {
                     key={patient.id}
                     initial={{ opacity: 0, x: -12 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 + index * 0.03, type: "spring", stiffness: 300, damping: 24 }}
+                    transition={{ delay: 0.5 + index * 0.03, type: "spring" as const, stiffness: 300, damping: 24 }}
                     style={{
                       borderBottom: "1px solid #f1f5f9",
                       cursor: "default",
