@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import {
@@ -16,6 +16,7 @@ import {
   Building2,
 } from "lucide-react"
 import { usePatients } from "@/lib/patient-context"
+import { filterByPeriod } from "@/lib/filter-utils"
 
 const bedStatus = [
   { ward: "ICU", total: 10, occupied: 9, vacant: 1, reserved: 0, gradient: "linear-gradient(135deg, #ef4444, #ec4899)" },
@@ -68,7 +69,9 @@ export default function IPDPage() {
     }))
   )
 
-  const filteredAdmissions = ipdAdmissions.filter(
+  const periodFilteredAdmissions = useMemo(() => filterByPeriod(ipdAdmissions, activePeriod, "admissionDate"), [ipdAdmissions, activePeriod])
+
+  const filteredAdmissions = periodFilteredAdmissions.filter(
     (admission) =>
       admission.patient.toLowerCase().includes(searchTerm.toLowerCase()) ||
       admission.admissionNumber.toLowerCase().includes(searchTerm.toLowerCase())

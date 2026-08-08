@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import {
@@ -15,6 +15,7 @@ import {
   FileText,
 } from "lucide-react"
 import { usePatients } from "@/lib/patient-context"
+import { filterByPeriod } from "@/lib/filter-utils"
 
 export default function OPDPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -29,19 +30,20 @@ export default function OPDPage() {
       umr: p.uniqueNumber,
     }))
   )
-  const totalVisits = allOpdVisits.length
-  const completedVisits = allOpdVisits.filter((v) => v.status === "Completed").length
-  const inProgressVisits = allOpdVisits.filter((v) => v.status === "In Progress").length
-  const scheduledVisits = allOpdVisits.filter((v) => v.status === "Scheduled").length
+  const periodFilteredVisits = useMemo(() => filterByPeriod(allOpdVisits, activePeriod, "date"), [allOpdVisits, activePeriod])
+  const totalVisits = periodFilteredVisits.length
+  const completedVisits = periodFilteredVisits.filter((v) => v.status === "Completed").length
+  const inProgressVisits = periodFilteredVisits.filter((v) => v.status === "In Progress").length
+  const scheduledVisits = periodFilteredVisits.filter((v) => v.status === "Scheduled").length
 
   const statsData = [
     { title: "Total Visits", value: String(totalVisits), icon: Stethoscope, gradient: "linear-gradient(135deg, #f59e0b, #f97316)", shadow: "0 8px 24px rgba(245,158,11,0.35)" },
-    { title: "Today", value: String(totalVisits), icon: Clock, gradient: "linear-gradient(135deg, #22c55e, #16a34a)", shadow: "0 8px 24px rgba(34,197,94,0.35)" },
+    { title: "Period Visits", value: String(totalVisits), icon: Clock, gradient: "linear-gradient(135deg, #22c55e, #16a34a)", shadow: "0 8px 24px rgba(34,197,94,0.35)" },
     { title: "In Progress", value: String(inProgressVisits), icon: User, gradient: "linear-gradient(135deg, #3b82f6, #2563eb)", shadow: "0 8px 24px rgba(59,130,246,0.35)" },
     { title: "Completed", value: String(completedVisits), icon: FileText, gradient: "linear-gradient(135deg, #8b5cf6, #7c3aed)", shadow: "0 8px 24px rgba(139,92,246,0.35)" },
   ]
 
-  const filteredVisits = allOpdVisits.filter(
+  const filteredVisits = periodFilteredVisits.filter(
     (visit) =>
       visit.patient.toLowerCase().includes(searchTerm.toLowerCase()) ||
       visit.visitNumber.toLowerCase().includes(searchTerm.toLowerCase())

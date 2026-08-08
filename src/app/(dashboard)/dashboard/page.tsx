@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { useSession } from "next-auth/react"
@@ -10,6 +10,7 @@ import {
   AlertTriangle, CheckCircle, Clock,
 } from "lucide-react"
 import { usePatients } from "@/lib/patient-context"
+import { filterByPeriod } from "@/lib/filter-utils"
 
 const bedStatus = [
   { ward: "ICU", total: 20, occupied: 16, color: "#ef4444" },
@@ -60,21 +61,31 @@ export default function DashboardPage() {
   const [activeFilter, setActiveFilter] = useState("Today")
   const filters = ["Today", "This Week", "This Month", "All Time"]
 
-  const totalPatients = patients.length
+  const filterKey = useMemo(() => {
+    switch (activeFilter) {
+      case "Today": return "today"
+      case "This Week": return "week"
+      case "This Month": return "month"
+      default: return "all"
+    }
+  }, [activeFilter])
 
-  const recentAppointments = patients.flatMap((p) =>
-    p.visits
-      .filter((v) => v.date === new Date().toISOString().split("T")[0])
-      .map((v) => ({
-        id: v.id,
-        patient: `${p.firstName} ${p.lastName}`,
-        doctor: v.doctor,
-        dept: v.department,
-        time: v.date,
-        status: v.status,
-        avatar: `${p.firstName[0]}${p.lastName[0]}`,
-      }))
+  const filteredPatients = useMemo(() => filterByPeriod(patients, filterKey, "registeredAt"), [patients, filterKey])
+
+  const totalPatients = filteredPatients.length
+
+  const allAppointments = patients.flatMap((p) =>
+    p.visits.map((v) => ({
+      id: v.id,
+      patient: `${p.firstName} ${p.lastName}`,
+      doctor: v.doctor,
+      dept: v.department,
+      time: v.date,
+      status: v.status,
+      avatar: `${p.firstName[0]}${p.lastName[0]}`,
+    }))
   )
+  const recentAppointments = filterByPeriod(allAppointments, filterKey, "time")
 
   const totalBeds = bedStatus.reduce((sum, w) => sum + w.total, 0)
   const occupiedBeds = bedStatus.reduce((sum, w) => sum + w.occupied, 0)

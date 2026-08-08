@@ -1,10 +1,11 @@
 ﻿"use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { Plus, Search, Download, Eye, Edit, Pill, Package, AlertTriangle, TrendingUp, ShoppingCart } from "lucide-react"
 import { AnimatedPage, StaggerContainer, StaggerItem } from "@/components/animated-wrapper"
+import { filterByPeriod } from "@/lib/filter-utils"
 
 const medicines = [
   { id: "MED001", name: "Paracetamol 500mg", generic: "Paracetamol", category: "Analgesic", manufacturer: "Cipla", batchNo: "BAT001", stock: 500, minStock: 100, purchasePrice: 2, sellingPrice: 5, expiryDate: "2027-12-31", status: "In Stock" },
@@ -37,10 +38,14 @@ const statsData = [
 export default function PharmacyPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState("medicines")
+  const [activePeriod, setActivePeriod] = useState("all")
 
   const filteredMedicines = medicines.filter(
     (med) => med.name.toLowerCase().includes(searchTerm.toLowerCase()) || med.generic.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const filteredPurchases = useMemo(() => filterByPeriod(purchases, activePeriod, "date"), [activePeriod])
+  const filteredSales = useMemo(() => filterByPeriod(sales, activePeriod, "date"), [activePeriod])
 
   const getStockLevel = (stock: number, minStock: number) => {
     const ratio = stock / minStock
@@ -128,6 +133,31 @@ export default function PharmacyPage() {
                 }}
               >
                 {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Period Filter Bar */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+            {[
+              { key: "all", label: "All Time" },
+              { key: "today", label: "Today" },
+              { key: "week", label: "This Week" },
+              { key: "month", label: "This Month" },
+            ].map((period) => (
+              <button
+                key={period.key}
+                onClick={() => setActivePeriod(period.key)}
+                style={{
+                  padding: "8px 18px", borderRadius: "20px",
+                  border: activePeriod === period.key ? "1.5px solid #14b8a6" : "1.5px solid #e2e8f0",
+                  background: activePeriod === period.key ? "linear-gradient(135deg, #14b8a6, #22c55e)" : "#fff",
+                  color: activePeriod === period.key ? "#fff" : "#64748b",
+                  cursor: "pointer", fontSize: "13px", fontWeight: 600, transition: "all 0.2s",
+                  boxShadow: activePeriod === period.key ? "0 4px 12px rgba(20,184,166,0.3)" : "none",
+                }}
+              >
+                {period.label}
               </button>
             ))}
           </div>
@@ -249,7 +279,7 @@ export default function PharmacyPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {purchases.map((pur, index) => (
+                    {filteredPurchases.map((pur, index) => (
                       <motion.tr
                         key={pur.id}
                         initial={{ opacity: 0, x: -10 }}
@@ -297,7 +327,7 @@ export default function PharmacyPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {sales.map((sale, index) => (
+                    {filteredSales.map((sale, index) => (
                       <motion.tr
                         key={sale.id}
                         initial={{ opacity: 0, x: -10 }}

@@ -18,6 +18,7 @@ import {
   TrendingUp,
   Heart,
 } from "lucide-react"
+import { filterByPeriod } from "@/lib/filter-utils"
 
 function getAge(dob: string): number {
   const birth = new Date(dob)
@@ -64,31 +65,34 @@ const statCardColors = [
 export default function PatientsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterStatus, setFilterStatus] = useState("All")
+  const [activePeriod, setActivePeriod] = useState("all")
   const { patients } = usePatients()
 
   const now = new Date()
   const currentMonth = now.getMonth()
   const currentYear = now.getFullYear()
 
+  const periodFilteredPatients = useMemo(() => filterByPeriod(patients, activePeriod, "registeredAt"), [patients, activePeriod])
+
   const stats = useMemo(() => {
-    const totalPatients = patients.length
-    const activePatients = patients.filter((p) => p.status === "Active").length
-    const newThisMonth = patients.filter((p) => {
+    const totalPatients = periodFilteredPatients.length
+    const activePatients = periodFilteredPatients.filter((p) => p.status === "Active").length
+    const newThisMonth = periodFilteredPatients.filter((p) => {
       const d = new Date(p.registeredAt)
       return d.getMonth() === currentMonth && d.getFullYear() === currentYear
     }).length
-    const currentlyAdmitted = patients.filter((p) => p.status === "Admitted").length
+    const currentlyAdmitted = periodFilteredPatients.filter((p) => p.status === "Admitted").length
     return [
       { label: "Total Patients", value: totalPatients, subtitle: "All registered", icon: Users },
       { label: "Active Patients", value: activePatients, subtitle: "Currently active", icon: Activity },
       { label: "New This Month", value: newThisMonth, subtitle: "Recent registrations", icon: TrendingUp },
       { label: "Currently Admitted", value: currentlyAdmitted, subtitle: "In hospital", icon: Heart },
     ]
-  }, [patients, currentMonth, currentYear])
+  }, [periodFilteredPatients, currentMonth, currentYear])
 
   const filteredPatients = useMemo(() => {
     const q = searchTerm.toLowerCase()
-    return patients.filter((p) => {
+    return periodFilteredPatients.filter((p) => {
       const fullName = `${p.firstName} ${p.lastName}`.toLowerCase()
       const matchesSearch =
         fullName.includes(q) ||
@@ -97,7 +101,7 @@ export default function PatientsPage() {
       const matchesFilter = filterStatus === "All" || p.status === filterStatus
       return matchesSearch && matchesFilter
     })
-  }, [patients, searchTerm, filterStatus])
+  }, [periodFilteredPatients, searchTerm, filterStatus])
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -322,6 +326,38 @@ export default function PatientsPage() {
             <Download size={15} />
             Export
           </motion.button>
+        </motion.div>
+
+        {/* Period Filter Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.4 }}
+          style={{
+            display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap",
+          }}
+        >
+          {[
+            { key: "all", label: "All Time" },
+            { key: "today", label: "Today" },
+            { key: "week", label: "This Week" },
+            { key: "month", label: "This Month" },
+          ].map((period) => (
+            <button
+              key={period.key}
+              onClick={() => setActivePeriod(period.key)}
+              style={{
+                padding: "8px 18px", borderRadius: "20px",
+                border: activePeriod === period.key ? "1.5px solid #0f766e" : "1.5px solid #e2e8f0",
+                background: activePeriod === period.key ? "linear-gradient(135deg, #0f766e, #14b8a6)" : "#fff",
+                color: activePeriod === period.key ? "#fff" : "#64748b",
+                cursor: "pointer", fontSize: "13px", fontWeight: 600, transition: "all 0.2s",
+                boxShadow: activePeriod === period.key ? "0 4px 12px rgba(20,184,166,0.3)" : "none",
+              }}
+            >
+              {period.label}
+            </button>
+          ))}
         </motion.div>
 
         {/* Patients Table */}

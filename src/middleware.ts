@@ -6,13 +6,13 @@ const publicRoutes = ["/login", "/api/auth", "/api/health", "/"]
 const roleRoutes: Record<string, string[]> = {
   SUPER_ADMIN: ["/dashboard", "/patients", "/doctors", "/appointments", "/opd", "/ipd", "/pharmacy", "/pathology", "/radiology", "/blood-bank", "/billing", "/surgery", "/ambulance", "/front-office", "/hr", "/reports", "/messages", "/settings"],
   ADMIN: ["/dashboard", "/patients", "/doctors", "/appointments", "/opd", "/ipd", "/pharmacy", "/pathology", "/radiology", "/blood-bank", "/billing", "/surgery", "/ambulance", "/front-office", "/hr", "/reports", "/messages", "/settings"],
-  DOCTOR: ["/dashboard", "/appointments", "/patients", "/opd", "/ipd", "/pathology", "/radiology", "/messages"],
-  NURSE: ["/dashboard", "/patients", "/ipd", "/opd", "/blood-bank", "/messages"],
-  PHARMACIST: ["/dashboard", "/pharmacy", "/messages"],
-  PATHOLOGIST: ["/dashboard", "/pathology", "/messages"],
-  RADIOLOGIST: ["/dashboard", "/radiology", "/messages"],
+  DOCTOR: ["/dashboard", "/appointments", "/patients", "/opd", "/ipd", "/pathology", "/radiology", "/surgery", "/messages"],
+  NURSE: ["/dashboard", "/patients", "/ipd", "/opd", "/pharmacy", "/blood-bank", "/messages"],
+  PHARMACIST: ["/dashboard", "/patients", "/pharmacy", "/messages"],
+  PATHOLOGIST: ["/dashboard", "/patients", "/pathology", "/messages"],
+  RADIOLOGIST: ["/dashboard", "/patients", "/radiology", "/messages"],
   ACCOUNTANT: ["/dashboard", "/billing", "/hr", "/reports", "/messages"],
-  RECEPTIONIST: ["/dashboard", "/appointments", "/patients", "/front-office", "/messages"],
+  RECEPTIONIST: ["/dashboard", "/appointments", "/patients", "/billing", "/front-office", "/messages"],
   PATIENT: ["/patient-portal"],
 }
 

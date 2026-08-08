@@ -1,10 +1,11 @@
 ﻿"use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { Plus, Search, Download, Eye, CreditCard, IndianRupee, CheckCircle, Clock, AlertCircle, FileText, Printer } from "lucide-react"
 import { usePatients } from "@/lib/patient-context"
+import { filterByPeriod } from "@/lib/filter-utils"
 
 const statusStyles: Record<string, { bg: string; color: string; border: string }> = {
   Paid: { bg: "#dcfce7", color: "#166534", border: "#bbf7d0" },
@@ -43,20 +44,23 @@ export default function BillingPage() {
     }))
   )
 
-  const totalRevenue = bills.reduce((acc, bill) => acc + Number(bill.totalAmount), 0)
-  const totalCollected = bills.reduce((acc, bill) => acc + Number(bill.paidAmount), 0)
-  const totalPending = bills.reduce((acc, bill) => acc + Number(bill.dueAmount), 0)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [activePeriod, setActivePeriod] = useState("all")
+
+  const periodFilteredBills = useMemo(() => filterByPeriod(bills, activePeriod, "billDate"), [bills, activePeriod])
+
+  const totalRevenue = periodFilteredBills.reduce((acc, bill) => acc + Number(bill.totalAmount), 0)
+  const totalCollected = periodFilteredBills.reduce((acc, bill) => acc + Number(bill.paidAmount), 0)
+  const totalPending = periodFilteredBills.reduce((acc, bill) => acc + Number(bill.dueAmount), 0)
 
   const statsData = [
     { title: "Total Revenue", value: `₦${totalRevenue.toLocaleString()}`, icon: IndianRupee },
     { title: "Collected", value: `₦${totalCollected.toLocaleString()}`, icon: CheckCircle },
     { title: "Pending", value: `₦${totalPending.toLocaleString()}`, icon: AlertCircle },
-    { title: "Total Bills", value: bills.length.toString(), icon: FileText },
+    { title: "Total Bills", value: periodFilteredBills.length.toString(), icon: FileText },
   ]
 
-  const [searchTerm, setSearchTerm] = useState("")
-
-  const filteredBills = bills.filter(
+  const filteredBills = periodFilteredBills.filter(
     bill =>
       bill.patient.toLowerCase().includes(searchTerm.toLowerCase()) ||
       bill.billNumber.toLowerCase().includes(searchTerm.toLowerCase())
@@ -108,6 +112,31 @@ export default function BillingPage() {
               </button>
             </Link>
           </div>
+        </div>
+
+        {/* Period Filter Bar */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+          {[
+            { key: "all", label: "All Time" },
+            { key: "today", label: "Today" },
+            { key: "week", label: "This Week" },
+            { key: "month", label: "This Month" },
+          ].map((period) => (
+            <button
+              key={period.key}
+              onClick={() => setActivePeriod(period.key)}
+              style={{
+                padding: "8px 18px", borderRadius: "20px",
+                border: activePeriod === period.key ? "1.5px solid #0f766e" : "1.5px solid #e2e8f0",
+                background: activePeriod === period.key ? "linear-gradient(135deg, #0f766e, #14b8a6)" : "#fff",
+                color: activePeriod === period.key ? "#fff" : "#64748b",
+                cursor: "pointer", fontSize: "13px", fontWeight: 600, transition: "all 0.2s",
+                boxShadow: activePeriod === period.key ? "0 4px 12px rgba(20,184,166,0.3)" : "none",
+              }}
+            >
+              {period.label}
+            </button>
+          ))}
         </div>
 
         {/* Stat Cards */}

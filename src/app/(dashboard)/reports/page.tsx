@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import {
@@ -17,6 +17,7 @@ import {
   FileText,
   BarChart2,
 } from "lucide-react"
+import { filterByPeriod } from "@/lib/filter-utils"
 
 const reportTypes = [
   { id: "revenue", title: "Revenue Report", description: "Daily, weekly, and monthly revenue analytics", icon: IndianRupee, color: "#3b82f6", bgColor: "#eff6ff", href: "/reports/revenue" },
@@ -41,6 +42,17 @@ export default function ReportsPage() {
   const [activePeriod, setActivePeriod] = useState("All Time")
 
   const periods = ["Today", "This Week", "This Month", "All Time"]
+
+  const filterKey = useMemo(() => {
+    switch (activePeriod) {
+      case "Today": return "today"
+      case "This Week": return "week"
+      case "This Month": return "month"
+      default: return "all"
+    }
+  }, [activePeriod])
+
+  const filteredReports = useMemo(() => filterByPeriod(recentReports, filterKey, "date"), [filterKey])
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -247,7 +259,7 @@ export default function ReportsPage() {
               Recently Generated Reports
             </h2>
             <span style={{ fontSize: "13px", color: "#64748b" }}>
-              {recentReports.length} reports
+              {filteredReports.length} reports
             </span>
           </div>
 
@@ -281,7 +293,7 @@ export default function ReportsPage() {
 
           {/* Table Body */}
           <div>
-            {recentReports.map((report, index) => (
+            {filteredReports.map((report, index) => (
               <motion.div
                 key={report.id}
                 initial={{ opacity: 0, x: -10 }}

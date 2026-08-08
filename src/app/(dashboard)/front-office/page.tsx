@@ -1,9 +1,10 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { Plus, Search, Download, Eye, Edit, Users, Phone, Mail, CheckCircle } from "lucide-react"
+import { filterByPeriod } from "@/lib/filter-utils"
 
 const stats = [
   { title: "Visitors Today", value: "128", icon: Users, gradient: "linear-gradient(135deg, #14b8a6, #06b6d4)", shadow: "0 8px 24px rgba(20,184,166,0.35)" },
@@ -53,6 +54,7 @@ const tabs = ["Visitors", "Phone Calls", "Postal"] as const
 export default function FrontOfficePage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState<"Visitors" | "Phone Calls" | "Postal">("Visitors")
+  const [activePeriod, setActivePeriod] = useState("all")
 
   const filteredVisitors = visitors.filter(
     v => v.visitorName.toLowerCase().includes(searchTerm.toLowerCase()) || v.patientName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -62,7 +64,8 @@ export default function FrontOfficePage() {
     c => c.callerName.toLowerCase().includes(searchTerm.toLowerCase()) || c.department.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const filteredPostal = postal.filter(
+  const periodFilteredPostal = useMemo(() => filterByPeriod(postal, activePeriod, "receivedDate"), [activePeriod])
+  const filteredPostal = periodFilteredPostal.filter(
     p => p.trackingNumber.toLowerCase().includes(searchTerm.toLowerCase()) || p.sender.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
@@ -142,6 +145,31 @@ export default function FrontOfficePage() {
               onMouseLeave={e => { if (activeTab !== t) e.currentTarget.style.background = "transparent" }}
             >
               {t}
+            </button>
+          ))}
+        </div>
+
+        {/* Period Filter Bar */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px", flexWrap: "wrap" }}>
+          {[
+            { key: "all", label: "All Time" },
+            { key: "today", label: "Today" },
+            { key: "week", label: "This Week" },
+            { key: "month", label: "This Month" },
+          ].map((period) => (
+            <button
+              key={period.key}
+              onClick={() => setActivePeriod(period.key)}
+              style={{
+                padding: "8px 18px", borderRadius: "20px",
+                border: activePeriod === period.key ? "1.5px solid #14b8a6" : "1.5px solid #e2e8f0",
+                background: activePeriod === period.key ? "linear-gradient(135deg, #14b8a6, #06b6d4)" : "#fff",
+                color: activePeriod === period.key ? "#fff" : "#64748b",
+                cursor: "pointer", fontSize: "13px", fontWeight: 600, transition: "all 0.2s",
+                boxShadow: activePeriod === period.key ? "0 4px 12px rgba(20,184,166,0.3)" : "none",
+              }}
+            >
+              {period.label}
             </button>
           ))}
         </div>

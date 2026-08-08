@@ -1,9 +1,10 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { Plus, Search, Download, Eye, Edit, Ambulance, CheckCircle, Clock, AlertCircle, Phone } from "lucide-react"
+import { filterByPeriod } from "@/lib/filter-utils"
 
 const vehicles = [
   { id: "AMB001", vehicleNumber: "MH-01-AB-1234", type: "ALS", driver: "Ramesh Yadav", contact: "9876543210", status: "Available", lastService: "2026-07-15", nextService: "2026-10-15" },
@@ -46,12 +47,18 @@ const tabs = ["Vehicles", "Call History"] as const
 export default function AmbulancePage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState<"Vehicles" | "Call History">("Vehicles")
+  const [activePeriod, setActivePeriod] = useState("all")
 
   const filteredVehicles = vehicles.filter(
     v => v.vehicleNumber.toLowerCase().includes(searchTerm.toLowerCase()) || v.driver.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const filteredCalls = callHistory.filter(
+  const periodFilteredCalls = useMemo(() => {
+    const callsWithDate = callHistory.map(c => ({ ...c, date: c.callTime.split(" ")[0] }))
+    return filterByPeriod(callsWithDate, activePeriod, "date")
+  }, [activePeriod])
+
+  const filteredCalls = periodFilteredCalls.filter(
     c => c.callerName.toLowerCase().includes(searchTerm.toLowerCase()) || c.callNumber.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
@@ -131,6 +138,31 @@ export default function AmbulancePage() {
               onMouseLeave={e => { if (activeTab !== t) e.currentTarget.style.background = "transparent" }}
             >
               {t}
+            </button>
+          ))}
+        </div>
+
+        {/* Period Filter Bar */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px", flexWrap: "wrap" }}>
+          {[
+            { key: "all", label: "All Time" },
+            { key: "today", label: "Today" },
+            { key: "week", label: "This Week" },
+            { key: "month", label: "This Month" },
+          ].map((period) => (
+            <button
+              key={period.key}
+              onClick={() => setActivePeriod(period.key)}
+              style={{
+                padding: "8px 18px", borderRadius: "20px",
+                border: activePeriod === period.key ? "1.5px solid #f97316" : "1.5px solid #e2e8f0",
+                background: activePeriod === period.key ? "linear-gradient(135deg, #f97316, #ef4444)" : "#fff",
+                color: activePeriod === period.key ? "#fff" : "#64748b",
+                cursor: "pointer", fontSize: "13px", fontWeight: 600, transition: "all 0.2s",
+                boxShadow: activePeriod === period.key ? "0 4px 12px rgba(249,115,22,0.3)" : "none",
+              }}
+            >
+              {period.label}
             </button>
           ))}
         </div>

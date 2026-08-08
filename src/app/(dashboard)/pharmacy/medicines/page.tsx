@@ -1,10 +1,11 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import { useSession } from "next-auth/react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Plus, Search, Package, AlertTriangle, TrendingUp, Edit, Eye, X, Save } from "lucide-react"
 import Link from "next/link"
+import { filterByPeriod } from "@/lib/filter-utils"
 
 const initialDrugs = [
   { id: 1, name: "Amoxicillin 500mg", category: "Capsule", batchNo: "BAT-2026-001", stockQty: 320, unitPrice: 1200, expiryDate: "2027-06-15", supplier: "Medico Pharma", status: "In Stock" },
@@ -24,11 +25,13 @@ export default function DrugInventoryPage() {
   const role = (session?.user as any)?.role || "SUPER_ADMIN"
   const [drugs, setDrugs] = useState(initialDrugs)
   const [search, setSearch] = useState("")
+  const [activePeriod, setActivePeriod] = useState("all")
   const [viewDrug, setViewDrug] = useState<typeof initialDrugs[0] | null>(null)
   const [editDrug, setEditDrug] = useState<typeof initialDrugs[0] | null>(null)
   const [editForm, setEditForm] = useState({ name: "", category: "", batchNo: "", stockQty: 0, unitPrice: 0, expiryDate: "", supplier: "" })
 
-  const filtered = drugs.filter(d => d.name.toLowerCase().includes(search.toLowerCase()) || d.category.toLowerCase().includes(search.toLowerCase()))
+  const periodFilteredDrugs = useMemo(() => filterByPeriod(drugs, activePeriod, "expiryDate"), [drugs, activePeriod])
+  const filtered = periodFilteredDrugs.filter(d => d.name.toLowerCase().includes(search.toLowerCase()) || d.category.toLowerCase().includes(search.toLowerCase()))
 
   const openEdit = (drug: typeof initialDrugs[0]) => {
     setEditDrug(drug)
@@ -96,9 +99,34 @@ export default function DrugInventoryPage() {
 
       {/* Search */}
       <div style={{ background: "#fff", borderRadius: "16px", padding: "16px 20px", marginBottom: "20px", border: "1px solid #f1f5f9", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
-        <div style={{ position: "relative", maxWidth: "400px" }}>
-          <Search size={16} color="#94a3b8" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search drugs..." style={{ ...inputStyle, paddingLeft: "38px" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+          <div style={{ position: "relative", maxWidth: "400px", flex: 1 }}>
+            <Search size={16} color="#94a3b8" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
+            <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search drugs..." style={{ ...inputStyle, paddingLeft: "38px" }} />
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            {[
+              { key: "all", label: "All Time" },
+              { key: "today", label: "Today" },
+              { key: "week", label: "This Week" },
+              { key: "month", label: "This Month" },
+            ].map((period) => (
+              <button
+                key={period.key}
+                onClick={() => setActivePeriod(period.key)}
+                style={{
+                  padding: "8px 18px", borderRadius: "20px",
+                  border: activePeriod === period.key ? "1.5px solid #0f766e" : "1.5px solid #e2e8f0",
+                  background: activePeriod === period.key ? "linear-gradient(135deg, #0f766e, #14b8a6)" : "#fff",
+                  color: activePeriod === period.key ? "#fff" : "#64748b",
+                  cursor: "pointer", fontSize: "13px", fontWeight: 600, transition: "all 0.2s",
+                  boxShadow: activePeriod === period.key ? "0 4px 12px rgba(20,184,166,0.3)" : "none",
+                }}
+              >
+                {period.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

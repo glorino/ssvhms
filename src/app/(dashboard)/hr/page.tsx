@@ -1,9 +1,10 @@
 ﻿"use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { Plus, Search, Download, Eye, Edit, Users, CheckCircle, Clock, AlertCircle, Banknote, Filter } from "lucide-react"
+import { filterByPeriod } from "@/lib/filter-utils"
 
 const stats = [
   { title: "Total Staff", value: "6", icon: Users, gradient: "linear-gradient(135deg, #8b5cf6, #a855f7)", shadow: "0 8px 24px rgba(139,92,246,0.35)" },
@@ -64,6 +65,10 @@ function getInitials(name: string) {
 export default function HRPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState<"Staff" | "Attendance" | "Leaves" | "Payroll">("Staff")
+  const [activePeriod, setActivePeriod] = useState("all")
+
+  const filteredAttendance = useMemo(() => filterByPeriod(attendance, activePeriod, "date"), [activePeriod])
+  const filteredLeaves = useMemo(() => filterByPeriod(leaves, activePeriod, "startDate"), [activePeriod])
 
   const filteredStaff = staff.filter(
     s => s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.employeeId.toLowerCase().includes(searchTerm.toLowerCase())
@@ -145,6 +150,31 @@ export default function HRPage() {
               onMouseLeave={e => { if (activeTab !== t) e.currentTarget.style.background = "transparent" }}
             >
               {t}
+            </button>
+          ))}
+        </div>
+
+        {/* Period Filter Bar */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px", flexWrap: "wrap" }}>
+          {[
+            { key: "all", label: "All Time" },
+            { key: "today", label: "Today" },
+            { key: "week", label: "This Week" },
+            { key: "month", label: "This Month" },
+          ].map((period) => (
+            <button
+              key={period.key}
+              onClick={() => setActivePeriod(period.key)}
+              style={{
+                padding: "8px 18px", borderRadius: "20px",
+                border: activePeriod === period.key ? "1.5px solid #8b5cf6" : "1.5px solid #e2e8f0",
+                background: activePeriod === period.key ? "linear-gradient(135deg, #8b5cf6, #a855f7)" : "#fff",
+                color: activePeriod === period.key ? "#fff" : "#64748b",
+                cursor: "pointer", fontSize: "13px", fontWeight: 600, transition: "all 0.2s",
+                boxShadow: activePeriod === period.key ? "0 4px 12px rgba(139,92,246,0.3)" : "none",
+              }}
+            >
+              {period.label}
             </button>
           ))}
         </div>
@@ -387,7 +417,7 @@ export default function HRPage() {
                 </thead>
                 <tbody>
                   <AnimatePresence>
-                    {attendance.map((att, index) => (
+                    {filteredAttendance.map((att, index) => (
                       <motion.tr
                         key={att.id}
                         initial={{ opacity: 0, x: -10 }}
@@ -476,7 +506,7 @@ export default function HRPage() {
                 </thead>
                 <tbody>
                   <AnimatePresence>
-                    {leaves.map((leave, index) => (
+                    {filteredLeaves.map((leave, index) => (
                       <motion.tr
                         key={leave.id}
                         initial={{ opacity: 0, x: -10 }}

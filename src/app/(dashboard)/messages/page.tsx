@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import { motion } from "framer-motion"
 import {
   Send,
@@ -14,6 +14,7 @@ import {
   CheckCircle,
   MessageSquare,
 } from "lucide-react"
+import { filterByPeriod } from "@/lib/filter-utils"
 
 const stats = [
   {

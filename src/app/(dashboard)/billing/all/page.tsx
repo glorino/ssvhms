@@ -1,10 +1,11 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Search, Download, Eye, Printer, Plus } from "lucide-react"
 import Link from "next/link"
 import { usePatients } from "@/lib/patient-context"
+import { filterByPeriod } from "@/lib/filter-utils"
 
 const statusStyles: Record<string, { bg: string; color: string; border: string }> = {
   Paid: { bg: "#ecfdf5", color: "#059669", border: "#a7f3d0" },
@@ -27,20 +28,23 @@ export default function AllBillsPage() {
   const { patients } = usePatients()
   const bills = patients.flatMap(p => p.bills.map(b => ({ ...b, billNo: b.id, patient: `${p.firstName} ${p.lastName}`, umr: p.uniqueNumber, type: b.items, amount: b.amount, paid: b.paid, due: b.due, date: b.date, status: b.status })))
 
-  const totalRevenue = bills.reduce((acc, b) => acc + b.amount, 0)
-  const totalCollected = bills.reduce((acc, b) => acc + b.paid, 0)
-  const totalPending = bills.reduce((acc, b) => acc + b.due, 0)
+  const [search, setSearch] = useState("")
+  const [activePeriod, setActivePeriod] = useState("all")
+
+  const periodFilteredBills = useMemo(() => filterByPeriod(bills, activePeriod, "date"), [bills, activePeriod])
+
+  const totalRevenue = periodFilteredBills.reduce((acc, b) => acc + b.amount, 0)
+  const totalCollected = periodFilteredBills.reduce((acc, b) => acc + b.paid, 0)
+  const totalPending = periodFilteredBills.reduce((acc, b) => acc + b.due, 0)
 
   const stats = [
     { title: "Total Revenue", value: formatNaira(totalRevenue), color: "#14b8a6", bg: "#f0fdfa" },
     { title: "Collected", value: formatNaira(totalCollected), color: "#059669", bg: "#ecfdf5" },
     { title: "Pending", value: formatNaira(totalPending), color: "#d97706", bg: "#fffbeb" },
-    { title: "Overdue", value: formatNaira(bills.filter((b) => b.status === "Pending").reduce((acc, b) => acc + b.due, 0)), color: "#dc2626", bg: "#fef2f2" },
+    { title: "Overdue", value: formatNaira(periodFilteredBills.filter((b) => b.status === "Pending").reduce((acc, b) => acc + b.due, 0)), color: "#dc2626", bg: "#fef2f2" },
   ]
 
-  const [search, setSearch] = useState("")
-
-  const filtered = bills.filter(
+  const filtered = periodFilteredBills.filter(
     (b) =>
       b.patient.toLowerCase().includes(search.toLowerCase()) ||
       b.billNo.toLowerCase().includes(search.toLowerCase())
@@ -91,6 +95,31 @@ export default function AllBillsPage() {
             </button>
           </Link>
         </div>
+      </div>
+
+      {/* Period Filter Bar */}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px", flexWrap: "wrap" }}>
+        {[
+          { key: "all", label: "All Time" },
+          { key: "today", label: "Today" },
+          { key: "week", label: "This Week" },
+          { key: "month", label: "This Month" },
+        ].map((period) => (
+          <button
+            key={period.key}
+            onClick={() => setActivePeriod(period.key)}
+            style={{
+              padding: "8px 18px", borderRadius: "20px",
+              border: activePeriod === period.key ? "1.5px solid #0f766e" : "1.5px solid #e2e8f0",
+              background: activePeriod === period.key ? "linear-gradient(135deg, #0f766e, #14b8a6)" : "#fff",
+              color: activePeriod === period.key ? "#fff" : "#64748b",
+              cursor: "pointer", fontSize: "13px", fontWeight: 600, transition: "all 0.2s",
+              boxShadow: activePeriod === period.key ? "0 4px 12px rgba(20,184,166,0.3)" : "none",
+            }}
+          >
+            {period.label}
+          </button>
+        ))}
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "24px" }}>

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import {
@@ -18,6 +18,7 @@ import {
   Activity,
 } from "lucide-react"
 import { usePatients } from "@/lib/patient-context"
+import { filterByPeriod } from "@/lib/filter-utils"
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -38,11 +39,27 @@ export default function AppointmentsPage() {
     p.visits.map((v) => ({ ...v, patient: `${p.firstName} ${p.lastName}` }))
   )
 
-  const totalApts = appointments.length
-  const completedApts = appointments.filter((a) => a.status === "Completed").length
-  const inProgressApts = appointments.filter((a) => a.status === "In Progress").length
-  const scheduledApts = appointments.filter((a) => a.status === "Scheduled").length
-  const cancelledApts = appointments.filter((a) => a.status === "Cancelled").length
+  const [searchTerm, setSearchTerm] = useState("")
+  const [activePeriod, setActivePeriod] = useState("All Time")
+
+  const periods = ["Today", "This Week", "This Month", "All Time"]
+
+  const filterKey = useMemo(() => {
+    switch (activePeriod) {
+      case "Today": return "today"
+      case "This Week": return "week"
+      case "This Month": return "month"
+      default: return "all"
+    }
+  }, [activePeriod])
+
+  const periodFilteredAppointments = useMemo(() => filterByPeriod(appointments, filterKey, "date"), [appointments, filterKey])
+
+  const totalApts = periodFilteredAppointments.length
+  const completedApts = periodFilteredAppointments.filter((a) => a.status === "Completed").length
+  const inProgressApts = periodFilteredAppointments.filter((a) => a.status === "In Progress").length
+  const scheduledApts = periodFilteredAppointments.filter((a) => a.status === "Scheduled").length
+  const cancelledApts = periodFilteredAppointments.filter((a) => a.status === "Cancelled").length
 
   const statsData = [
     {
@@ -87,12 +104,7 @@ export default function AppointmentsPage() {
     },
   ]
 
-  const [searchTerm, setSearchTerm] = useState("")
-  const [activePeriod, setActivePeriod] = useState("All Time")
-
-  const periods = ["Today", "This Week", "This Month", "All Time"]
-
-  const filteredAppointments = appointments.filter(
+  const filteredAppointments = periodFilteredAppointments.filter(
     (apt) =>
       apt.patient.toLowerCase().includes(searchTerm.toLowerCase()) ||
       apt.doctor.toLowerCase().includes(searchTerm.toLowerCase())

@@ -1,9 +1,10 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { Plus, Search, Download, Eye, Edit, Scissors, CheckCircle, Clock, AlertCircle, XCircle } from "lucide-react"
+import { filterByPeriod } from "@/lib/filter-utils"
 
 const statusStyles: Record<string, { bg: string; color: string; border: string }> = {
   Completed: { bg: "#dcfce7", color: "#166534", border: "#bbf7d0" },
@@ -42,7 +43,18 @@ export default function SurgeryPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [activePeriod, setActivePeriod] = useState("All")
 
-  const filteredSurgeries = surgeries.filter(
+  const filterKey = useMemo(() => {
+    switch (activePeriod) {
+      case "Today": return "today"
+      case "This Week": return "week"
+      case "This Month": return "month"
+      default: return "all"
+    }
+  }, [activePeriod])
+
+  const periodFilteredSurgeries = useMemo(() => filterByPeriod(surgeries, filterKey, "scheduledDate"), [filterKey])
+
+  const filteredSurgeries = periodFilteredSurgeries.filter(
     surgery =>
       surgery.patient.toLowerCase().includes(searchTerm.toLowerCase()) ||
       surgery.surgeryNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||

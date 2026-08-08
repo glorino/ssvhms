@@ -1,9 +1,10 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { Plus, Search, Download, Eye, Edit, Droplet, CheckCircle, Clock, AlertCircle, Heart } from "lucide-react"
+import { filterByPeriod } from "@/lib/filter-utils"
 
 const bloodInventory = [
   { bloodGroup: "A+", units: 25, minUnits: 10, lastUpdated: "2026-08-07" },
@@ -50,11 +51,14 @@ export default function BloodBankPage() {
   const [activeTab, setActiveTab] = useState("donations")
   const [activePeriod, setActivePeriod] = useState("all")
 
-  const filteredDonations = donations.filter(
+  const periodFilteredDonations = useMemo(() => filterByPeriod(donations, activePeriod, "donationDate"), [activePeriod])
+  const periodFilteredIssues = useMemo(() => filterByPeriod(issues, activePeriod, "issueDate"), [activePeriod])
+
+  const filteredDonations = periodFilteredDonations.filter(
     (donation) => donation.donorName.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const filteredIssues = issues.filter(
+  const filteredIssues = periodFilteredIssues.filter(
     (issue) => issue.patient.toLowerCase().includes(searchTerm.toLowerCase()) || issue.issueNumber.toLowerCase().includes(searchTerm.toLowerCase())
   )
 

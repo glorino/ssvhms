@@ -1,10 +1,11 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { Plus, Search, Download, Eye, Edit, FlaskConical, CheckCircle, Clock, AlertCircle, Microscope } from "lucide-react"
 import { usePatients } from "@/lib/patient-context"
+import { filterByPeriod } from "@/lib/filter-utils"
 
 const statusStyles: Record<string, { bg: string; color: string; border: string }> = {
   Completed: { bg: "#dcfce7", color: "#166534", border: "#bbf7d0" },
@@ -43,10 +44,15 @@ export default function PathologyPage() {
     }))
   )
 
-  const totalTests = tests.length
-  const completedTests = tests.filter(t => t.status === "Completed").length
-  const inProgressTests = tests.filter(t => t.status === "In Progress").length
-  const pendingTests = tests.filter(t => t.status === "Pending").length
+  const [searchTerm, setSearchTerm] = useState("")
+  const [activePeriod, setActivePeriod] = useState("all")
+
+  const periodFilteredTests = useMemo(() => filterByPeriod(tests, activePeriod, "date"), [tests, activePeriod])
+
+  const totalTests = periodFilteredTests.length
+  const completedTests = periodFilteredTests.filter(t => t.status === "Completed").length
+  const inProgressTests = periodFilteredTests.filter(t => t.status === "In Progress").length
+  const pendingTests = periodFilteredTests.filter(t => t.status === "Pending").length
 
   const statsData = [
     { title: "Total Tests", value: totalTests.toString(), icon: FlaskConical },
@@ -55,9 +61,7 @@ export default function PathologyPage() {
     { title: "Pending", value: pendingTests.toString(), icon: AlertCircle },
   ]
 
-  const [searchTerm, setSearchTerm] = useState("")
-
-  const filteredTests = tests.filter(
+  const filteredTests = periodFilteredTests.filter(
     test =>
       test.patient.toLowerCase().includes(searchTerm.toLowerCase()) ||
       test.testNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -108,6 +112,31 @@ export default function PathologyPage() {
               </button>
             </Link>
           </div>
+        </div>
+
+        {/* Period Filter Bar */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+          {[
+            { key: "all", label: "All Time" },
+            { key: "today", label: "Today" },
+            { key: "week", label: "This Week" },
+            { key: "month", label: "This Month" },
+          ].map((period) => (
+            <button
+              key={period.key}
+              onClick={() => setActivePeriod(period.key)}
+              style={{
+                padding: "8px 18px", borderRadius: "20px",
+                border: activePeriod === period.key ? "1.5px solid #8b5cf6" : "1.5px solid #e2e8f0",
+                background: activePeriod === period.key ? "linear-gradient(135deg, #8b5cf6, #7c3aed)" : "#fff",
+                color: activePeriod === period.key ? "#fff" : "#64748b",
+                cursor: "pointer", fontSize: "13px", fontWeight: 600, transition: "all 0.2s",
+                boxShadow: activePeriod === period.key ? "0 4px 12px rgba(139,92,246,0.3)" : "none",
+              }}
+            >
+              {period.label}
+            </button>
+          ))}
         </div>
 
         {/* Stat Cards */}
