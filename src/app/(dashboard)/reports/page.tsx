@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import {
@@ -14,27 +14,19 @@ import {
   Calendar,
   TrendingUp,
   BarChart3,
-  PieChart,
   FileText,
+  BarChart2,
 } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import {
-  AnimatedPage,
-  StaggerContainer,
-  StaggerItem,
-} from "@/components/animated-wrapper"
 
 const reportTypes = [
-  { id: "revenue", title: "Revenue Report", description: "Daily, weekly, and monthly revenue analytics", icon: IndianRupee, gradient: "from-blue-500 to-indigo-600", shadow: "shadow-blue-500/30", href: "/reports/revenue" },
-  { id: "patients", title: "Patient Report", description: "Patient registration, discharge, and demographics", icon: Users, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/30", href: "/reports/patients" },
-  { id: "doctors", title: "Doctor Report", description: "Doctor performance and consultation analytics", icon: Stethoscope, gradient: "from-purple-500 to-violet-600", shadow: "shadow-purple-500/30", href: "/reports/doctors" },
-  { id: "pharmacy", title: "Pharmacy Report", description: "Medicine sales, inventory, and purchase analytics", icon: Pill, gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30", href: "/reports/pharmacy" },
-  { id: "pathology", title: "Pathology Report", description: "Lab tests conducted, results, and turnaround time", icon: FlaskConical, gradient: "from-rose-500 to-pink-600", shadow: "shadow-rose-500/30", href: "/reports/pathology" },
-  { id: "radiology", title: "Radiology Report", description: "Imaging studies and diagnostic analytics", icon: Scan, gradient: "from-indigo-500 to-blue-600", shadow: "shadow-indigo-500/30", href: "/reports/radiology" },
-  { id: "appointments", title: "Appointment Report", description: "Appointment scheduling and attendance analytics", icon: Calendar, gradient: "from-teal-500 to-cyan-600", shadow: "shadow-teal-500/30", href: "/reports/appointments" },
-  { id: "billing", title: "Billing Report", description: "Invoice generation, payments, and dues analytics", icon: FileText, gradient: "from-orange-500 to-red-600", shadow: "shadow-orange-500/30", href: "/reports/billing" },
+  { id: "revenue", title: "Revenue Report", description: "Daily, weekly, and monthly revenue analytics", icon: IndianRupee, color: "#3b82f6", bgColor: "#eff6ff", href: "/reports/revenue" },
+  { id: "patients", title: "Patient Report", description: "Patient registration, discharge, and demographics", icon: Users, color: "#10b981", bgColor: "#ecfdf5", href: "/reports/patients" },
+  { id: "doctors", title: "Doctor Report", description: "Doctor performance and consultation analytics", icon: Stethoscope, color: "#8b5cf6", bgColor: "#f5f3ff", href: "/reports/doctors" },
+  { id: "pharmacy", title: "Pharmacy Report", description: "Medicine sales, inventory, and purchase analytics", icon: Pill, color: "#f59e0b", bgColor: "#fffbeb", href: "/reports/pharmacy" },
+  { id: "pathology", title: "Pathology Report", description: "Lab tests conducted, results, and turnaround time", icon: FlaskConical, color: "#ef4444", bgColor: "#fef2f2", href: "/reports/pathology" },
+  { id: "radiology", title: "Radiology Report", description: "Imaging studies and diagnostic analytics", icon: Scan, color: "#6366f1", bgColor: "#eef2ff", href: "/reports/radiology" },
+  { id: "appointments", title: "Appointment Report", description: "Appointment scheduling and attendance analytics", icon: Calendar, color: "#14b8a6", bgColor: "#f0fdfa", href: "/reports/appointments" },
+  { id: "billing", title: "Billing Report", description: "Invoice generation, payments, and dues analytics", icon: FileText, color: "#f97316", bgColor: "#fff7ed", href: "/reports/billing" },
 ]
 
 const recentReports = [
@@ -46,96 +38,330 @@ const recentReports = [
 ]
 
 export default function ReportsPage() {
+  const [activePeriod, setActivePeriod] = useState("All Time")
+
+  const periods = ["Today", "This Week", "This Month", "All Time"]
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  }
+
   return (
-    <AnimatedPage>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
+    <div style={{ minHeight: "100vh", backgroundColor: "#f8fafc" }}>
+      {/* Gradient Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        style={{
+          background: "linear-gradient(135deg, #059669 0%, #14b8a6 100%)",
+          padding: "32px 40px",
+          borderRadius: "0 0 24px 24px",
+          boxShadow: "0 10px 40px rgba(20, 184, 166, 0.3)",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          width: "300px",
+          height: "300px",
+          background: "rgba(255, 255, 255, 0.1)",
+          borderRadius: "50%",
+          transform: "translate(100px, -100px)",
+        }} />
+        <div style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          width: "200px",
+          height: "200px",
+          background: "rgba(255, 255, 255, 0.05)",
+          borderRadius: "50%",
+          transform: "translate(-50px, 50px)",
+        }} />
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", zIndex: 1 }}>
           <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 style={{ fontSize: "28px", fontWeight: 700, color: "white", margin: 0 }}>
               Reports & Analytics
             </h1>
-            <p className="text-slate-500">Generate and view hospital analytics reports</p>
+            <p style={{ fontSize: "14px", color: "rgba(255, 255, 255, 0.7)", marginTop: "8px" }}>
+              Generate and view hospital analytics reports
+            </p>
           </div>
-          <Button variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50">
-            <Download className="mr-2 h-4 w-4" />
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            style={{
+              backgroundColor: "white",
+              color: "#059669",
+              padding: "12px 24px",
+              borderRadius: "12px",
+              border: "none",
+              fontSize: "14px",
+              fontWeight: 600,
+              cursor: "pointer",
+              boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <Download size={18} />
             Export All
-          </Button>
+          </motion.button>
         </div>
+      </motion.div>
 
-        <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {reportTypes.map((report) => (
-            <StaggerItem key={report.id}>
-              <Link href={report.href}>
-                <motion.div whileHover={{ scale: 1.02, y: -2 }} transition={{ type: "spring", stiffness: 300 }}>
-                  <Card className={`overflow-hidden shadow-lg ${report.shadow} hover:shadow-xl transition-shadow duration-300 cursor-pointer`}>
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-3">
-                        <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${report.gradient} flex items-center justify-center shadow-lg`}>
-                          <report.icon className="h-6 w-6 text-white" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-slate-800">{report.title}</h3>
-                          <p className="text-xs text-slate-500 mt-1">{report.description}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </Link>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
-
+      <div style={{ padding: "24px 40px" }}>
+        {/* Filter Bar */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.2 }}
+          style={{
+            backgroundColor: "white",
+            borderRadius: "16px",
+            padding: "16px 24px",
+            marginBottom: "24px",
+            boxShadow: "0 2px 12px rgba(0, 0, 0, 0.04)",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+          }}
         >
-          <Card className="shadow-lg border-0">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
-                Recently Generated Reports
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {recentReports.map((report, index) => (
-                  <motion.div
-                    key={report.id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="flex items-center justify-between rounded-lg border border-slate-100 p-4 hover:bg-gradient-to-r hover:from-violet-50/50 hover:to-purple-50/50 transition-colors duration-200"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-md">
-                        <BarChart3 className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-slate-800">{report.reportName}</p>
-                        <p className="text-xs text-slate-500">
-                          Generated by {report.generatedBy} on {report.date}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="bg-violet-50 text-violet-700 border-violet-200">
-                        {report.type}
-                      </Badge>
-                      <Badge variant="success" className="bg-emerald-100 text-emerald-700 border-emerald-200">
-                        {report.status}
-                      </Badge>
-                      <Button variant="ghost" size="sm" className="hover:bg-violet-50 hover:text-violet-600">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <span style={{ fontSize: "13px", color: "#64748b", fontWeight: 500 }}>Filter:</span>
+          {periods.map((period) => (
+            <motion.button
+              key={period}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setActivePeriod(period)}
+              style={{
+                padding: "8px 16px",
+                borderRadius: "20px",
+                border: "none",
+                fontSize: "13px",
+                fontWeight: 500,
+                cursor: "pointer",
+                transition: "all 0.2s",
+                backgroundColor: activePeriod === period ? "#059669" : "#f1f5f9",
+                color: activePeriod === period ? "white" : "#64748b",
+              }}
+            >
+              {period}
+            </motion.button>
+          ))}
+        </motion.div>
+
+        {/* Report Types Grid */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: "20px",
+            marginBottom: "24px",
+          }}
+        >
+          {reportTypes.map((report) => (
+            <motion.div
+              key={report.id}
+              variants={itemVariants}
+              whileHover={{ y: -4, boxShadow: "0 12px 30px rgba(0, 0, 0, 0.1)" }}
+            >
+              <Link href={report.href} style={{ textDecoration: "none" }}>
+                <div style={{
+                  backgroundColor: "white",
+                  borderRadius: "16px",
+                  padding: "24px",
+                  boxShadow: "0 2px 12px rgba(0, 0, 0, 0.04)",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "16px",
+                  transition: "all 0.3s ease",
+                  cursor: "pointer",
+                  height: "100%",
+                }}>
+                  <div style={{
+                    width: "56px",
+                    height: "56px",
+                    borderRadius: "14px",
+                    backgroundColor: report.bgColor,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}>
+                    <report.icon size={24} style={{ color: report.color }} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: "15px", fontWeight: 600, color: "#1e293b", margin: "0 0 4px 0" }}>
+                      {report.title}
+                    </h3>
+                    <p style={{ fontSize: "13px", color: "#64748b", margin: 0, lineHeight: "1.5" }}>
+                      {report.description}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Recent Reports Table */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          style={{
+            backgroundColor: "white",
+            borderRadius: "16px",
+            boxShadow: "0 2px 12px rgba(0, 0, 0, 0.04)",
+            overflow: "hidden",
+          }}
+        >
+          <div style={{
+            padding: "20px 24px",
+            borderBottom: "1px solid #e2e8f0",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}>
+            <h2 style={{ fontSize: "16px", fontWeight: 600, color: "#1e293b", margin: 0 }}>
+              Recently Generated Reports
+            </h2>
+            <span style={{ fontSize: "13px", color: "#64748b" }}>
+              {recentReports.length} reports
+            </span>
+          </div>
+
+          {/* Table Header */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr auto",
+            padding: "12px 24px",
+            backgroundColor: "#f8fafc",
+            borderBottom: "1px solid #e2e8f0",
+          }}>
+            <span style={{ fontSize: "12px", fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Report Name
+            </span>
+            <span style={{ fontSize: "12px", fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Generated By
+            </span>
+            <span style={{ fontSize: "12px", fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Date
+            </span>
+            <span style={{ fontSize: "12px", fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Type
+            </span>
+            <span style={{ fontSize: "12px", fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Status
+            </span>
+            <span style={{ fontSize: "12px", fontWeight: 600, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              Action
+            </span>
+          </div>
+
+          {/* Table Body */}
+          <div>
+            {recentReports.map((report, index) => (
+              <motion.div
+                key={report.id}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr auto",
+                  padding: "16px 24px",
+                  borderBottom: "1px solid #f1f5f9",
+                  alignItems: "center",
+                  transition: "background-color 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f8fafc"
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "transparent"
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <div style={{
+                    width: "40px",
+                    height: "40px",
+                    borderRadius: "10px",
+                    background: "linear-gradient(135deg, #059669 0%, #14b8a6 100%)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}>
+                    <BarChart2 size={18} style={{ color: "white" }} />
+                  </div>
+                  <span style={{ fontSize: "14px", fontWeight: 500, color: "#1e293b" }}>
+                    {report.reportName}
+                  </span>
+                </div>
+                <span style={{ fontSize: "13px", color: "#64748b" }}>
+                  {report.generatedBy}
+                </span>
+                <span style={{ fontSize: "13px", color: "#64748b" }}>
+                  {report.date}
+                </span>
+                <span style={{ fontSize: "13px", color: "#64748b" }}>
+                  {report.type}
+                </span>
+                <span style={{
+                  padding: "4px 10px",
+                  borderRadius: "12px",
+                  backgroundColor: "#ecfdf5",
+                  color: "#059669",
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  display: "inline-block",
+                  width: "fit-content",
+                }}>
+                  {report.status}
+                </span>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  style={{
+                    width: "36px",
+                    height: "36px",
+                    borderRadius: "8px",
+                    border: "none",
+                    backgroundColor: "#f1f5f9",
+                    color: "#059669",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Download size={16} />
+                </motion.button>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       </div>
-    </AnimatedPage>
+    </div>
   )
 }

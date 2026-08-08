@@ -2,15 +2,8 @@
 
 import React, { useState } from "react"
 import Link from "next/link"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { Plus, Search, Download, Eye, Edit, Droplet, CheckCircle, Clock, AlertCircle, Heart } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { AnimatedPage, StaggerContainer, StaggerItem } from "@/components/animated-wrapper"
 
 const bloodInventory = [
   { bloodGroup: "A+", units: 25, minUnits: 10, lastUpdated: "2026-08-07" },
@@ -42,16 +35,20 @@ const issues = [
 
 const totalUnits = bloodInventory.reduce((acc, item) => acc + item.units, 0)
 const lowStockGroups = bloodInventory.filter((item) => item.units < item.minUnits).length
+const donationsToday = donations.filter((d) => d.donationDate === "2026-08-07").length
+const issuesToday = issues.filter((i) => i.issueDate === "2026-08-07").length
 
 const statsData = [
-  { title: "Total Units", value: totalUnits, icon: Droplet, gradient: "from-red-500 to-rose-600", shadow: "shadow-red-500/30" },
-  { title: "Total Donations", value: "6", icon: Heart, gradient: "from-pink-500 to-rose-600", shadow: "shadow-pink-500/30" },
-  { title: "Issues Today", value: "5", icon: CheckCircle, gradient: "from-emerald-500 to-teal-600", shadow: "shadow-emerald-500/30" },
-  { title: "Low Stock Groups", value: lowStockGroups, icon: AlertCircle, gradient: "from-amber-500 to-orange-600", shadow: "shadow-amber-500/30" },
+  { title: "Total Units", value: totalUnits, icon: Droplet, gradient: "linear-gradient(135deg, #ef4444, #f43f5e)", shadow: "0 8px 24px rgba(239,68,68,0.35)" },
+  { title: "Donations Today", value: donationsToday, icon: Heart, gradient: "linear-gradient(135deg, #ec4899, #f43f5e)", shadow: "0 8px 24px rgba(236,72,153,0.35)" },
+  { title: "Issues Today", value: issuesToday, icon: CheckCircle, gradient: "linear-gradient(135deg, #22c55e, #16a34a)", shadow: "0 8px 24px rgba(34,197,94,0.35)" },
+  { title: "Low Stock Groups", value: lowStockGroups, icon: AlertCircle, gradient: "linear-gradient(135deg, #f97316, #ef4444)", shadow: "0 8px 24px rgba(249,115,22,0.35)" },
 ]
 
 export default function BloodBankPage() {
   const [searchTerm, setSearchTerm] = useState("")
+  const [activeTab, setActiveTab] = useState("donations")
+  const [activePeriod, setActivePeriod] = useState("all")
 
   const filteredDonations = donations.filter(
     (donation) => donation.donorName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -62,202 +59,439 @@ export default function BloodBankPage() {
   )
 
   return (
-    <AnimatedPage>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">Blood Bank</h1>
-            <p className="text-slate-500">Manage blood donations, issues, and inventory</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="border-slate-200 hover:bg-slate-50"><Download className="mr-2 h-4 w-4" />Export</Button>
-            <Link href="/blood-bank/donate">
-              <Button size="sm" className="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 shadow-lg shadow-red-500/30">
-                <Plus className="mr-2 h-4 w-4" />Record Donation
-              </Button>
-            </Link>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ padding: "24px 0" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+        {/* Gradient Banner */}
+        <div style={{
+          background: "linear-gradient(135deg, #ef4444, #f43f5e)",
+          borderRadius: "20px",
+          padding: "32px",
+          color: "white",
+          position: "relative",
+          overflow: "hidden",
+        }}>
+          <div style={{
+            position: "absolute", top: 0, right: 0, width: "300px", height: "300px",
+            background: "radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%)",
+            borderRadius: "50%", transform: "translate(30%, -30%)",
+          }} />
+          <div style={{
+            position: "absolute", bottom: 0, left: 0, width: "200px", height: "200px",
+            background: "radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)",
+            borderRadius: "50%", transform: "translate(-30%, 30%)",
+          }} />
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "16px", position: "relative", zIndex: 1 }}>
+            <div>
+              <h1 style={{ fontSize: "28px", fontWeight: 800, margin: 0 }}>Blood Bank</h1>
+              <p style={{ opacity: 0.9, margin: "6px 0 0 0", fontSize: "14px" }}>Manage blood donations, issues, and inventory</p>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <button style={{
+                display: "inline-flex", alignItems: "center", gap: "6px",
+                padding: "9px 18px", borderRadius: "10px", border: "1.5px solid rgba(255,255,255,0.3)",
+                background: "rgba(255,255,255,0.15)", color: "white", fontSize: "13px", fontWeight: 600,
+                cursor: "pointer", backdropFilter: "blur(8px)", transition: "all 0.2s",
+              }}>
+                <Download size={15} /> Export
+              </button>
+              <Link href="/blood-bank/donate">
+                <button style={{
+                  display: "inline-flex", alignItems: "center", gap: "6px",
+                  padding: "9px 20px", borderRadius: "10px", border: "none",
+                  background: "white", color: "#ef4444", fontSize: "13px", fontWeight: 600,
+                  cursor: "pointer", boxShadow: "0 4px 16px rgba(0,0,0,0.15)", transition: "all 0.2s",
+                }}>
+                  <Plus size={15} /> Record Donation
+                </button>
+              </Link>
+            </div>
           </div>
         </div>
 
-        <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-          {statsData.map((stat) => (
-            <StaggerItem key={stat.title}>
-              <motion.div whileHover={{ scale: 1.02, y: -2 }} transition={{ type: "spring", stiffness: 300 }}>
-                <Card className={`overflow-hidden shadow-lg ${stat.shadow} hover:shadow-xl transition-shadow duration-300`}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-2xl font-bold">{stat.value}</div>
-                        <p className="text-xs text-slate-500">{stat.title}</p>
-                      </div>
-                      <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center shadow-lg`}>
-                        <stat.icon className="h-6 w-6 text-white" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </StaggerItem>
+        {/* Filter Bar */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+          {[
+            { key: "all", label: "All Time" },
+            { key: "today", label: "Today" },
+            { key: "week", label: "This Week" },
+            { key: "month", label: "This Month" },
+          ].map((period) => (
+            <button
+              key={period.key}
+              onClick={() => setActivePeriod(period.key)}
+              style={{
+                padding: "8px 18px", borderRadius: "20px",
+                border: activePeriod === period.key ? "1.5px solid #ef4444" : "1.5px solid #e2e8f0",
+                background: activePeriod === period.key ? "linear-gradient(135deg, #ef4444, #f43f5e)" : "white",
+                color: activePeriod === period.key ? "white" : "#64748b",
+                cursor: "pointer", fontSize: "13px", fontWeight: 600, transition: "all 0.2s",
+                boxShadow: activePeriod === period.key ? "0 4px 12px rgba(239,68,68,0.3)" : "none",
+              }}
+            >
+              {period.label}
+            </button>
           ))}
-        </StaggerContainer>
+        </div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-          <Card className="shadow-lg border-0">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">Blood Group Availability</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-                {bloodInventory.map((item, index) => (
-                  <motion.div
-                    key={item.bloodGroup}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.05 }}
-                    whileHover={{ scale: 1.05 }}
-                    className={`rounded-xl p-4 text-center shadow-md hover:shadow-lg transition-all duration-300 ${item.units < item.minUnits ? "bg-gradient-to-br from-red-50 to-rose-50 border-2 border-red-200" : "bg-white border-2 border-slate-100"}`}
-                  >
-                    <p className="text-2xl font-bold text-red-600">{item.bloodGroup}</p>
-                    <p className={`text-3xl font-bold ${item.units < item.minUnits ? "text-red-600" : "text-slate-800"}`}>{item.units}</p>
-                    <p className="text-xs text-slate-500">units</p>
-                  </motion.div>
-                ))}
+        {/* Stat Cards */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "18px" }}>
+          {statsData.map((stat, i) => (
+            <motion.div
+              key={stat.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08, type: "spring", stiffness: 300 }}
+              whileHover={{ scale: 1.03, y: -3 }}
+              style={{
+                background: "#fff", borderRadius: "16px", padding: "20px",
+                boxShadow: stat.shadow, border: "1px solid rgba(0,0,0,0.04)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div>
+                  <div style={{ fontSize: "26px", fontWeight: 800, color: "#1e293b" }}>{stat.value}</div>
+                  <p style={{ fontSize: "12px", color: "#94a3b8", marginTop: "2px", fontWeight: 500 }}>{stat.title}</p>
+                </div>
+                <div style={{
+                  width: "48px", height: "48px", borderRadius: "14px",
+                  background: stat.gradient,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: stat.shadow,
+                }}>
+                  <stat.icon size={24} color="#fff" />
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Blood Group Availability Grid */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          style={{
+            background: "#fff", borderRadius: "16px",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+            border: "1px solid rgba(0,0,0,0.04)", overflow: "hidden",
+          }}
+        >
+          <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9" }}>
+            <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b" }}>Blood Group Availability</h2>
+          </div>
+          <div style={{ padding: "24px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "14px" }}>
+              {bloodInventory.map((item, index) => (
+                <motion.div
+                  key={item.bloodGroup}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ scale: 1.05, y: -3 }}
+                  style={{
+                    borderRadius: "14px",
+                    padding: "18px 14px",
+                    textAlign: "center",
+                    border: item.units < item.minUnits ? "2px solid #fecaca" : "2px solid #f1f5f9",
+                    background: item.units < item.minUnits ? "linear-gradient(135deg, #fef2f2, #fff1f2)" : "#fff",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  <p style={{ fontSize: "18px", fontWeight: 800, color: "#ef4444", margin: 0 }}>{item.bloodGroup}</p>
+                  <p style={{ fontSize: "28px", fontWeight: 800, color: item.units < item.minUnits ? "#ef4444" : "#1e293b", margin: "4px 0 2px" }}>{item.units}</p>
+                  <p style={{ fontSize: "11px", color: "#94a3b8", margin: 0 }}>units</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-          <Tabs defaultValue="donations">
-            <TabsList className="bg-white shadow-md rounded-xl p-1">
-              <TabsTrigger value="donations" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-rose-600 data-[state=active]:text-white rounded-lg">Donations</TabsTrigger>
-              <TabsTrigger value="issues" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-rose-600 data-[state=active]:text-white rounded-lg">Issues</TabsTrigger>
-            </TabsList>
+        {/* Tab Switcher */}
+        <div style={{
+          display: "flex", gap: "8px", background: "white", padding: "6px",
+          borderRadius: "14px", boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+          border: "1px solid rgba(0,0,0,0.04)", width: "fit-content",
+        }}>
+          {[
+            { key: "donations", label: "Donations", gradient: "linear-gradient(135deg, #ef4444, #f43f5e)" },
+            { key: "issues", label: "Issues", gradient: "linear-gradient(135deg, #ec4899, #f43f5e)" },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              style={{
+                padding: "10px 28px", borderRadius: "10px", border: "none",
+                background: activeTab === tab.key ? tab.gradient : "transparent",
+                color: activeTab === tab.key ? "white" : "#64748b",
+                cursor: "pointer", fontSize: "14px", fontWeight: 600, transition: "all 0.2s",
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-            <TabsContent value="donations">
-              <Card className="shadow-lg border-0 mt-4">
-                <CardHeader>
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <CardTitle className="text-lg font-semibold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">Donation Records</CardTitle>
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 h-4 w-4 text-slate-400 -translate-y-1/2" />
-                      <Input type="search" placeholder="Search donors..." className="pl-10 w-64 border-slate-200 focus:border-red-500 focus:ring-red-500" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div style={{ overflowX: "auto" }}>
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-slate-100">
-                        <TableHead className="font-semibold text-slate-700">Donor Name</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Blood Group</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Units</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Donation Date</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Hb (g/dL)</TableHead>
-                        <TableHead className="font-semibold text-slate-700">BP</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
-                        <TableHead className="text-right font-semibold text-slate-700">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredDonations.map((donation, index) => (
-                        <motion.tr
-                          key={donation.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="border-slate-100 hover:bg-gradient-to-r hover:from-red-50/50 hover:to-rose-50/50 transition-colors duration-200"
-                        >
-                          <TableCell className="font-medium text-slate-700">{donation.donorName}</TableCell>
-                          <TableCell><Badge variant="destructive" className="bg-red-100 text-red-700 border-red-200">{donation.bloodGroup}</Badge></TableCell>
-                          <TableCell className="text-slate-600">{donation.units}</TableCell>
-                          <TableCell className="text-slate-600">{donation.donationDate}</TableCell>
-                          <TableCell className="text-slate-600">{donation.hemoglobin}</TableCell>
-                          <TableCell className="text-slate-600">{donation.bp}</TableCell>
-                          <TableCell>
-                            <Badge variant={donation.status === "Approved" ? "success" : "destructive"} className={donation.status === "Approved" ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-red-100 text-red-700 border-red-200"}>
-                              {donation.status}
-                            </Badge>
-                          </TableCell>
-                          <td className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-blue-50 hover:text-blue-600"><Eye className="h-4 w-4" /></Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-red-50 hover:text-red-600"><Edit className="h-4 w-4" /></Button>
-                            </div>
-                          </td>
-                        </motion.tr>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+        {/* Donations Table */}
+        {activeTab === "donations" && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            style={{
+              background: "#fff", borderRadius: "16px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+              border: "1px solid rgba(0,0,0,0.04)", overflow: "hidden",
+            }}
+          >
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+                <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b" }}>Donation Records</h2>
+                <div style={{ position: "relative" }}>
+                  <Search size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                  <input
+                    type="search"
+                    placeholder="Search donors..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{
+                      paddingLeft: "36px", paddingRight: "14px", paddingTop: "9px", paddingBottom: "9px",
+                      width: "260px", borderRadius: "10px",
+                      border: "1.5px solid #e2e8f0", fontSize: "13px", color: "#334155",
+                      outline: "none", transition: "border-color 0.2s",
+                    }}
+                    onFocus={(e) => (e.currentTarget.style.borderColor = "#ef4444")}
+                    onBlur={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+                  />
+                </div>
+              </div>
+            </div>
 
-            <TabsContent value="issues">
-              <Card className="shadow-lg border-0 mt-4">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-semibold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">Issue Records</CardTitle>
-                    <Link href="/blood-bank/issue">
-                      <Button size="sm" className="bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 shadow-lg shadow-pink-500/30">
-                        <Plus className="mr-2 h-4 w-4" />New Issue
-                      </Button>
-                    </Link>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                <thead>
+                  <tr style={{ borderBottom: "2px solid #f1f5f9" }}>
+                    {["Donor Name", "Blood Group", "Units", "Donation Date", "Hb (g/dL)", "BP", "Status", "Actions"].map((h) => (
+                      <th key={h} style={{
+                        padding: "12px 16px",
+                        textAlign: h === "Actions" ? "right" : "left",
+                        fontWeight: 700, color: "#64748b", fontSize: "11px",
+                        textTransform: "uppercase", letterSpacing: "0.05em",
+                      }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <AnimatePresence>
+                    {filteredDonations.map((donation, index) => (
+                      <motion.tr
+                        key={donation.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.04 }}
+                        style={{ borderBottom: "1px solid #f8fafc", transition: "background 0.2s" }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "linear-gradient(90deg, rgba(239,68,68,0.04), rgba(244,63,94,0.02))")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <td style={{ padding: "14px 16px", fontWeight: 600, color: "#334155" }}>{donation.donorName}</td>
+                        <td style={{ padding: "14px 16px" }}>
+                          <span style={{
+                            display: "inline-block", padding: "3px 10px", borderRadius: "6px",
+                            background: "#fef2f2", border: "1px solid #fecaca",
+                            fontSize: "12px", color: "#ef4444", fontWeight: 600,
+                          }}>
+                            {donation.bloodGroup}
+                          </span>
+                        </td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{donation.units}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{donation.donationDate}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{donation.hemoglobin}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{donation.bp}</td>
+                        <td style={{ padding: "14px 16px" }}>
+                          <span style={{
+                            display: "inline-block", padding: "4px 12px", borderRadius: "20px",
+                            background: donation.status === "Approved" ? "#dcfce7" : "#fef2f2",
+                            color: donation.status === "Approved" ? "#166534" : "#991b1b",
+                            border: `1px solid ${donation.status === "Approved" ? "#bbf7d0" : "#fecaca"}`,
+                            fontSize: "12px", fontWeight: 600,
+                          }}>
+                            {donation.status}
+                          </span>
+                        </td>
+                        <td style={{ padding: "14px 16px", textAlign: "right" }}>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "4px" }}>
+                            <button style={{
+                              width: "32px", height: "32px", borderRadius: "8px", border: "none",
+                              background: "transparent", cursor: "pointer",
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              color: "#64748b", transition: "all 0.2s",
+                            }}
+                              onMouseEnter={(e) => { e.currentTarget.style.background = "#eff6ff"; e.currentTarget.style.color = "#3b82f6" }}
+                              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b" }}
+                            >
+                              <Eye size={16} />
+                            </button>
+                            <button style={{
+                              width: "32px", height: "32px", borderRadius: "8px", border: "none",
+                              background: "transparent", cursor: "pointer",
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              color: "#64748b", transition: "all 0.2s",
+                            }}
+                              onMouseEnter={(e) => { e.currentTarget.style.background = "#fff1f2"; e.currentTarget.style.color = "#ef4444" }}
+                              onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b" }}
+                            >
+                              <Edit size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </tbody>
+              </table>
+            </div>
+
+            {filteredDonations.length === 0 && (
+              <div style={{ padding: "48px 24px", textAlign: "center", color: "#94a3b8", fontSize: "14px" }}>
+                No donations found matching your search.
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* Issues Table */}
+        {activeTab === "issues" && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            style={{
+              background: "#fff", borderRadius: "16px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+              border: "1px solid rgba(0,0,0,0.04)", overflow: "hidden",
+            }}
+          >
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+                <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#1e293b" }}>Issue Records</h2>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <div style={{ position: "relative" }}>
+                    <Search size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+                    <input
+                      type="search"
+                      placeholder="Search issues..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      style={{
+                        paddingLeft: "36px", paddingRight: "14px", paddingTop: "9px", paddingBottom: "9px",
+                        width: "260px", borderRadius: "10px",
+                        border: "1.5px solid #e2e8f0", fontSize: "13px", color: "#334155",
+                        outline: "none", transition: "border-color 0.2s",
+                      }}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = "#ec4899")}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = "#e2e8f0")}
+                    />
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div style={{ overflowX: "auto" }}>
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-slate-100">
-                        <TableHead className="font-semibold text-slate-700">Issue No.</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Patient</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Blood Group</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Units</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Issue Date</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Doctor</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Department</TableHead>
-                        <TableHead className="font-semibold text-slate-700">Status</TableHead>
-                        <TableHead className="text-right font-semibold text-slate-700">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredIssues.map((issue, index) => (
-                        <motion.tr
-                          key={issue.id}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="border-slate-100 hover:bg-gradient-to-r hover:from-pink-50/50 hover:to-rose-50/50 transition-colors duration-200"
-                        >
-                          <TableCell className="font-medium text-slate-700">{issue.issueNumber}</TableCell>
-                          <TableCell className="text-slate-600">{issue.patient}</TableCell>
-                          <TableCell><Badge variant="destructive" className="bg-red-100 text-red-700 border-red-200">{issue.bloodGroup}</Badge></TableCell>
-                          <TableCell className="text-slate-600">{issue.units}</TableCell>
-                          <TableCell className="text-slate-600">{issue.issueDate}</TableCell>
-                          <TableCell className="text-slate-600">{issue.doctor}</TableCell>
-                          <TableCell className="text-slate-600">{issue.department}</TableCell>
-                          <TableCell>
-                            <Badge variant={issue.status === "Completed" ? "success" : "warning"} className={issue.status === "Completed" ? "bg-emerald-100 text-emerald-700 border-emerald-200" : "bg-amber-100 text-amber-700 border-amber-200"}>
-                              {issue.status}
-                            </Badge>
-                          </TableCell>
-                          <td className="text-right">
-                            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-blue-50 hover:text-blue-600"><Eye className="h-4 w-4" /></Button>
-                          </td>
-                        </motion.tr>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </motion.div>
+                  <Link href="/blood-bank/issue">
+                    <button style={{
+                      display: "inline-flex", alignItems: "center", gap: "6px",
+                      padding: "9px 20px", borderRadius: "10px", border: "none",
+                      background: "linear-gradient(135deg, #ec4899, #f43f5e)",
+                      color: "#fff", fontSize: "13px", fontWeight: 600,
+                      cursor: "pointer", boxShadow: "0 4px 16px rgba(236,72,153,0.4)",
+                      transition: "all 0.2s",
+                    }}>
+                      <Plus size={15} /> New Issue
+                    </button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                <thead>
+                  <tr style={{ borderBottom: "2px solid #f1f5f9" }}>
+                    {["Issue No.", "Patient", "Blood Group", "Units", "Issue Date", "Doctor", "Department", "Status", "Actions"].map((h) => (
+                      <th key={h} style={{
+                        padding: "12px 16px",
+                        textAlign: h === "Actions" ? "right" : "left",
+                        fontWeight: 700, color: "#64748b", fontSize: "11px",
+                        textTransform: "uppercase", letterSpacing: "0.05em",
+                      }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <AnimatePresence>
+                    {filteredIssues.map((issue, index) => (
+                      <motion.tr
+                        key={issue.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.04 }}
+                        style={{ borderBottom: "1px solid #f8fafc", transition: "background 0.2s" }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "linear-gradient(90deg, rgba(236,72,153,0.04), rgba(244,63,94,0.02))")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <td style={{ padding: "14px 16px", fontWeight: 600, color: "#334155" }}>{issue.issueNumber}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{issue.patient}</td>
+                        <td style={{ padding: "14px 16px" }}>
+                          <span style={{
+                            display: "inline-block", padding: "3px 10px", borderRadius: "6px",
+                            background: "#fef2f2", border: "1px solid #fecaca",
+                            fontSize: "12px", color: "#ef4444", fontWeight: 600,
+                          }}>
+                            {issue.bloodGroup}
+                          </span>
+                        </td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{issue.units}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{issue.issueDate}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{issue.doctor}</td>
+                        <td style={{ padding: "14px 16px", color: "#64748b" }}>{issue.department}</td>
+                        <td style={{ padding: "14px 16px" }}>
+                          <span style={{
+                            display: "inline-block", padding: "4px 12px", borderRadius: "20px",
+                            background: issue.status === "Completed" ? "#dcfce7" : "#fff7ed",
+                            color: issue.status === "Completed" ? "#166534" : "#9a3412",
+                            border: `1px solid ${issue.status === "Completed" ? "#bbf7d0" : "#fed7aa"}`,
+                            fontSize: "12px", fontWeight: 600,
+                          }}>
+                            {issue.status}
+                          </span>
+                        </td>
+                        <td style={{ padding: "14px 16px", textAlign: "right" }}>
+                          <button style={{
+                            width: "32px", height: "32px", borderRadius: "8px", border: "none",
+                            background: "transparent", cursor: "pointer",
+                            display: "inline-flex", alignItems: "center", justifyContent: "center",
+                            color: "#64748b", transition: "all 0.2s",
+                          }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = "#eff6ff"; e.currentTarget.style.color = "#3b82f6" }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b" }}
+                          >
+                            <Eye size={16} />
+                          </button>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </tbody>
+              </table>
+            </div>
+
+            {filteredIssues.length === 0 && (
+              <div style={{ padding: "48px 24px", textAlign: "center", color: "#94a3b8", fontSize: "14px" }}>
+                No issues found matching your search.
+              </div>
+            )}
+          </motion.div>
+        )}
       </div>
-    </AnimatedPage>
+    </motion.div>
   )
 }
